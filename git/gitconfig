@@ -1,0 +1,31 @@
+[user]
+	name = Åsmund Grammeltvedt
+	email = asmundg@snap.tv
+    signingkey = 4D67B169
+
+[color]
+	diff = auto
+	status = auto
+	branch = auto
+
+[push]
+	default = tracking
+
+[alias]
+	fa = fetch --all --prune
+	ci = commit
+	st = status
+	br = branch
+	co = checkout
+    me = merge --no-ff
+
+[mergetool]
+    prompt = false
+
+[core]
+	editor = emacsclient
+	excludesfile = /home/asmundg/.gitignore_global
+
+[rerere]
+    enabled = true
+
