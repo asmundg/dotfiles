@@ -33,7 +33,7 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
-export EDITOR="emacsclient"
+export EDITOR="emacsclient -nw"
 export ALTERNATE_EDITOR="emacs"
 
 export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
