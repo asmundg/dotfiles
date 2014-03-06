@@ -23,7 +23,7 @@
     prompt = false
 
 [core]
-	editor = emacsclient
+	editor = emacsclient -nw
 	excludesfile = /home/asmundg/.gitignore_global
 
 [rerere]
