@@ -1,0 +1,5 @@
+xrdb -merge .Xresources
+
+xscreensaver -no-splash &
+xrandr --output DVI-1 --right-of DVI-0
+/usr/bin/i3

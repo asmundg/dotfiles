@@ -1,0 +1,70 @@
+URxvt*termName: xterm
+URxvt*geometry: 240x84
+URxvt*loginShell: true
+URxvt*scrollColor: #777777
+URxvt*scrollstyle: plain
+URxvt*scrollTtyKeypress: true
+URxvt*scrollTtyOutput: false
+URxvt*scrollWithBuffer: false
+URxvt*secondaryScreen: true
+URxvt*secondaryScroll: true
+URxvt*skipScroll: true
+URxvt*scrollBar: false
+URxvt*scrollBar_right: false
+URxvt*scrollBar_floating: false
+URxvt*fading: 10
+URxvt*utmpInhibit: false
+URxvt*urgentOnBell: false
+URxvt*visualBell: false
+URxvt*mapAlert: true
+URxvt*mouseWheelScrollPage: false
+URxvt*background: Black
+URxvt*foreground: White
+URxvt*colorUL: yellow
+URxvt*underlineColor: yellow
+URxvt*font: xft:Terminus:pixelsize=8
+URxvt*saveLines: 8192
+URxvt*buffered: true
+URxvt*hold: false
+URxvt*internalBorder:
+URxvt*print-pipe: cat > $HOME/$(echo urxvt.dump.$(date +'%Y%M%d%H%m%S'))
+URxvt*perl-ext-common:
+URxvt*perl-ext:
+
+! Normal
+! color0    black
+! color1    red
+! color2    green
+! color3    yellow
+! color4    blue
+! color5    purple
+! color6    cyan
+! color7    white
+
+URxvt*color0:    #6c6c6c
+URxvt*color1:    #e9897c
+URxvt*color2:    #b6e77d
+URxvt*color3:    #ecebbe
+URxvt*color4:    #a9cdeb
+URxvt*color5:    #ea96eb
+URxvt*color6:    #c9caec
+URxvt*color7:    #f2f2f2
+
+! Light
+! color8    black
+! color9    red
+! color10    green
+! color11    yellow
+! color12    blue
+! color13    purple
+! color14    cyan
+! color15    white
+
+URxvt*color8:    #747474
+URxvt*color9:    #f99286
+URxvt*color10:    #c3f786
+URxvt*color11:    #fcfbcc
+URxvt*color12:    #b6defb
+URxvt*color13:    #fba1fb
+URxvt*color14:    #d7d9fc
+URxvt*color15:    #e2e2e2
