@@ -19,6 +19,7 @@
                   magit-commit-training-wheels
                   magit-filenotify
                   magit-find-file
+                  markdown-mode
                   mo-git-blame
                   slime
                   smex
