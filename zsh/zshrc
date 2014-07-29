@@ -33,12 +33,6 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
-export EDITOR="emacsclient -nw"
-export ALTERNATE_EDITOR="emacs"
-
-export PATH=$HOME/.local/bin:$PATH
-export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
-
 eval "$(vex --shell-config zsh)"
 
 [ -s "/home/asmundg/.nvm/nvm.sh" ] && . "/home/asmundg/.nvm/nvm.sh" # This loads nvm

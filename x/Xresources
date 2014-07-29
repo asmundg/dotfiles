@@ -22,7 +22,7 @@ URxvt*background: Black
 URxvt*foreground: White
 URxvt*colorUL: yellow
 URxvt*underlineColor: yellow
-URxvt*font: xft:Terminus:pixelsize=8
+URxvt*font: xft:Terminus:pixelsize=13
 URxvt*saveLines: 8192
 URxvt*buffered: true
 URxvt*hold: false

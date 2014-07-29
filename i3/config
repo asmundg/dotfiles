@@ -126,5 +126,7 @@ bar {
 }
 
 exec xscreensaver
+exec xrdb -merge ~/.Xresources
+
 bindsym $mod+z exec i3lock
 bindsym $mod+p exec sudo pm-suspend
