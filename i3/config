@@ -126,5 +126,5 @@ bar {
 }
 
 exec xscreensaver
-bindsym $mod+z exec xscreensaver-command -lock
+bindsym $mod+z exec i3lock
 bindsym $mod+p exec sudo pm-suspend
