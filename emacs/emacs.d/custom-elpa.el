@@ -13,6 +13,7 @@
                   find-file-in-project
                   flycheck
                   ido-ubiquitous
+                  iy-go-to-char
 ;;                  jedi
                   js2-mode
                   magit
@@ -42,6 +43,9 @@
 
 (require 'auto-complete)
 (global-auto-complete-mode)
+
+(require 'iy-go-to-char)
+(global-set-key (kbd "M-m") 'iy-go-to-char)
 
 (provide 'custom-elpa)
 ;;; custom-elpa.el ends here
