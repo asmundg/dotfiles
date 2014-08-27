@@ -17,6 +17,8 @@
                   iy-go-to-char
                   jedi
                   js2-mode
+                  json-mode
+                  lua-mode
                   magit
                   magit-commit-training-wheels
                   magit-filenotify
