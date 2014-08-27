@@ -40,10 +40,10 @@
 (setq ido-enable-flex-matching t)
 
 (global-set-key (kbd "M-x") 'smex)
-
-(setq help-at-pt-timer-delay 0.1)
 (global-set-key (kbd "C-c g") 'helm-git-grep)
 (global-set-key (kbd "C-x g") 'helm-git-grep-at-point)
+
+(setq help-at-pt-timer-delay 0.1)
 (setq help-at-pt-display-when-idle '(flymake-overlay))
 
 (require 'auto-complete)
