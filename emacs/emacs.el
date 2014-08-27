@@ -33,6 +33,7 @@ With argument ARG, do this that many times."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(coffee-tab-width 2)
  '(current-language-environment "UTF-8")
  '(custom-safe-themes (quote ("b1e54397de2c207e550dc3a090844c4b52d1a2c4a48a17163cce577b09c28236" default)))
  '(global-font-lock-mode t nil (font-lock))
