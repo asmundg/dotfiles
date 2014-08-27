@@ -12,5 +12,8 @@
 (setq venv-location (expand-file-name "~/.virtualenvs"))
 (setq gud-pdb-command-name "python -m pdb")
 
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)
+
 (provide 'custom-python)
 ;;; custom-python.el ends here

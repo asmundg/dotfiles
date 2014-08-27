@@ -15,7 +15,7 @@
                   helm-git-grep
                   ido-ubiquitous
                   iy-go-to-char
-;;                  jedi
+                  jedi
                   js2-mode
                   magit
                   magit-commit-training-wheels
