@@ -12,6 +12,7 @@
                   color-theme
                   find-file-in-project
                   flycheck
+                  helm-git-grep
                   ido-ubiquitous
                   iy-go-to-char
 ;;                  jedi
@@ -39,6 +40,8 @@
 (global-set-key (kbd "M-x") 'smex)
 
 (setq help-at-pt-timer-delay 0.1)
+(global-set-key (kbd "C-c g") 'helm-git-grep)
+(global-set-key (kbd "C-x g") 'helm-git-grep-at-point)
 (setq help-at-pt-display-when-idle '(flymake-overlay))
 
 (require 'auto-complete)
