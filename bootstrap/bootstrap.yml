@@ -15,8 +15,7 @@
       - pidgin
       - python-dev
       - ssh-askpass
-      - texlive-lang-european
-      - texlive-latex-extra
+      - texlive
       - unison
       - x11-xserver-utils
       - xfonts-terminus
@@ -29,6 +28,7 @@
       extra_args: --user
     with_items:
       - flake8
+      - git-up
 
   - name: Get brev.cls
     git:
