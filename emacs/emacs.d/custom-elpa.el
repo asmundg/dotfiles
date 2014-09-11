@@ -20,7 +20,6 @@
                   json-mode
                   lua-mode
                   magit
-                  magit-commit-training-wheels
                   magit-filenotify
                   magit-find-file
                   markdown-mode

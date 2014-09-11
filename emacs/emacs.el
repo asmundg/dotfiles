@@ -5,7 +5,6 @@
 (add-to-list 'load-path "~/.emacs.d/")
 (require 'custom-elpa)
 (require 'custom-git)
-(require 'custom-handlebars)
 (require 'custom-js)
 (require 'custom-look)
 (require 'custom-python)
