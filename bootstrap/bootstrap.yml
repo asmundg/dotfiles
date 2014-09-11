@@ -1,0 +1,45 @@
+- hosts: localhost
+  tasks:
+  - name: Install debs
+    apt:
+      pkg: "{{ item }}"
+      state: present
+    with_items:
+      - avahi-utils
+      - emacs
+      - firefox
+      - i3
+      - lightdm-gtk-greeter
+      - lxc
+      - markdown
+      - pidgin
+      - python-dev
+      - ssh-askpass
+      - texlive-lang-european
+      - texlive-latex-extra
+      - unison
+      - x11-xserver-utils
+      - xfonts-terminus
+      - zsh
+    sudo: yes
+
+  - name: Install user python
+    pip:
+      name: "{{ item }}"
+      extra_args: --user
+    with_items:
+      - flake8
+
+  - name: Get brev.cls
+    git:
+      repo: https://github.com/asgeirn/brev-cls.git
+      dest: /usr/src/brev-cls
+    sudo: yes
+  - name: Instal brev-cls
+    command: make install
+    args:
+      chdir: /usr/src/brev-cls
+    sudo: yes
+  - name: Update texmf
+    command: mktexlsr
+    sudo: yes
