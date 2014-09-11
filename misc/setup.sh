@@ -1,3 +1,3 @@
 #!/bin/sh -eux
 
-ln -s $(readlink -f $(dirname $0))/profile ~/.profile
+ln -sf $(readlink -f $(dirname $0))/profile ~/.profile

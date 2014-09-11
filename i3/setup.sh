@@ -1,3 +1,3 @@
 #!/bin/sh -eux
 
-ln -s $(readlink -f $(dirname $0)) ~/.i3
+if [ ! -L ~/.i3 ]; then ln -sf $(readlink -f $(dirname $0)) ~/.i3; fi
