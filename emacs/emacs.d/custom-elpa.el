@@ -27,7 +27,8 @@
                   slime
                   smex
                   virtualenvwrapper
-                  yaml-mode)))
+                  yaml-mode
+                  hc-zenburn-theme)))
      (dolist (pkg packages)
        (when (not (package-installed-p pkg))
          (package-refresh-contents)

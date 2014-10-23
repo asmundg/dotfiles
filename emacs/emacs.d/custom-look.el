@@ -1,3 +1,10 @@
+;;; package -- Summary
+; Color and font configuration
+
+;;; Commentary:
+
+;;; Code:
+
 (set-face-attribute 'default nil :height 80)
 
 (define-globalized-minor-mode
@@ -21,10 +28,7 @@
 (global-set-key (kbd "M--")
                 '(lambda () (interactive) (global-text-scale-adjust -1)))
 
-(require 'color-theme)
-(eval-after-load "color-theme"
-  '(progn
-     (color-theme-initialize)
-     (color-theme-midnight)))
+
+(load-theme 'hc-zenburn)
 
 (provide 'custom-look)
