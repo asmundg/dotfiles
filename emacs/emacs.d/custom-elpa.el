@@ -27,6 +27,7 @@
                   markdown-mode
                   mo-git-blame
                   slime
+                  solarized-theme
                   virtualenvwrapper
                   yaml-mode
                   hc-zenburn-theme)))

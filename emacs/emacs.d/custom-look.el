@@ -29,6 +29,6 @@
                 '(lambda () (interactive) (global-text-scale-adjust -1)))
 
 
-(load-theme 'hc-zenburn)
+(load-theme 'solarized-dark)
 
 (provide 'custom-look)
