@@ -2,13 +2,6 @@
 ;;; Commentary:
 
 ;;; Code:
-(add-to-list 'load-path "~/.emacs.d/")
-(require 'custom-elpa)
-(require 'custom-git)
-(require 'custom-js)
-(require 'custom-look)
-(require 'custom-python)
-
 (global-set-key (kbd "M-p") 'backward-paragraph)
 (global-set-key (kbd "M-n") 'forward-paragraph)
 
@@ -34,7 +27,7 @@ With argument ARG, do this that many times."
  ;; If there is more than one, they won't work right.
  '(coffee-tab-width 2)
  '(current-language-environment "UTF-8")
- '(custom-safe-themes (quote ("b1e54397de2c207e550dc3a090844c4b52d1a2c4a48a17163cce577b09c28236" default)))
+ '(custom-safe-themes (quote ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(global-font-lock-mode t nil (font-lock))
  '(help-at-pt-display-when-idle (quote (flymake-overlay)) nil (help-at-pt))
  '(help-at-pt-timer-delay 0.1)
@@ -53,6 +46,14 @@ With argument ARG, do this that many times."
  ;; If there is more than one, they won't work right.
  '(flymake-errline ((((class color)) (:underline "red"))))
  '(flymake-warnline ((((class color)) (:underline "yellow")))))
+
+(add-to-list 'load-path "~/.emacs.d/")
+(add-to-list 'load-path "~/.emacs.d/local/")
+(require 'custom-elpa)
+(require 'custom-git)
+(require 'custom-js)
+(require 'custom-look)
+(require 'custom-python)
 
 (setq inhibit-splash-screen t)
 (line-number-mode 1)
