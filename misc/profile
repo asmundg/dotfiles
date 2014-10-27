@@ -26,3 +26,5 @@ export EDITOR="emacsclient -nw"
 export ALTERNATE_EDITOR="emacs"
 export PATH=$HOME/.local/bin:$PATH
 export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
+
+eval $(gpg-agent --daemon)
