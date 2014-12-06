@@ -1,3 +1,6 @@
+;;; custom-js.el -- Javascript config
+;;; Commentary:
+
 ;; (when (load "flymake" t)
 ;;   (defun flymake-gjslint-init ()
 ;;     (let* ((temp-file (flymake-init-create-temp-buffer-copy
@@ -14,10 +17,22 @@
 ;;                '("^Line \\([[:digit:]]+\\), E:[[:digit:]]+: "
 ;;                  nil 1 nil)))
 
+;;; Code:
+(require 'nvm)
+
 (add-to-list 'auto-mode-alist '("\\.js$" . javascript-mode))
 ;;(add-hook 'javascript-mode-hook 'flymake-mode-on)
 
+(defun load-nvm ()
+  "Initialize nvm."
+  (nvm-use "0.11")
+  (exec-path-from-shell-copy-env "PATH"))
+
 (add-to-list 'auto-mode-alist '("\\.coffee$" . coffee-mode))
-;;(add-hook 'coffee-mode-hook 'flymake-coffee-load)
+(setq coffee-mode-hook nil)
+(add-hook 'coffee-mode-hook 'auto-complete-mode)
+(add-hook 'coffee-mode-hook 'load-nvm)
+(add-hook 'coffee-mode-hook 'flycheck-mode)
 
 (provide 'custom-js)
+;;; custom-js.el ends here

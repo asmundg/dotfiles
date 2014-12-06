@@ -26,6 +26,7 @@
                   magit-find-file
                   markdown-mode
                   mo-git-blame
+                  nvm
                   slime
                   solarized-theme
                   virtualenvwrapper
