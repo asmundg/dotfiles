@@ -27,6 +27,7 @@
                   markdown-mode
                   mo-git-blame
                   nvm
+                  password-store
                   slime
                   solarized-theme
                   virtualenvwrapper
