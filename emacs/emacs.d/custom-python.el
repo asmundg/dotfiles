@@ -2,10 +2,6 @@
 ;;; Commentary:
 
 ;;; Code:
-(custom-set-faces
- '(flymake-errline ((((class color)) (:underline "red"))))
- '(flymake-warnline ((((class color)) (:underline "yellow")))))
-
 (defun project-directory (buffer-name)
   "Return root directory of the project containing BUFFER-NAME.
 
@@ -48,15 +44,7 @@ to be a project root."
   (defvar venv-location (expand-file-name "~/.virtualenvs"))
   (defvar gud-pdb-command-name "python -m pdb"))
 
-(defun setup-py2cov ()
-  "Initialize py2cov coverage tool."
-
-  (require 'pycov2)
-  (pycov2-mode))
-
-
 (add-hook 'python-mode-hook 'setup-venv)
-;(add-hook 'python-mode-hook 'setup-py2cov)
 (add-hook 'python-mode-hook 'jedi:setup)
 (add-hook 'python-mode-hook 'jedi-setup-venv)
 (defvar jedi:complete-on-dot t)

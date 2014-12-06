@@ -31,8 +31,7 @@
                   slime
                   solarized-theme
                   virtualenvwrapper
-                  yaml-mode
-                  hc-zenburn-theme)))
+                  yaml-mode)))
      (dolist (pkg packages)
        (when (not (package-installed-p pkg))
          (package-refresh-contents)
