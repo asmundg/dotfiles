@@ -10,6 +10,7 @@
                   autopair
                   coffee-mode
                   color-theme
+                  exec-path-from-shell
                   find-file-in-project
                   flycheck
                   helm
