@@ -13,6 +13,7 @@
       - lightdm-gtk-greeter
       - lxc
       - markdown
+      - pass
       - pidgin
       - python-dev
       - ssh-askpass
