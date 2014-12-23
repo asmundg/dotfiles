@@ -48,8 +48,8 @@ With argument ARG, do this that many times."
  '(flymake-errline ((((class color)) (:underline "red"))))
  '(flymake-warnline ((((class color)) (:underline "yellow")))))
 
-(add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/local/")
+(add-to-list 'load-path "~/.emacs.d/config/")
 (require 'custom-elpa)
 (require 'custom-git)
 (require 'custom-js)
