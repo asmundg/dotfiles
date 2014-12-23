@@ -37,6 +37,7 @@ With argument ARG, do this that many times."
  '(show-paren-style (quote expression))
  '(show-trailing-whitespace t)
  '(tab-width 4)
+ '(select-enable-clipboard t)
  '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
 
 (custom-set-faces
