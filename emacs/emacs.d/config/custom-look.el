@@ -30,5 +30,7 @@
 
 
 (load-theme 'solarized-dark)
+(setq sml/theme 'respectful)
+(sml/setup)
 
 (provide 'custom-look)
