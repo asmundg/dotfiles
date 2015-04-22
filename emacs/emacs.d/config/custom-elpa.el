@@ -14,6 +14,7 @@
                   find-file-in-project
                   flycheck
                   helm
+                  helm-ls-git
                   helm-git-grep
                   iy-go-to-char
                   jedi
@@ -41,6 +42,7 @@
 
 
 (require 'helm-config)
+(require 'helm-ls-git)
 (helm-mode 1)
 
 (setq
@@ -58,6 +60,7 @@
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-c g") 'helm-git-grep)
 (global-set-key (kbd "C-x g") 'helm-git-grep-at-point)
+(global-set-key (kbd "C-x C-g") 'helm-browse-project)
 
 (defvar help-at-pt-timer-delay 0.1)
 (defvar help-at-pt-display-when-idle '(flymake-overlay))
