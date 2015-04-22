@@ -30,6 +30,7 @@
                   nvm
                   password-store
                   slime
+                  smart-mode-line
                   solarized-theme
                   virtualenvwrapper
                   yaml-mode)))
