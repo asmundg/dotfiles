@@ -27,7 +27,9 @@ With argument ARG, do this that many times."
  ;; If there is more than one, they won't work right.
  '(coffee-tab-width 2)
  '(current-language-environment "UTF-8")
- '(custom-safe-themes (quote ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
+ '(custom-safe-themes
+   (quote
+    ("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(global-font-lock-mode t nil (font-lock))
  '(help-at-pt-display-when-idle (quote (flymake-overlay)) nil (help-at-pt))
  '(help-at-pt-timer-delay 0.1)
