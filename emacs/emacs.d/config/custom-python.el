@@ -32,8 +32,9 @@ to be a project root."
   "Activates the virtualenv of the current buffer."
 
   (require 'virtualenvwrapper)
-  (let ((project-name (project-name buffer-file-name)))
-    (when project-name (venv-workon project-name))))
+  (if buffer-file-name
+      (let ((project-name (project-name buffer-file-name)))
+        (when project-name (venv-workon project-name)))))
 
 (defun setup-venv ()
   "Initialize venv."
