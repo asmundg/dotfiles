@@ -24,7 +24,7 @@
 
 [core]
 	editor = emacsclient -nw
-	excludesfile = /home/asmundg/.gitignore_global
+	excludesfile = ~/.gitignore
 
 [rerere]
     enabled = true
