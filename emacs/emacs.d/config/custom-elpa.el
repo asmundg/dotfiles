@@ -34,6 +34,7 @@
                   smart-mode-line
                   solarized-theme
                   virtualenvwrapper
+                  web-mode
                   yaml-mode)))
      (dolist (pkg packages)
        (when (not (package-installed-p pkg))
@@ -70,6 +71,8 @@
 
 (require 'iy-go-to-char)
 (global-set-key (kbd "M-m") 'iy-go-to-char)
+
+(setq magit-last-seen-setup-instructions "1.4.0")
 
 (provide 'custom-elpa)
 ;;; custom-elpa.el ends here
