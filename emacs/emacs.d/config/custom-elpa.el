@@ -6,13 +6,17 @@
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/"))
 
-(let ((packages '(auto-complete
-                  autopair
+(let ((packages '(ac-cider
+                  auto-complete
+                  cider
+                  clojure-mode
                   coffee-mode
                   color-theme
                   exec-path-from-shell
                   find-file-in-project
                   flycheck
+                  flycheck-clojure
+                  flycheck-pos-tip
                   helm
                   helm-ls-git
                   helm-git-grep
@@ -30,8 +34,12 @@
                   mo-git-blame
                   nvm
                   password-store
+                  python-mode
+                  rainbow-delimiters
+                  rainbow-identifiers
                   slime
                   smart-mode-line
+                  smartparens
                   solarized-theme
                   virtualenvwrapper
                   web-mode
@@ -72,7 +80,26 @@
 (require 'iy-go-to-char)
 (global-set-key (kbd "M-m") 'iy-go-to-char)
 
-(setq magit-last-seen-setup-instructions "1.4.0")
+; Clojure
+;; require or autoload smartparens
+(add-hook 'clojure-mode-hook #'smartparens-strict-mode)
+(add-hook 'clojure-mode-hook #'cider-mode)
+(add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'clojure-mode-hook #'rainbow-identifiers-mode)
+
+(add-hook 'after-init-hook 'global-flycheck-mode)
+(eval-after-load 'flycheck
+  '(progn
+    (flycheck-clojure-setup)
+    (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
+    (setq flycheck-display-errors-delay 0.1)))
+
+; Smartparens
+(require 'smartparens-config)
+(smartparens-global-mode t)
+(global-set-key (kbd "M-(") (lambda (&optional arg) (interactive "P") (sp-wrap-with-pair "(")))
+(global-set-key (kbd "C-M-)") 'sp-forward-slurp-sexp)
+(global-set-key (kbd "C-M-(") 'sp-forward-barf-sexp)
 
 (provide 'custom-elpa)
 ;;; custom-elpa.el ends here

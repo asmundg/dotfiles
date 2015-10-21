@@ -69,12 +69,7 @@ With argument ARG, do this that many times."
 (delete-selection-mode 1)
 
 (setq nxml-slash-auto-complete-flag t)
-(setq skeleton-pair nil)
-(autopair-global-mode)
 (require 'uniquify)
-
-(add-hook 'after-init-hook #'global-flycheck-mode)
-(setq flycheck-display-errors-delay 0.1)
 
 (provide 'emacs)
 
