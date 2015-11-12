@@ -17,6 +17,7 @@
 (global-set-key (kbd "C-x v b") 'mo-git-blame-current)
 
 (setq magit-last-seen-setup-instructions "1.4.0")
+(setq magit-push-always-verify nil)
 
 (provide 'custom-git)
 ;;; custom-git.el ends here
