@@ -1,11 +1,14 @@
 - hosts: localhost
+  connection: local
   tasks:
   - name: Install debs
     apt:
       pkg: "{{ item }}"
       state: present
+      update_cache: yes
     with_items:
       - avahi-utils
+      - build-essential
       - emacs
       - firefox
       - gnupg-agent
@@ -18,6 +21,7 @@
       - python-dev
       - ssh-askpass
       - texlive
+      - tetex-brev
       - unison
       - x11-xserver-utils
       - xfonts-terminus
@@ -27,21 +31,30 @@
   - name: Install user python
     pip:
       name: "{{ item }}"
-      extra_args: --user
+      extra_args: --user --upgrade
     with_items:
       - flake8
       - git-up
 
-  - name: Get brev.cls
-    git:
-      repo: https://github.com/asgeirn/brev-cls.git
-      dest: /usr/src/brev-cls
-    sudo: yes
-  - name: Instal brev-cls
+  # Stow
+  - name: Fetch stow
+    get_url:
+      url: https://ftp.gnu.org/gnu/stow/stow-2.2.2.tar.gz
+      dest: /tmp/
+  - name: Unpack stow
+    command: tar xf stow-2.2.2.tar.gz
+    args:
+      chdir: /tmp
+  - name: Configure stow
+    command: ./configure
+    args:
+      chdir: /tmp/stow-2.2.2
+  - name: Make stow
+    command: make
+    args:
+      chdir: /tmp/stow-2.2.2
+  - name: Install stow
     command: make install
     args:
-      chdir: /usr/src/brev-cls
-    sudo: yes
-  - name: Update texmf
-    command: mktexlsr
+      chdir: /tmp/stow-2.2.2
     sudo: yes

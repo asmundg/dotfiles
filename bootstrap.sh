@@ -1,10 +1,12 @@
 #!/bin/sh -eux
 
-./setup.sh
+export PATH=$HOME/.local/bin/:$PATH
 
 sudo apt-get update
-sudo apt-get install python-pip
-pip install --user vex
-vex -m ansible true || true
-vex ansible pip install ansible
-vex ansible ansible-playbook -i bootstrap/inventory -K bootstrap/bootstrap.yml
+sudo apt-get install -y python-dev python-setuptools
+easy_install --user pip
+pip install --user ansible
+(pushd $(dirname $0)
+ ansible-playbook -i bootstrap/inventory -K bootstrap/bootstrap.yml
+ stow -v emacs i3 keysnail zsh
+)

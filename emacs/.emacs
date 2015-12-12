@@ -35,11 +35,11 @@ With argument ARG, do this that many times."
  '(help-at-pt-timer-delay 0.1)
  '(indent-tabs-mode nil)
  '(require-final-newline t)
+ '(select-enable-clipboard t)
  '(show-paren-mode t nil (paren))
  '(show-paren-style (quote expression))
  '(show-trailing-whitespace t)
  '(tab-width 4)
- '(select-enable-clipboard t)
  '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
 
 (custom-set-faces
@@ -47,16 +47,18 @@ With argument ARG, do this that many times."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(flymake-errline ((((class color)) (:underline "red"))))
- '(flymake-warnline ((((class color)) (:underline "yellow")))))
+ )
 
 (add-to-list 'load-path "~/.emacs.d/local/")
 (add-to-list 'load-path "~/.emacs.d/config/")
 (require 'custom-elpa)
 (require 'custom-git)
+(require 'custom-haskell)
 (require 'custom-js)
 (require 'custom-look)
 (require 'custom-python)
+
+(require 'private-org)
 
 (setq inhibit-splash-screen t)
 (line-number-mode 1)
@@ -74,3 +76,4 @@ With argument ARG, do this that many times."
 (provide 'emacs)
 
 ;;; emacs.el ends here
+(put 'upcase-region 'disabled nil)

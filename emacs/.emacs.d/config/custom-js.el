@@ -26,7 +26,6 @@
 
 (add-hook 'coffee-mode-hook 'auto-complete-mode)
 (add-hook 'coffee-mode-hook 'load-nvm)
-(add-hook 'coffee-mode-hook 'flycheck-mode)
 
 (require 'flycheck)
 (flycheck-add-mode 'javascript-eslint 'web-mode)

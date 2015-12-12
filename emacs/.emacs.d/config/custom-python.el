@@ -48,6 +48,8 @@ to be a project root."
 (add-hook 'python-mode-hook 'setup-venv)
 (add-hook 'python-mode-hook 'jedi:setup)
 (add-hook 'python-mode-hook 'jedi-setup-venv)
+(add-hook 'python-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'python-mode-hook #'rainbow-identifiers-mode)
 (defvar jedi:complete-on-dot t)
 
 (provide 'custom-python)
