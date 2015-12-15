@@ -45,11 +45,12 @@ to be a project root."
   (defvar venv-location (expand-file-name "~/.virtualenvs"))
   (defvar gud-pdb-command-name "python -m pdb"))
 
-(add-hook 'python-mode-hook 'setup-venv)
 (add-hook 'python-mode-hook 'jedi:setup)
+(add-hook 'python-mode-hook 'rainbow-delimiters-mode)
+(add-hook 'python-mode-hook 'rainbow-identifiers-mode)
+(add-hook 'python-mode-hook 'setup-venv)
 (add-hook 'python-mode-hook 'jedi-setup-venv)
-(add-hook 'python-mode-hook #'rainbow-delimiters-mode)
-(add-hook 'python-mode-hook #'rainbow-identifiers-mode)
+
 (defvar jedi:complete-on-dot t)
 
 (provide 'custom-python)
