@@ -58,8 +58,6 @@ With argument ARG, do this that many times."
 (require 'custom-look)
 (require 'custom-python)
 
-(require 'private-org)
-
 (setq inhibit-splash-screen t)
 (line-number-mode 1)
 (column-number-mode 1)
