@@ -37,24 +37,11 @@
       - git-up
 
   # Stow
-  - name: Fetch stow
-    get_url:
-      url: https://ftp.gnu.org/gnu/stow/stow-2.2.2.tar.gz
-      dest: /tmp/
-  - name: Unpack stow
-    command: tar xf stow-2.2.2.tar.gz
-    args:
-      chdir: /tmp
-  - name: Configure stow
-    command: ./configure
-    args:
-      chdir: /tmp/stow-2.2.2
-  - name: Make stow
-    command: make
-    args:
-      chdir: /tmp/stow-2.2.2
-  - name: Install stow
-    command: make install
-    args:
-      chdir: /tmp/stow-2.2.2
-    sudo: yes
+  - include: automake.yml
+    name: stow
+    url: https://ftp.gnu.org/gnu/stow/stow-2.2.2.tar.gz
+
+  # Git
+  - include: automake.yml
+    name: git
+    url: https://www.kernel.org/pub/software/scm/git/git-2.6.4.tar.xz

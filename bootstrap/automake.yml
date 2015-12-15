@@ -1,0 +1,15 @@
+- name: "Fetch {{ name }}"
+  get_url:
+    url: "{{ url }}"
+    dest: /tmp/
+- name: "Unpack {{ name }}"
+  command: "tar xf {{ url | basename }}"
+  args:
+    chdir: /tmp
+- name: "Configure {{ name }}"
+  command: ./configure chdir="/tmp/{{ url | basename | regex_replace('^(.*)(\.tar\..*)$', '\\1') }}"
+- name: "Make {{ name }}"
+  command: make chdir="/tmp/{{ url | basename | regex_replace('^(.*)(\.tar\..*)$', '\\1') }}"
+- name: "Install {{ name }}"
+  command: make install chdir="/tmp/{{ url | basename | regex_replace('^(.*)(\.tar\..*)$', '\\1') }}"
+  sudo: yes
