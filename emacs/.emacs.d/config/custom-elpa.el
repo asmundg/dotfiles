@@ -88,11 +88,10 @@
 (add-hook 'clojure-mode-hook #'rainbow-identifiers-mode)
 
 (add-hook 'after-init-hook 'global-flycheck-mode)
-(eval-after-load 'flycheck
-  '(progn
-    (flycheck-clojure-setup)
-    (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
-    (setq flycheck-display-errors-delay 0.1)))
+(with-eval-after-load 'flycheck
+  (flycheck-pos-tip-mode)
+  (flycheck-clojure-setup)
+  (setq flycheck-display-errors-delay 0.1))
 
 ; Smartparens
 (require 'smartparens-config)
