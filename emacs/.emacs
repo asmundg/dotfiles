@@ -52,10 +52,11 @@ With argument ARG, do this that many times."
 (add-to-list 'load-path "~/.emacs.d/local/")
 (add-to-list 'load-path "~/.emacs.d/config/")
 (require 'custom-elpa)
+(require 'config-csharp)
 (require 'custom-git)
 (require 'custom-haskell)
 (require 'custom-js)
-(require 'custom-look)
+(require 'config-appearance)
 (require 'custom-python)
 
 (setq inhibit-splash-screen t)

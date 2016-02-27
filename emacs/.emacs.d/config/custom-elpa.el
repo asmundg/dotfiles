@@ -12,6 +12,8 @@
                   clojure-mode
                   coffee-mode
                   color-theme
+                  company
+                  csharp-mode
                   exec-path-from-shell
                   find-file-in-project
                   flycheck
@@ -33,6 +35,7 @@
                   markdown-mode
                   mo-git-blame
                   nvm
+                  omnisharp
                   password-store
                   python-mode
                   rainbow-delimiters

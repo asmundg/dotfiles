@@ -1,5 +1,4 @@
-;;; package -- Summary
-; Color and font configuration
+;;; config-appearance.el -- Color and font configuration
 
 ;;; Commentary:
 
@@ -33,4 +32,8 @@
 (setq sml/theme 'respectful)
 (sml/setup)
 
-(provide 'custom-look)
+(set-frame-font
+ "-outline-Consolas-normal-r-normal-normal-11-97-96-96-c-*-iso8859-1")
+
+(provide 'config-appearance)
+;;; config-appearance.el ends here
