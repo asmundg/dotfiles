@@ -8,5 +8,5 @@
 (eval-after-load 'company
   '(add-to-list 'company-backends 'company-omnisharp))
 
-(provide 'custom-csharp)
+(provide 'config-csharp)
 ;;; config-csharp.el ends here
