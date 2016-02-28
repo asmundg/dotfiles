@@ -32,8 +32,11 @@
 (setq sml/theme 'respectful)
 (sml/setup)
 
+
 (set-frame-font
- "-outline-Consolas-normal-r-normal-normal-11-97-96-96-c-*-iso8859-1")
+ (if (eq system-type 'windows-nt)
+     "-outline-Consolas-normal-r-normal-normal-11-97-96-96-c-*-iso8859-1"
+   "-outline-Terminus-normal-r-normal-normal-11-97-96-96-c-*-iso8859-1"))
 
 (provide 'config-appearance)
 ;;; config-appearance.el ends here
