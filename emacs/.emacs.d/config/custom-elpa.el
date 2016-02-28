@@ -37,6 +37,7 @@
                   nvm
                   omnisharp
                   password-store
+                  powershell
                   python-mode
                   rainbow-delimiters
                   rainbow-identifiers
