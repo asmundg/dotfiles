@@ -20,6 +20,7 @@
                   flycheck-clojure
                   flycheck-pos-tip
                   helm
+                  helm-dash
                   helm-ls-git
                   helm-git-grep
                   iy-go-to-char

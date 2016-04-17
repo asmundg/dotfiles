@@ -20,6 +20,7 @@
       - pidgin
       - python-dev
       - ssh-askpass
+      - sqlite3
       - texlive
       - tetex-brev
       - unison
