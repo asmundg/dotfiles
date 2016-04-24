@@ -2,6 +2,13 @@
 ;;; Commentary:
 
 ;;; Code:
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (global-set-key (kbd "M-p") 'backward-paragraph)
 (global-set-key (kbd "M-n") 'forward-paragraph)
 
@@ -34,6 +41,8 @@ With argument ARG, do this that many times."
  '(help-at-pt-display-when-idle (quote (flymake-overlay)) nil (help-at-pt))
  '(help-at-pt-timer-delay 0.1)
  '(indent-tabs-mode nil)
+ '(minimap-mode t)
+ '(minimap-window-location (quote right))
  '(require-final-newline t)
  '(select-enable-clipboard t)
  '(show-paren-mode t nil (paren))
@@ -47,7 +56,7 @@ With argument ARG, do this that many times."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(minimap-active-region-background ((t (:background "dark slate gray")))))
 
 (add-to-list 'load-path "~/.emacs.d/local/")
 (add-to-list 'load-path "~/.emacs.d/config/")

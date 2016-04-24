@@ -34,6 +34,7 @@
                   magit-filenotify
                   magit-find-file
                   markdown-mode
+                  minimap
                   mo-git-blame
                   nvm
                   omnisharp
