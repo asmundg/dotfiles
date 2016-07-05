@@ -19,6 +19,26 @@
 ;;; Disable keyboard fumble of death
 (global-unset-key "\C-x\C-c")
 
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(coffee-tab-width 2)
+ '(current-language-environment "UTF-8")
+ '(custom-safe-themes
+   (quote
+    ("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
+ '(global-font-lock-mode t nil (font-lock))
+ '(indent-tabs-mode nil)
+ '(require-final-newline t)
+ '(select-enable-clipboard t)
+ '(show-paren-mode t nil (paren))
+ '(show-paren-style (quote expression))
+ '(show-trailing-whitespace t)
+ '(tab-width 4)
+ '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
+
 (use-package aggressive-indent
   :config
   (add-to-list
@@ -125,9 +145,6 @@
   :config
   (load-theme 'solarized-dark))
 
-; Suppress error "directory
-; ~/.emacs.d/server is unsafe"
-; on windows.)
 (if (eq system-type 'windows-nt)
     (progn
       (set-frame-font "-outline-Consolas-normal-r-normal-normal-11-97-96-96-c-*-iso8859-1")
@@ -152,29 +169,6 @@
 With argument ARG, do this that many times."
   (interactive "p")
   (delete-region (point) (progn (backward-word arg) (point))))
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(coffee-tab-width 2)
- '(current-language-environment "UTF-8")
- '(custom-safe-themes
-   (quote
-    ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
- '(global-font-lock-mode t nil (font-lock))
- '(help-at-pt-display-when-idle (quote (flymake-overlay)) nil (help-at-pt))
- '(help-at-pt-timer-delay 0.1)
- '(indent-tabs-mode nil)
- '(require-final-newline t)
- '(select-enable-clipboard t)
- '(show-paren-mode t nil (paren))
- '(show-paren-style (quote expression))
- '(show-trailing-whitespace t)
- '(smartparens-global-mode t)
- '(tab-width 4)
- '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
