@@ -31,6 +31,9 @@
     ("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(global-font-lock-mode t nil (font-lock))
  '(indent-tabs-mode nil)
+ '(package-selected-packages
+   (quote
+    (helm-smex helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-ls-git helm-git-grep helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
  '(require-final-newline t)
  '(select-enable-clipboard t)
  '(show-paren-mode t nil (paren))
@@ -79,10 +82,9 @@
 
 (use-package helm
   :bind (("C-x b" . helm-buffers-list)
-         ("C-x C-f" . helm-find-files)
-         ("M-x" . helm-M-x))
+         ("C-x C-f" . helm-find-files))
   :config
-  (require 'helm-config)
+  (use-package helm-config)
   (helm-mode 1)
   (setq
    helm-quick-update                     t ; do not display invisible candidates
@@ -102,6 +104,9 @@
   :config
   (if (eq system-type 'windows-nt)
       (defun helm-git-submodule-grep-process ())))
+
+(use-package helm-smex
+  :bind (("M-x" . helm-smex)))
 
 (use-package magit
   :bind (("C-x v s" . magit-status)
@@ -135,11 +140,12 @@
 (use-package smartparens
   :bind (("C-M-)" . sp-forward-slurp-sexp)
          ("C-M-(" . sp-forward-barf-sexp))
-  :config
-  (require 'smartparens-config)
-  (smartparens-global-mode 1)
+  :init
   (add-hook 'clojure-mode-hook 'smartparens-strict-mode)
-  (add-hook 'emacs-lisp-mode-hook 'smartparens-strict-mode))
+  (add-hook 'emacs-lisp-mode-hook 'smartparens-strict-mode)
+  (smartparens-global-mode 1)
+  :config
+  (require 'smartparens-config))
 
 (use-package solarized-theme
   :config
