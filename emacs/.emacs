@@ -88,7 +88,7 @@
   :bind (("C-x b" . helm-buffers-list)
          ("C-x C-f" . helm-find-files))
   :config
-  (use-package helm-config)
+  (use-package helm-config :ensure f)
   (helm-mode 1)
   (setq
    helm-quick-update                     t ; do not display invisible candidates
@@ -112,6 +112,9 @@
 (use-package helm-smex
   :bind (("M-x" . helm-smex)))
 
+(use-package helm-swoop
+  :bind (("C-x f" . helm-swoop)))
+
 (use-package magit
   :bind (("C-x v s" . magit-status)
          ("C-x v b" . magit-blame))
@@ -123,6 +126,8 @@
 (use-package nxml
   :config
   (setq nxml-slash-auto-complete-flag t))
+
+(use-package powershell)
 
 (use-package rainbow-delimiters
   :config
