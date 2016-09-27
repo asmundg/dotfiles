@@ -162,10 +162,14 @@
   :config
   (load-theme 'solarized-dark))
 
+(defun setup-tide-mode ()
+  (tide-setup)
+  (eldoc-mode))
+
 ;; This requires node
 (use-package tide
   :init
-  (add-hook 'typescript-mode-hook #'tide-setup))
+  (add-hook 'typescript-mode-hook #'setup-tide-mode))
 
 (use-package web-mode
   :init
@@ -173,7 +177,7 @@
   (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                (tide-setup)))))
+                (setup-tide-mode)))))
 
 (if (eq system-type 'windows-nt)
     (progn
