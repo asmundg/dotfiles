@@ -82,7 +82,7 @@
   :config
   (if (eq system-type 'windows-nt)
       (setq inferior-fsharp-program "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsi.exe\"")
-      (setq fsharp-compile-command "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsc.exe\"")))
+    (setq fsharp-compile-command "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsc.exe\"")))
 
 (use-package helm
   :bind (("C-x b" . helm-buffers-list)
@@ -114,6 +114,8 @@
 
 (use-package helm-swoop
   :bind (("C-x f" . helm-swoop)))
+
+(use-package markdown-mode)
 
 (use-package magit
   :bind (("C-x v s" . magit-status)
@@ -159,6 +161,19 @@
 (use-package solarized-theme
   :config
   (load-theme 'solarized-dark))
+
+;; This requires node
+(use-package tide
+  :init
+  (add-hook 'typescript-mode-hook #'tide-setup))
+
+(use-package web-mode
+  :init
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                (tide-setup)))))
 
 (if (eq system-type 'windows-nt)
     (progn
