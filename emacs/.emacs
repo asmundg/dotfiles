@@ -42,14 +42,14 @@
  '(tab-width 4)
  '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
 
-(use-package aggressive-indent
-  :config
-  (add-to-list
-   'aggressive-indent-dont-indent-if
-   '(and (derived-mode-p 'csharp-mode)
-         (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
-                             (thing-at-point 'line)))))
-  (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode))
+;; (use-package aggressive-indent
+;;   :config
+;;   (add-to-list
+;;    'aggressive-indent-dont-indent-if
+;;    '(and (derived-mode-p 'csharp-mode)
+;;          (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
+;;                              (thing-at-point 'line)))))
+;;   (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode))
 
 (use-package cider
   :config
@@ -71,7 +71,8 @@
 (use-package flycheck
   :config
   (global-flycheck-mode 1)
-  (setq flycheck-display-errors-delay 0.1))
+  (setq flycheck-display-errors-delay 0.1
+        flycheck-pos-tip-timeout 0))
 
 (use-package flycheck-pos-tip
   :init
@@ -164,7 +165,8 @@
 
 (defun setup-tide-mode ()
   (tide-setup)
-  (eldoc-mode))
+  (eldoc-mode)
+  (require 'ts-comint))
 
 ;; This requires node
 (use-package tide
@@ -179,16 +181,17 @@
               (when (string-equal "tsx" (file-name-extension buffer-file-name))
                 (setup-tide-mode)))))
 
+(add-to-list 'load-path "~/.emacs.d/local")
+
 (if (eq system-type 'windows-nt)
     (progn
-      (set-frame-font "-outline-Consolas-normal-r-normal-normal-11-97-96-96-c-*-iso8859-1")
+      (set-frame-font "-outline-Consolas-normal-r-normal-normal-13-97-96-96-c-*-iso8859-1")
       (when (>= emacs-major-version 23) ; Stupid hack for running emacs as admin
         (defun server-ensure-safe-dir (dir) "Noop" t)))
   (set-frame-font "-outline-Terminus-normal-r-normal-normal-14-97-96-96-c-*-iso8859-1"))
 
-(global-set-key (kbd "M-p") 'backward-paragraph)
 (global-set-key (kbd "M-n") 'forward-paragraph)
-
+(global-set-key (kbd "M-p") 'backward-paragraph)
 (global-set-key (kbd "C-w") 'backward-delete-word)
 (global-set-key (kbd "C-q") 'kill-region)
 (global-set-key (kbd "M-q") 'copy-region-as-kill)
@@ -203,13 +206,6 @@
 With argument ARG, do this that many times."
   (interactive "p")
   (delete-region (point) (progn (backward-word arg) (point))))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
 
 (setq inhibit-splash-screen t)
 (line-number-mode 1)
