@@ -33,7 +33,7 @@
  '(indent-tabs-mode nil)
  '(package-selected-packages
    (quote
-    (helm-smex helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-ls-git helm-git-grep helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
+    (tide helm-smex helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-ls-git helm-git-grep helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
  '(require-final-newline t)
  '(select-enable-clipboard t)
  '(show-paren-mode t nil (paren))
@@ -183,12 +183,30 @@
 
 (add-to-list 'load-path "~/.emacs.d/local")
 
-(if (eq system-type 'windows-nt)
-    (progn
-      (set-frame-font "-outline-Consolas-normal-r-normal-normal-13-97-96-96-c-*-iso8859-1")
-      (when (>= emacs-major-version 23) ; Stupid hack for running emacs as admin
-        (defun server-ensure-safe-dir (dir) "Noop" t)))
-  (set-frame-font "-outline-Terminus-normal-r-normal-normal-14-97-96-96-c-*-iso8859-1"))
+;; Quick and dirty font selection scheme
+(defun fontify-frame (frame)
+  (let ((size
+         ;; Large Resolution
+         (if (> (x-display-pixel-width) 2000)
+             (if (> (cadr (assoc 'mm-size (car (display-monitor-attributes-list)))) 310)
+                 ;; Large Display
+                 13
+               ;; Small Display
+               16)
+           ;; Low resolution
+           12))
+        (font (if (eq system-type 'windows-nt)
+                  ;; Windows
+                  "Consolas"
+                ;; Proper OS
+                "Terminus")))
+    (set-frame-font (format "-outline-%s-normal-r-normal-normal-%d-97-96-96-c-*-iso8859-1" font size))))
+
+;; Fontify current frame
+(fontify-frame nil)
+
+;; Fontify any future frames
+(push 'fontify-frame after-make-frame-functions)
 
 (global-set-key (kbd "M-n") 'forward-paragraph)
 (global-set-key (kbd "M-p") 'backward-paragraph)
@@ -223,3 +241,9 @@ With argument ARG, do this that many times."
 
 (provide 'emacs)
 ;;; .emacs ends here
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
