@@ -136,12 +136,14 @@
   :config
   (add-hook 'python-mode-hook #'rainbow-delimiters-mode)
   (add-hook 'csharp-mode-hook #'rainbow-delimiters-mode)
+  (add-hook 'tide-mode-hook #'rainbow-delimiters-mode)
   (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
 
 (use-package rainbow-identifiers
   :config
   (add-hook 'python-mode-hook #'rainbow-identifiers-mode)
   (add-hook 'csharp-mode-hook #'rainbow-identifiers-mode)
+  (add-hook 'tide-mode-hook #'rainbow-identifiers-mode)
   (add-hook 'clojure-mode-hook #'rainbow-identifiers-mode))
 
 (use-package smart-mode-line
