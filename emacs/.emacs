@@ -192,7 +192,7 @@
                  ;; Large Display
                  13
                ;; Small Display
-               16)
+               18)
            ;; Low resolution
            12))
         (font (if (eq system-type 'windows-nt)
