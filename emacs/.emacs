@@ -65,6 +65,10 @@
   :config
   (global-company-mode 1))
 
+(use-package default-text-scale
+  :bind (("C-M-=" . default-text-scale-increase)
+         ("C-M--" . default-text-scale-decrease)))
+
 (use-package expand-region
   :bind ("C-=" . er/expand-region))
 
