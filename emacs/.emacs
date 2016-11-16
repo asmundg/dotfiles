@@ -151,6 +151,9 @@
   (add-hook 'tide-mode-hook #'rainbow-identifiers-mode)
   (add-hook 'clojure-mode-hook #'rainbow-identifiers-mode))
 
+(use-package restclient)
+(use-package restclient-helm)
+
 (use-package smart-mode-line
   :config
   (setq sml/theme 'respectful)
@@ -172,13 +175,14 @@
 
 (defun setup-tide-mode ()
   (tide-setup)
-  (eldoc-mode)
-  (require 'ts-comint))
+  (eldoc-mode))
 
 ;; This requires node
 (use-package tide
   :init
   (add-hook 'typescript-mode-hook #'setup-tide-mode))
+
+(use-package ts-comint)
 
 (use-package web-mode
   :init
