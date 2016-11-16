@@ -34,7 +34,7 @@
  '(indent-tabs-mode nil)
  '(package-selected-packages
    (quote
-    (tide helm-smex helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-ls-git helm-git-grep helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
+    (restclient-helm restclient restclient-mode flycheck ts-comint default-text-scale tide helm-smex helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-ls-git helm-git-grep helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
  '(require-final-newline t)
  '(select-enable-clipboard t)
  '(show-paren-mode t nil (paren))
@@ -120,6 +120,10 @@
 
 (use-package helm-swoop
   :bind (("C-x f" . helm-swoop)))
+
+(use-package json-mode
+  :config
+  (setq js-indent-level 2))
 
 (use-package markdown-mode)
 
