@@ -15,6 +15,7 @@
 
 (setq package-enable-at-startup nil)
 (setq use-package-always-ensure t)
+(setq visible-bell 1)
 
 ;;; Disable keyboard fumble of death
 (global-unset-key "\C-x\C-c")
