@@ -248,7 +248,7 @@ With argument ARG, do this that many times."
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
-(global-linum-mode 1)
+(global-linum-mode -1)
 (global-auto-revert-mode 1)
 (delete-selection-mode 1)
 
