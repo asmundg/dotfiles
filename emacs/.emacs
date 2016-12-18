@@ -178,13 +178,20 @@
   (load-theme 'solarized-dark))
 
 (defun setup-tide-mode ()
-  (tide-setup)
-  (eldoc-mode))
+  "Only enable tide if we have a file buffer.
+
+tide-setup will crash otherwise."
+  (if (not (eq buffer-file-name nil))
+      (do
+          (tide-setup)
+          (eldoc-mode))))
 
 ;; This requires node
 (use-package tide
   :init
-  (add-hook 'typescript-mode-hook #'setup-tide-mode))
+  (add-hook 'typescript-mode-hook #'setup-tide-mode)
+  :config
+  (setq tide-tsserver-executable "node_modules/typescript/bin/tsserver"))
 
 (use-package ts-comint)
 
