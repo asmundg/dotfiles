@@ -182,9 +182,7 @@
 
 tide-setup will crash otherwise."
   (if (not (eq buffer-file-name nil))
-      (do
-          (tide-setup)
-          (eldoc-mode))))
+      (tide-setup)))
 
 ;; This requires node
 (use-package tide
