@@ -34,7 +34,7 @@
  '(indent-tabs-mode nil)
  '(package-selected-packages
    (quote
-    (restclient-helm restclient restclient-mode flycheck ts-comint default-text-scale tide helm-smex helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-ls-git helm-git-grep helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
+    (auto-virtualenv restclient-helm restclient restclient-mode flycheck ts-comint default-text-scale tide helm-smex helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-ls-git helm-git-grep helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
  '(require-final-newline t)
  '(select-enable-clipboard t)
  '(show-paren-mode t nil (paren))
@@ -52,6 +52,10 @@
 ;;                              (thing-at-point 'line)))))
 ;;   (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode))
 
+(use-package auto-virtualenv
+  :init
+  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
+
 (use-package cider
   :config
   (add-hook 'clojure-mode-hook 'cider-mode))
@@ -65,6 +69,14 @@
 (use-package company
   :config
   (global-company-mode 1))
+
+(use-package jedi
+  :init
+  (add-hook 'python-mode-hook 'jedi:setup)
+  :bind (("M-." . jedi:goto-definition)
+         ("M-," . jedi:goto-definition-pop-marker))
+  :config
+  (setq jedi:complete-on-dot t))
 
 (use-package default-text-scale
   :bind (("C-M-=" . default-text-scale-increase)
@@ -194,8 +206,8 @@ tide-setup will crash otherwise."
 (use-package ts-comint)
 
 (use-package web-mode
+  :mode "\\.tsx\\'"
   :init
-  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
   (add-hook 'web-mode-hook
             (lambda ()
               ;; Don't die horribly in magit ediff, where buffer-file-name is nil
