@@ -137,7 +137,10 @@
   :config
   (setq js-indent-level 2))
 
-(use-package markdown-mode)
+(use-package markdown-mode
+  :bind (:map markdown-mode-map
+              ("M-n" . forward-paragraph)
+              ("M-p" . backward-paragraph)))
 
 (use-package magit
   :bind (("C-x v s" . magit-status)
