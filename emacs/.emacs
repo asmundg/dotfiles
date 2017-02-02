@@ -64,7 +64,9 @@
 
 (use-package csharp-mode
   :config
-  (add-hook 'csharp-mode-hook '(lambda () (c-set-offset 'arglist-intro '+))))
+  (add-hook 'csharp-mode-hook '(lambda ()
+                                 (c-set-offset 'arglist-intro '+)
+                                 (set-fill-column 120))))
 
 (use-package company
   :config
@@ -84,6 +86,8 @@
 
 (use-package expand-region
   :bind ("C-=" . er/expand-region))
+
+(use-package fill-column-indicator)
 
 (use-package flycheck
   :config
@@ -275,6 +279,8 @@ With argument ARG, do this that many times."
 (require 'uniquify)
 
 (put 'upcase-region 'disabled nil)
+;; Always show fill column
+(add-hook 'after-change-major-mode-hook 'fci-mode)
 
 (provide 'emacs)
 ;;; .emacs ends here
