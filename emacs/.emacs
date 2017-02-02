@@ -125,7 +125,7 @@
          ("C-x g" . helm-git-grep-at-point))
   :config
   (if (eq system-type 'windows-nt)
-      (defun helm-git-submodule-grep-process ())))
+      (defun helm-git-grep-submodule-grep-process ())))
 
 (use-package helm-smex
   :bind (("M-x" . helm-smex)))
