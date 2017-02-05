@@ -89,7 +89,21 @@
 
 (use-package fill-column-indicator)
 
+(defun use-tslint-from-node-modules ()
+  (let* ((root (locate-dominating-file
+                (or (buffer-file-name) default-directory)
+                "node_modules"))
+         (tslint (and root
+                      (expand-file-name (if (eq system-type 'windows-nt)
+                                            "node_modules/.bin/tslint.cmd"
+                                          "node_modules/.bin/tslint")
+                                        root))))
+    (when (and tslint (file-executable-p tslint))
+      (setq-local flycheck-typescript-tslint-executable tslint))))
+
 (use-package flycheck
+  :init
+  (add-hook 'flycheck-mode-hook #'use-tslint-from-node-modules)
   :config
   (global-flycheck-mode 1)
   (setq flycheck-display-errors-delay 0.1
