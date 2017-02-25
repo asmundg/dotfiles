@@ -244,6 +244,8 @@ tide-setup will crash otherwise."
                          (string-equal "tsx" (file-name-extension buffer-file-name)))
                 (setup-tide-mode)))))
 
+(use-package yaml-mode)
+
 (add-to-list 'load-path "~/.emacs.d/local")
 
 ;; Quick and dirty font selection scheme
