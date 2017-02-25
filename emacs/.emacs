@@ -301,8 +301,6 @@ With argument ARG, do this that many times."
 (require 'uniquify)
 
 (put 'upcase-region 'disabled nil)
-;; Always show fill column
-(add-hook 'after-change-major-mode-hook 'fci-mode)
 
 (provide 'emacs)
 ;;; .emacs ends here
