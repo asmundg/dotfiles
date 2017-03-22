@@ -72,6 +72,12 @@
   :config
   (global-company-mode 1))
 
+(use-package company-ycmd
+  :init
+  (company-ycmd-setup))
+
+(use-package editorconfig)
+
 (use-package jedi
   :init
   (add-hook 'python-mode-hook 'jedi:setup)
@@ -113,6 +119,10 @@
   :init
   (with-eval-after-load 'flycheck
     (flycheck-pos-tip-mode)))
+
+(use-package flycheck-ycmd
+  :init
+  (flycheck-ycmd-setup))
 
 (use-package fsharp-mode
   :config
@@ -246,7 +256,12 @@ tide-setup will crash otherwise."
 
 (use-package yaml-mode)
 
-(add-to-list 'load-path "~/.emacs.d/local")
+(use-package ycmd
+  :init
+  (add-hook 'ycmd-mode-hook 'ycmd-eldoc-setup)
+  (add-hook 'csharp-mode-hook #'ycmd-mode)
+  :config
+  (set-variable 'ycmd-server-command '("python" "-u" "c:/users/asgramme/src/ycmd/ycmd" "--log" "debug")))
 
 ;; Quick and dirty font selection scheme
 (defun fontify-frame (frame)
