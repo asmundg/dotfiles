@@ -31,10 +31,11 @@
    (quote
     ("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(global-font-lock-mode t nil (font-lock))
+ '(helm-follow-mode-persistent t)
  '(indent-tabs-mode nil)
  '(package-selected-packages
    (quote
-    (auto-virtualenv restclient-helm restclient restclient-mode flycheck ts-comint default-text-scale tide helm-smex helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-ls-git helm-git-grep helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
+    (svg editorconfig helm-ls-git fci-mode helm-ag helm-grepint org auto-virtualenv restclient-helm restclient restclient-mode flycheck ts-comint default-text-scale tide helm-smex helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-git-grep helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
  '(require-final-newline t)
  '(select-enable-clipboard t)
  '(show-paren-mode t nil (paren))
@@ -66,7 +67,8 @@
   :config
   (add-hook 'csharp-mode-hook '(lambda ()
                                  (c-set-offset 'arglist-intro '+)
-                                 (set-fill-column 120))))
+                                 (set-fill-column 140)
+                                 (setq-local show-trailing-whitespace t))))
 
 (use-package company
   :config
@@ -76,7 +78,9 @@
   :init
   (company-ycmd-setup))
 
-(use-package editorconfig)
+(use-package editorconfig
+  :config
+  (editorconfig-mode 1))
 
 (use-package jedi
   :init
@@ -233,7 +237,8 @@
 
 tide-setup will crash otherwise."
   (if (not (eq buffer-file-name nil))
-      (tide-setup)))
+      (tide-setup))
+  (set-fill-column 140))
 
 ;; This requires node
 (use-package tide
@@ -318,6 +323,13 @@ With argument ARG, do this that many times."
 (require 'uniquify)
 
 (put 'upcase-region 'disabled nil)
+
+(defun url-decode-region (start end)
+  "Replace a region with the same contents, only URL decoded."
+  (interactive "r")
+  (let ((text (url-unhex-string (buffer-substring start end))))
+    (delete-region start end)
+    (insert text)))
 
 (provide 'emacs)
 ;;; .emacs ends here
