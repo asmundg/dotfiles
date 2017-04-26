@@ -97,8 +97,6 @@
 (use-package expand-region
   :bind ("C-=" . er/expand-region))
 
-(use-package fill-column-indicator)
-
 (defun use-tslint-from-node-modules ()
   (let* ((root (locate-dominating-file
                 (or (buffer-file-name) default-directory)
@@ -238,14 +236,15 @@
 tide-setup will crash otherwise."
   (if (not (eq buffer-file-name nil))
       (tide-setup))
-  (set-fill-column 140))
+  (set-fill-column 140)
+  (add-hook 'before-save-hook 'tide-format-before-save))
 
 ;; This requires node
 (use-package tide
   :init
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   :config
-  (setq tide-tsserver-executable "node_modules/typescript/bin/tsserver"))
+  (setq-local tide-tsserver-executable "node_modules/typescript/bin/tsserver"))
 
 (use-package ts-comint)
 
