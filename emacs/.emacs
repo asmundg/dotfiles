@@ -68,15 +68,14 @@
   (add-hook 'csharp-mode-hook '(lambda ()
                                  (c-set-offset 'arglist-intro '+)
                                  (set-fill-column 140)
-                                 (setq-local show-trailing-whitespace t))))
+                                 (setq-local show-trailing-whitespace t)
+                                 (setq company-backends '(company-omnisharp company-dabbrev-code company-keywords))
+                                 (company-mode)
+                                 (omnisharp-mode))))
 
 (use-package company
   :config
   (global-company-mode 1))
-
-(use-package company-ycmd
-  :init
-  (company-ycmd-setup))
 
 (use-package editorconfig
   :config
@@ -121,10 +120,6 @@
   :init
   (with-eval-after-load 'flycheck
     (flycheck-pos-tip-mode)))
-
-(use-package flycheck-ycmd
-  :init
-  (flycheck-ycmd-setup))
 
 (use-package fsharp-mode
   :config
@@ -191,6 +186,15 @@
 (use-package nxml
   :config
   (setq nxml-slash-auto-complete-flag t))
+
+(use-package omnisharp
+  :bind (("M-." . omnisharp-go-to-definition))
+  :config
+  (setq omnisharp-use-http t)
+  ; Fake it, we need to launch manually on windows
+  (setq omnisharp--server-info t))
+
+(use-package request-deferred)
 
 (use-package powershell)
 
@@ -261,13 +265,6 @@ tide-setup will crash otherwise."
                 (setup-tide-mode)))))
 
 (use-package yaml-mode)
-
-(use-package ycmd
-  :init
-  (add-hook 'ycmd-mode-hook 'ycmd-eldoc-setup)
-  (add-hook 'csharp-mode-hook #'ycmd-mode)
-  :config
-  (set-variable 'ycmd-server-command '("python" "-u" "c:/users/asgramme/src/ycmd/ycmd" "--log" "debug")))
 
 ;; Quick and dirty font selection scheme
 (defun fontify-frame (frame)
