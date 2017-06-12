@@ -69,7 +69,7 @@
                                  (c-set-offset 'arglist-intro '+)
                                  (set-fill-column 140)
                                  (setq-local show-trailing-whitespace t)
-                                 (setq company-backends '(company-omnisharp company-dabbrev-code company-keywords))
+                                 (setq-local company-backends '(company-omnisharp company-dabbrev-code company-keywords))
                                  (company-mode)
                                  (omnisharp-mode))))
 
@@ -96,17 +96,25 @@
 (use-package expand-region
   :bind ("C-=" . er/expand-region))
 
-(defun use-tslint-from-node-modules ()
+(defun find-executable-from-node-modules (name)
   (let* ((root (locate-dominating-file
                 (or (buffer-file-name) default-directory)
                 "node_modules"))
-         (tslint (and root
+         (binary (and root
                       (expand-file-name (if (eq system-type 'windows-nt)
-                                            "node_modules/.bin/tslint.cmd"
-                                          "node_modules/.bin/tslint")
+                                            (concat "node_modules/.bin/" name ".cmd")
+                                          (concat "node_modules/.bin/" tslint))
                                         root))))
-    (when (and tslint (file-executable-p tslint))
-      (setq-local flycheck-typescript-tslint-executable tslint))))
+    (and (file-executable-p binary) binary)))
+
+(defun use-tslint-from-node-modules ()
+  (when-let ((tslint (find-executable-from-node-modules "tslint")))
+    (setq-local flycheck-typescript-tslint-executable tslint)))
+
+(defun use-tsun-from-node-modules ()
+  (when-let ((tsun (find-executable-from-node-modules "tsun")))
+      (setq-local ts-comint-program-command tsun)))
+
 
 (use-package flycheck
   :init
@@ -188,7 +196,8 @@
   (setq nxml-slash-auto-complete-flag t))
 
 (use-package omnisharp
-  :bind (("M-." . omnisharp-go-to-definition))
+  :bind (("M-." . omnisharp-go-to-definition)
+         ("M-," . pop-tag-mark))
   :config
   (setq omnisharp-use-http t)
   ; Fake it, we need to launch manually on windows
@@ -250,7 +259,8 @@ tide-setup will crash otherwise."
   :init
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   :config
-  (setq tide-tsserver-executable "node_modules/typescript/bin/tsserver"))
+  (setq tide-tsserver-executable "node_modules/typescript/bin/tsserver")
+  (add-hook 'typescript-mode-hook #'use-tsun-from-node-modules))
 
 (use-package ts-comint)
 
