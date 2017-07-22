@@ -250,9 +250,7 @@ tide-setup will crash otherwise."
   (if (not (eq buffer-file-name nil))
       (tide-setup))
   (set-fill-column 140)
-  (add-hook 'before-save-hook 'tide-format-before-save)
-  (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
-  (flycheck-add-mode 'typescript-tslint 'web-mode))
+  (add-hook 'before-save-hook 'tide-format-before-save))
 
 ;; This requires node
 (use-package tide
@@ -260,7 +258,9 @@ tide-setup will crash otherwise."
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   :config
   (setq tide-tsserver-executable "node_modules/typescript/bin/tsserver")
-  (add-hook 'typescript-mode-hook #'use-tsun-from-node-modules))
+  (add-hook 'typescript-mode-hook #'use-tsun-from-node-modules)
+  (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
+  (flycheck-add-mode 'typescript-tslint 'web-mode))
 
 (use-package ts-comint)
 
