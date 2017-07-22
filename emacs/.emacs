@@ -105,7 +105,7 @@
                                             (concat "node_modules/.bin/" name ".cmd")
                                           (concat "node_modules/.bin/" tslint))
                                         root))))
-    (and (file-executable-p binary) binary)))
+    (and binary (file-executable-p binary) binary)))
 
 (defun use-tslint-from-node-modules ()
   (when-let ((tslint (find-executable-from-node-modules "tslint")))
@@ -278,22 +278,23 @@ tide-setup will crash otherwise."
 
 ;; Quick and dirty font selection scheme
 (defun fontify-frame (frame)
-  (let ((size
-         ;; Large Resolution
-         (if (> (x-display-pixel-width) 2000)
-             (if (> (cadr (assoc 'mm-size (car (display-monitor-attributes-list)))) 310)
-                 ;; Large Display
-                 13
-               ;; Small Display
-               18)
-           ;; Low resolution
-           12))
-        (font (if (eq system-type 'windows-nt)
-                  ;; Windows
-                  "Consolas"
-                ;; Proper OS
-                "Terminus")))
-    (set-frame-font (format "-outline-%s-normal-r-normal-normal-%d-97-96-96-c-*-iso8859-1" font size))))
+  (when (display-graphic-p)
+    (let ((size
+           ;; Large Resolution
+           (if (> (x-display-pixel-width) 2000)
+               (if (> (cadr (assoc 'mm-size (car (display-monitor-attributes-list)))) 310)
+                   ;; Large Display
+                   13
+                 ;; Small Display
+                 18)
+             ;; Low resolution
+             12))
+          (font (if (eq system-type 'windows-nt)
+                    ;; Windows
+                    "Consolas"
+                  ;; Proper OS
+                  "Terminus")))
+      (set-frame-font (format "-outline-%s-normal-r-normal-normal-%d-97-96-96-c-*-iso8859-1" font size)))))
 
 ;; Fontify current frame
 (fontify-frame nil)
