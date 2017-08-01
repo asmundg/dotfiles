@@ -29,13 +29,13 @@
  '(current-language-environment "UTF-8")
  '(custom-safe-themes
    (quote
-    ("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
+    ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(global-font-lock-mode t nil (font-lock))
  '(helm-follow-mode-persistent t)
  '(indent-tabs-mode nil)
  '(package-selected-packages
    (quote
-    (svg editorconfig helm-ls-git fci-mode helm-ag helm-grepint org auto-virtualenv restclient-helm restclient restclient-mode flycheck ts-comint default-text-scale tide helm-smex helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-git-grep helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
+    (rainbow-mode helm which-key avy counsel dockerfile-mode scion svg editorconfig fci-mode helm-ag helm-grepint org auto-virtualenv restclient restclient-mode flycheck ts-comint default-text-scale tide helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
  '(require-final-newline t)
  '(select-enable-clipboard t)
  '(show-paren-mode t nil (paren))
@@ -53,9 +53,13 @@
 ;;                              (thing-at-point 'line)))))
 ;;   (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode))
 
+(winner-mode 1)
+
 (use-package auto-virtualenv
   :init
   (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
+
+(use-package avy)
 
 (use-package cider
   :config
@@ -76,6 +80,27 @@
 (use-package company
   :config
   (global-company-mode 1))
+
+(use-package counsel
+  :diminish ivy-mode
+  :bind (("C-s" . swiper)
+         ("C-r" . swiper)
+         ;; ("C-c g" . counsel-git-grep) broken on windows
+         ("C-x C-f" . counsel-find-file)
+         ("M-x" . counsel-M-x))
+  :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers 1)
+  (setq ivy-count-format "(%d/%d)")
+  (setq ivy-wrap 1)
+  (setq ivy-use-selectable-prompt t)
+  (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word)
+
+  ; Partial workaround for broken grepping on windows (it's still
+  ; brokwn due to a really slow start, see
+  ; https://github.com/abo-abo/swiper/issues/786)
+  (when (eq system-type 'windows-nt)
+    (setq counsel-git-grep-cmd-default "git --no-pager grep --full-name -n --no-color -i -e \"%s\"")))
 
 (use-package dockerfile-mode)
 
@@ -117,6 +142,8 @@
   (when-let ((tsun (find-executable-from-node-modules "tsun")))
       (setq-local ts-comint-program-command tsun)))
 
+(use-package find-file-in-project
+  :bind (("C-x C-g" . find-file-in-project)))
 
 (use-package flycheck
   :init
@@ -145,21 +172,6 @@
                    (append '((company-capf company-dabbrev-code))
                            company-backends)))))
 
-(use-package helm
-  :bind (("C-x b" . helm-buffers-list)
-         ("C-x C-f" . helm-find-files))
-  :config
-  (use-package helm-config :ensure f)
-  (helm-mode 1)
-  (setq
-   helm-quick-update                     t ; do not display invisible candidates
-   helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
-   helm-buffers-fuzzy-matching           t ; fuzzy matching buffer names when non--nil
-   helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-   helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-   helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-   helm-ff-file-name-history-use-recentf t))
-
 (use-package helm-ls-git
   :bind ("C-x C-g" . helm-browse-project))
 
@@ -169,12 +181,6 @@
   :config
   (if (eq system-type 'windows-nt)
       (defun helm-git-grep-submodule-grep-process ())))
-
-(use-package helm-smex
-  :bind (("M-x" . helm-smex)))
-
-(use-package helm-swoop
-  :bind (("C-x f" . helm-swoop)))
 
 (use-package json-mode
   :config
@@ -224,7 +230,6 @@
   (add-hook 'clojure-mode-hook #'rainbow-identifiers-mode))
 
 (use-package restclient)
-(use-package restclient-helm)
 
 (use-package smart-mode-line
   :config
@@ -265,6 +270,11 @@ tide-setup will crash otherwise."
   (flycheck-add-mode 'typescript-tslint 'web-mode))
 
 (use-package ts-comint)
+
+(use-package which-key
+  :diminish which-key-mode
+  :init
+  (which-key-mode))
 
 (use-package web-mode
   :mode "\\.tsx\\'"
@@ -349,4 +359,13 @@ With argument ARG, do this that many times."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(ivy-current-match ((t :background "dark slate gray")))
+ '(ivy-minibuffer-match-face-1 ((t :foreground "#002b36" :background "#deep pink" :weight bold)))
+ '(ivy-minibuffer-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))
+ '(ivy-minibuffer-match-face-3 ((t :foreground "#002b36" :background "yellow" :weight bold)))
+ '(ivy-minibuffer-match-face-4 ((t :foreground "#002b36" :background "#orange" :weight bold)))
+ '(swiper-current-match ((t :background "dark slate gray")))
+ '(swiper-match-face-1 ((t :foreground "#002b36" :background "#deep pink" :weight bold)))
+ '(swiper-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))
+ '(swiper-match-face-3 ((t :foreground "#002b36" :background "yellow" :weight bold)))
+ '(swiper-match-face-4 ((t :foreground "#002b36" :background "orange" :weight bold))))
