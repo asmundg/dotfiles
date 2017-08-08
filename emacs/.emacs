@@ -189,7 +189,24 @@
 (use-package markdown-mode
   :bind (:map markdown-mode-map
               ("M-n" . forward-paragraph)
-              ("M-p" . backward-paragraph)))
+              ("M-p" . backward-paragraph))
+  :config
+  (setq-local markdown-fontify-code-blocks-natively t)
+  (setq-local markdown-code-lang-modes
+              '(("ocaml" . tuareg-mode)
+                ("elisp" . emacs-lisp-mode)
+                ("ditaa" . artist-mode)
+                ("asymptote" . asy-mode)
+                ("dot" . fundamental-mode)
+                ("sqlite" . sql-mode)
+                ("calc" . fundamental-mode)
+                ("C" . c-mode)
+                ("cpp" . c++-mode)
+                ("C++" . c++-mode)
+                ("screen" . shell-script-mode)
+                ("shell" . sh-mode)
+                ("bash" . sh-mode)
+                ("TypeScript" . typescript-mode))))
 
 (use-package magit
   :bind (("C-x v s" . magit-status)
@@ -360,12 +377,6 @@ With argument ARG, do this that many times."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ivy-current-match ((t :background "dark slate gray")))
- '(ivy-minibuffer-match-face-1 ((t :foreground "#002b36" :background "#deep pink" :weight bold)))
  '(ivy-minibuffer-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))
- '(ivy-minibuffer-match-face-3 ((t :foreground "#002b36" :background "yellow" :weight bold)))
- '(ivy-minibuffer-match-face-4 ((t :foreground "#002b36" :background "#orange" :weight bold)))
- '(swiper-current-match ((t :background "dark slate gray")))
- '(swiper-match-face-1 ((t :foreground "#002b36" :background "#deep pink" :weight bold)))
- '(swiper-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))
- '(swiper-match-face-3 ((t :foreground "#002b36" :background "yellow" :weight bold)))
- '(swiper-match-face-4 ((t :foreground "#002b36" :background "orange" :weight bold))))
+ '(swiper-line-face ((t :background "dark slate gray")))
+ '(swiper-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold))))
