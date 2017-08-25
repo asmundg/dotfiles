@@ -216,6 +216,9 @@
    magit-last-seen-setup-instructions "1.4.0"
    magit-push-always-verify nil))
 
+(use-package multiple-cursors
+  :bind (("C-S-c C-S-c" . mc/edit-lines)))
+
 (use-package nxml
   :config
   (setq nxml-slash-auto-complete-flag t))
@@ -378,5 +381,6 @@ With argument ARG, do this that many times."
  ;; If there is more than one, they won't work right.
  '(ivy-current-match ((t :background "dark slate gray")))
  '(ivy-minibuffer-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))
+ '(swiper-current-match ((t :background "dark slate gray")))
  '(swiper-line-face ((t :background "dark slate gray")))
  '(swiper-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold))))
