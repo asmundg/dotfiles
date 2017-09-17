@@ -130,15 +130,33 @@
   :bind ("C-=" . er/expand-region))
 
 (defun find-executable-from-node-modules (name)
-  (let* ((root (locate-dominating-file
-                (or (buffer-file-name) default-directory)
-                "node_modules"))
-         (binary (and root
-                      (expand-file-name (if (eq system-type 'windows-nt)
-                                            (concat "node_modules/.bin/" name ".cmd")
-                                          (concat "node_modules/.bin/" tslint))
-                                        root))))
-    (and binary (file-executable-p binary) binary)))
+  "Check for executable NAME in project root node_modules, then from the current directory and up."
+  (find-from-node-modules (concat
+                           (file-name-as-directory ".bin")
+                           name
+                           (if (eq system-type 'windows-nt) ".cmd" ""))))
+
+(defun find-from-node-modules (name)
+  "Check for executable NAME in project root node_modules, then from the current directory and up."
+  (let* ((relative-executable-path (concat
+                                    (file-name-as-directory "node_modules")
+                                    name))
+         (toplevel (expand-file-name
+                    relative-executable-path
+                    (projectile-project-root)))
+         (closest-parent (expand-file-name
+                          relative-executable-path
+                          (locate-dominating-file default-directory "node_modules"))))
+    (seq-find 'file-exists-p (list toplevel closest-parent))))
+
+(defun use-tsserver-from-node-modules ()
+  "Check for NAME in project root node_modules, then from the current directory and up."
+  (when-let ((executable (find-from-node-modules
+                          (concat
+                           (file-name-as-directory "typescript")
+                           (file-name-as-directory "bin")
+                           "tsserver"))))
+    (setq-local tide-tsserver-executable executable)))
 
 (defun use-tslint-from-node-modules ()
   (when-let ((tslint (find-executable-from-node-modules "tslint")))
@@ -237,6 +255,8 @@
   ; Fake it, we need to launch manually on windows
   (setq omnisharp--server-info t))
 
+(use-package projectile)
+
 (use-package request-deferred)
 
 (use-package powershell)
@@ -281,6 +301,7 @@
 
 tide-setup will crash otherwise."
   (if (not (eq buffer-file-name nil))
+      (use-tsserver-from-node-modules)
       (tide-setup))
   (set-fill-column 140)
   (add-hook 'before-save-hook 'tide-format-before-save))
@@ -290,7 +311,6 @@ tide-setup will crash otherwise."
   :init
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   :config
-  (setq tide-tsserver-executable "node_modules/typescript/bin/tsserver")
   (add-hook 'typescript-mode-hook #'use-tsun-from-node-modules)
   (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
   (flycheck-add-mode 'typescript-tslint 'web-mode))
