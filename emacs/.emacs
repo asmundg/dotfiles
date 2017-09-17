@@ -87,6 +87,7 @@
          ("C-r" . swiper)
          ;; ("C-c g" . counsel-git-grep) broken on windows
          ("C-x C-f" . counsel-find-file)
+         ("C-x C-l" . counsel-esh-history)
          ("M-x" . counsel-M-x))
   :config
   (ivy-mode 1)
@@ -94,6 +95,9 @@
   (setq ivy-count-format "(%d/%d)")
   (setq ivy-wrap 1)
   (setq ivy-use-selectable-prompt t)
+  (setq ivy-re-builders-alist
+        '((t . ivy--regex-ignore-order)))
+  (setq ivy-initial-inputs-alist nil)
   (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word)
 
   ; Partial workaround for broken grepping on windows (it's still
@@ -107,6 +111,8 @@
 (use-package editorconfig
   :config
   (editorconfig-mode 1))
+
+(use-package flx)
 
 (use-package jedi
   :init
