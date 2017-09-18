@@ -301,8 +301,9 @@
 
 tide-setup will crash otherwise."
   (if (not (eq buffer-file-name nil))
-      (use-tsserver-from-node-modules)
-      (tide-setup))
+      (progn
+        (use-tsserver-from-node-modules)
+        (tide-setup)))
   (set-fill-column 140)
   (add-hook 'before-save-hook 'tide-format-before-save))
 
