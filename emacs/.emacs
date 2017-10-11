@@ -85,7 +85,8 @@
   :diminish ivy-mode
   :bind (("C-s" . swiper)
          ("C-r" . swiper)
-         ;; ("C-c g" . counsel-git-grep) broken on windows
+         ("C-c g" . counsel-git-grep)
+         ("C-x C-g" . counsel-projectile-find-file)
          ("C-x C-f" . counsel-find-file)
          ("C-x C-l" . counsel-esh-history)
          ("M-x" . counsel-M-x))
@@ -105,6 +106,8 @@
   ; https://github.com/abo-abo/swiper/issues/786)
   (when (eq system-type 'windows-nt)
     (setq counsel-git-grep-cmd-default "git --no-pager grep --full-name -n --no-color -i -e \"%s\"")))
+
+(use-package counsel-projectile)
 
 (use-package dockerfile-mode)
 
@@ -166,12 +169,7 @@
   (when-let ((tsun (find-executable-from-node-modules "tsun")))
       (setq-local ts-comint-program-command tsun)))
 
-(use-package find-file-in-project
-  :bind (("C-x C-g" . find-file-in-project)))
-
 (use-package flycheck
-  :init
-  (add-hook 'flycheck-mode-hook #'use-tslint-from-node-modules)
   :config
   (global-flycheck-mode 1)
   (setq flycheck-display-errors-delay 0.1
@@ -311,6 +309,7 @@ tide-setup will crash otherwise."
 (use-package tide
   :init
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
+  (add-hook 'typescript-mode-hook #'use-tslint-from-node-modules)
   :config
   (add-hook 'typescript-mode-hook #'use-tsun-from-node-modules)
   (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
@@ -352,7 +351,7 @@ tide-setup will crash otherwise."
                     ;; Windows
                     "Consolas"
                   ;; Proper OS
-                  "Terminus")))
+                  "Inconsolata")))
       (set-frame-font (format "-outline-%s-normal-r-normal-normal-%d-97-96-96-c-*-iso8859-1" font size)))))
 
 ;; Fontify current frame
@@ -361,6 +360,7 @@ tide-setup will crash otherwise."
 ;; Fontify any future frames
 (push 'fontify-frame after-make-frame-functions)
 
+(global-set-key (kbd  "C-c c") 'org-capture)
 (global-set-key (kbd "M-n") 'forward-paragraph)
 (global-set-key (kbd "M-p") 'backward-paragraph)
 (global-set-key (kbd "C-w") 'backward-delete-word)
@@ -385,8 +385,14 @@ With argument ARG, do this that many times."
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
 (global-linum-mode -1)
-(global-auto-revert-mode 1)
 (delete-selection-mode 1)
+
+;; Auto refresh buffers
+(global-auto-revert-mode 1)
+
+;; Also auto refresh dired, but be quiet about it
+(setq global-auto-revert-non-file-buffers t)
+(setq auto-revert-verbose nil)
 
 (require 'uniquify)
 
@@ -401,13 +407,20 @@ With argument ARG, do this that many times."
 
 (provide 'emacs)
 ;;; .emacs ends here
+(if (eq system-type 'windows-nt)
+    (custom-set-faces
+     ;; custom-set-faces was added by Custom.
+     ;; If you edit it by hand, you could mess it up, so be careful.
+     ;; Your init file should contain only one such instance.
+     ;; If there is more than one, they won't work right.
+     '(ivy-current-match ((t :background "dark slate gray")))
+     '(ivy-minibuffer-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))
+     '(swiper-current-match ((t :background "dark slate gray")))
+     '(swiper-line-face ((t :background "dark slate gray")))
+     '(swiper-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ivy-current-match ((t :background "dark slate gray")))
- '(ivy-minibuffer-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))
- '(swiper-current-match ((t :background "dark slate gray")))
- '(swiper-line-face ((t :background "dark slate gray")))
- '(swiper-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold))))
+ )
