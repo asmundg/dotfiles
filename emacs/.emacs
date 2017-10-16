@@ -20,6 +20,9 @@
 ;;; Disable keyboard fumble of death
 (global-unset-key "\C-x\C-c")
 
+(setq org-directory "~")
+(setq org-default-notes-file (concat org-directory "/notes.org"))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -33,9 +36,10 @@
  '(global-font-lock-mode t nil (font-lock))
  '(helm-follow-mode-persistent t)
  '(indent-tabs-mode nil)
+ '(org-agenda-files (quote ("~/Documents/TODO.org")))
  '(package-selected-packages
    (quote
-    (rainbow-mode helm which-key avy counsel dockerfile-mode scion svg editorconfig fci-mode helm-ag helm-grepint org auto-virtualenv restclient restclient-mode flycheck ts-comint default-text-scale tide helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
+    (yarn-mode npm-mode ivy-pass counsel-projectile request-deferred projectile magit helm-git-grep helm-ls-git rainbow-mode helm which-key avy counsel dockerfile-mode scion svg editorconfig fci-mode helm-ag helm-grepint org auto-virtualenv restclient restclient-mode flycheck ts-comint default-text-scale tide helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
  '(require-final-newline t)
  '(select-enable-clipboard t)
  '(show-paren-mode t nil (paren))
@@ -116,6 +120,8 @@
   (editorconfig-mode 1))
 
 (use-package flx)
+
+(use-package ivy-pass)
 
 (use-package jedi
   :init
@@ -236,10 +242,15 @@
   :config
   (setq
    magit-last-seen-setup-instructions "1.4.0"
-   magit-push-always-verify nil))
+   magit-push-always-verify nil
+   magit-diff-refine-hunk 'all))
 
 (use-package multiple-cursors
   :bind (("C-S-c C-S-c" . mc/edit-lines)))
+
+(use-package npm-mode
+  :config
+  (setq npm-global-mode t))
 
 (use-package nxml
   :config
@@ -309,9 +320,8 @@ tide-setup will crash otherwise."
 (use-package tide
   :init
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
-  (add-hook 'typescript-mode-hook #'use-tslint-from-node-modules)
-  :config
-  (add-hook 'typescript-mode-hook #'use-tsun-from-node-modules)
+  (add-hook 'tide-mode-hook #'use-tslint-from-node-modules)
+  (add-hook 'tide-mode-hook #'use-tsun-from-node-modules)
   (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
   (flycheck-add-mode 'typescript-tslint 'web-mode))
 
@@ -333,6 +343,8 @@ tide-setup will crash otherwise."
                 (setup-tide-mode)))))
 
 (use-package yaml-mode)
+
+(use-package yarn-mode)
 
 ;; Quick and dirty font selection scheme
 (defun fontify-frame (frame)
