@@ -17,6 +17,8 @@
 (setq use-package-always-ensure t)
 (setq visible-bell 1)
 
+(setenv "PATH" (concat (getenv "PATH") ":" (getenv "HOME") "/.node/bin"))
+
 ;;; Disable keyboard fumble of death
 (global-unset-key "\C-x\C-c")
 
@@ -269,9 +271,11 @@
   :bind (("M-." . omnisharp-go-to-definition)
          ("M-," . pop-tag-mark))
   :config
-  (setq omnisharp-use-http t)
-  ; Fake it, we need to launch manually on windows
-  (setq omnisharp--server-info t))
+  (if (eq system-type 'windows-nt)
+      (progn
+        (setq omnisharp-use-http t)
+        ; Fake it, we need to launch manually on windows
+        (setq omnisharp--server-info t))))
 
 (use-package projectile)
 
