@@ -23,6 +23,12 @@
 (setq org-directory "~")
 (setq org-default-notes-file (concat org-directory "/notes.org"))
 
+;; Put autosave and backups out of the way
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -156,7 +162,7 @@
          (closest-parent (expand-file-name
                           relative-executable-path
                           (locate-dominating-file default-directory "node_modules"))))
-    (seq-find 'file-exists-p (list toplevel closest-parent))))
+    (seq-find 'file-exists-p (list closest-parent toplevel))))
 
 (defun use-tsserver-from-node-modules ()
   "Check for NAME in project root node_modules, then from the current directory and up."
@@ -218,6 +224,8 @@
   :bind (:map markdown-mode-map
               ("M-n" . forward-paragraph)
               ("M-p" . backward-paragraph))
+  :init
+  (add-hook 'markdown-mode-hook 'turn-on-orgtbl)
   :config
   (setq-local markdown-fontify-code-blocks-natively t)
   (setq-local markdown-code-lang-modes
@@ -243,7 +251,8 @@
   (setq
    magit-last-seen-setup-instructions "1.4.0"
    magit-push-always-verify nil
-   magit-diff-refine-hunk 'all))
+   ;; Always on linux, never on Windows, due to slooow
+   magit-diff-refine-hunk (if (eq system-type 'windows-nt) nil 'all)))
 
 (use-package multiple-cursors
   :bind (("C-S-c C-S-c" . mc/edit-lines)))
