@@ -121,6 +121,8 @@
 
 (use-package counsel-projectile)
 
+(use-package docker-compose-mode)
+
 (use-package dockerfile-mode)
 
 (use-package editorconfig
