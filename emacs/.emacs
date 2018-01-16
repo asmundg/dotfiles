@@ -24,6 +24,7 @@
 
 (setq org-directory "~")
 (setq org-default-notes-file (concat org-directory "/notes.org"))
+(add-hook 'org-mode-hook #'flyspell-mode)
 
 ;; Put autosave and backups out of the way
 (setq backup-directory-alist
@@ -47,7 +48,7 @@
  '(org-agenda-files (quote ("~/Documents/TODO.org")))
  '(package-selected-packages
    (quote
-    (intero docker-compose-mode yarn-mode npm-mode ivy-pass counsel-projectile request-deferred projectile magit helm-git-grep helm-ls-git rainbow-mode helm which-key avy counsel dockerfile-mode scion svg editorconfig fci-mode helm-ag helm-grepint org auto-virtualenv restclient restclient-mode flycheck ts-comint default-text-scale tide helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
+    (indium intero docker-compose-mode yarn-mode npm-mode ivy-pass counsel-projectile request-deferred projectile magit helm-git-grep helm-ls-git rainbow-mode helm which-key avy counsel dockerfile-mode scion svg editorconfig fci-mode helm-ag helm-grepint org auto-virtualenv restclient restclient-mode flycheck ts-comint default-text-scale tide helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
  '(require-final-newline t)
  '(select-enable-clipboard t)
  '(show-paren-mode t nil (paren))
@@ -219,6 +220,8 @@
   (if (eq system-type 'windows-nt)
       (defun helm-git-grep-submodule-grep-process ())))
 
+(use-package indium)
+
 (use-package json-mode
   :config
   (setq js-indent-level 2))
@@ -229,6 +232,7 @@
               ("M-p" . backward-paragraph))
   :init
   (add-hook 'markdown-mode-hook 'turn-on-orgtbl)
+  (add-hook 'markdown-mode-hook #'flyspell-mode)
   :config
   (setq-local markdown-fontify-code-blocks-natively t)
   (setq-local markdown-code-lang-modes
@@ -336,6 +340,7 @@ tide-setup will crash otherwise."
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   (add-hook 'tide-mode-hook #'use-tslint-from-node-modules)
   (add-hook 'tide-mode-hook #'use-tsun-from-node-modules)
+  (add-hook 'tide-mode-hook #'flyspell-prog-mode)
   (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
   (flycheck-add-mode 'typescript-tslint 'web-mode))
 
@@ -386,7 +391,7 @@ tide-setup will crash otherwise."
 ;; Fontify any future frames
 (push 'fontify-frame after-make-frame-functions)
 
-(global-set-key (kbd  "C-c c") 'org-capture)
+(global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "M-n") 'forward-paragraph)
 (global-set-key (kbd "M-p") 'backward-paragraph)
 (global-set-key (kbd "C-w") 'backward-delete-word)
