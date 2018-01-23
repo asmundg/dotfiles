@@ -344,8 +344,9 @@ tide-setup will crash otherwise."
   (add-hook 'tide-mode-hook #'use-tslint-from-node-modules)
   (add-hook 'tide-mode-hook #'use-tsun-from-node-modules)
   (add-hook 'tide-mode-hook #'flyspell-prog-mode)
-  (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
-  (flycheck-add-mode 'typescript-tslint 'web-mode))
+  (flycheck-add-mode 'typescript-tslint 'web-mode)
+  :config
+  (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append))
 
 (use-package ts-comint)
 
