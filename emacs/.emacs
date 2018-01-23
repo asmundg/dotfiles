@@ -32,6 +32,11 @@
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
 
+;; Disable lockfiles on Windows, as they create all sorts of weird
+;; file system effects
+(when (eq system-type 'windows-nt)
+  (setq create-lockfiles nil))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -50,6 +55,20 @@
    (quote
     (indium intero docker-compose-mode yarn-mode npm-mode ivy-pass counsel-projectile request-deferred projectile magit helm-git-grep helm-ls-git rainbow-mode helm which-key avy counsel dockerfile-mode scion svg editorconfig fci-mode helm-ag helm-grepint org auto-virtualenv restclient restclient-mode flycheck ts-comint default-text-scale tide helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
  '(require-final-newline t)
+ '(safe-local-variable-values
+   (quote
+    ((eval set
+           (make-local-variable
+            (quote tide-tsserver-executable))
+           (expand-file-name "scripts/node_modules/typescript/bin/tsserver"
+                             (file-name-directory
+                              (let
+                                  ((d
+                                    (dir-locals-find-file ".")))
+                                (if
+                                    (stringp d)
+                                    d
+                                  (car d)))))))))
  '(select-enable-clipboard t)
  '(show-paren-mode t nil (paren))
  '(show-paren-style (quote expression))
@@ -57,14 +76,15 @@
  '(tab-width 4)
  '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
 
-;; (use-package aggressive-indent
-;;   :config
-;;   (add-to-list
-;;    'aggressive-indent-dont-indent-if
-;;    '(and (derived-mode-p 'csharp-mode)
-;;          (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
-;;                              (thing-at-point 'line)))))
-;;   (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode))
+(use-package aggressive-indent
+  :config
+  ;;   (add-to-list
+  ;;    'aggressive-indent-dont-indent-if
+  ;;    '(and (derived-mode-p 'csharp-mode)
+  ;;          (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
+  ;;                              (thing-at-point 'line)))))
+  (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode)
+  (add-hook 'csharp-mode-hook 'aggressive-indent-mode))
 
 (winner-mode 1)
 
@@ -91,7 +111,7 @@
                                  ;; Don't die horribly in magit ediff, where buffer-file-name is nil
                                  (when (and buffer-file-name
                                             (string-equal "tsx" (file-name-extension buffer-file-name)))
-                                 (omnisharp-mode)))))
+                                   (omnisharp-mode)))))
 
 (use-package company
   :config
@@ -117,9 +137,9 @@
   (setq ivy-initial-inputs-alist nil)
   (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word)
 
-  ; Partial workaround for broken grepping on windows (it's still
-  ; brokwn due to a really slow start, see
-  ; https://github.com/abo-abo/swiper/issues/786)
+                                        ; Partial workaround for broken grepping on windows (it's still
+                                        ; broken due to a really slow start, see
+                                        ; https://github.com/abo-abo/swiper/issues/786)
   (when (eq system-type 'windows-nt)
     (setq counsel-git-grep-cmd-default "git --no-pager grep --full-name -n --no-color -i -e \"%s\"")))
 
@@ -132,6 +152,8 @@
 (use-package editorconfig
   :config
   (editorconfig-mode 1))
+
+(use-package flow-minor-mode)
 
 (use-package flx)
 
@@ -192,7 +214,7 @@
 
 (defun use-tsun-from-node-modules ()
   (when-let ((tsun (find-executable-from-node-modules "tsun")))
-      (setq-local ts-comint-program-command tsun)))
+    (setq-local ts-comint-program-command tsun)))
 
 (use-package flycheck
   :config
@@ -282,7 +304,7 @@
   (if (eq system-type 'windows-nt)
       (progn
         (setq omnisharp-use-http t)
-        ; Fake it, we need to launch manually on windows
+                                        ; Fake it, we need to launch manually on windows
         (setq omnisharp--server-info t))))
 
 (use-package projectile)
@@ -344,9 +366,9 @@ tide-setup will crash otherwise."
   (add-hook 'tide-mode-hook #'use-tslint-from-node-modules)
   (add-hook 'tide-mode-hook #'use-tsun-from-node-modules)
   (add-hook 'tide-mode-hook #'flyspell-prog-mode)
-  (flycheck-add-mode 'typescript-tslint 'web-mode)
   :config
-  (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append))
+  (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
+  (flycheck-add-mode 'typescript-tslint 'web-mode))
 
 (use-package ts-comint)
 
