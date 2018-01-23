@@ -88,7 +88,10 @@
                                  (setq-local show-trailing-whitespace t)
                                  (setq-local company-backends '(company-omnisharp company-dabbrev-code company-keywords))
                                  (company-mode)
-                                 (omnisharp-mode))))
+                                 ;; Don't die horribly in magit ediff, where buffer-file-name is nil
+                                 (when (and buffer-file-name
+                                            (string-equal "tsx" (file-name-extension buffer-file-name)))
+                                 (omnisharp-mode)))))
 
 (use-package company
   :config
