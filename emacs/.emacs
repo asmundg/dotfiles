@@ -17,7 +17,12 @@
 (setq use-package-always-ensure t)
 (setq visible-bell 1)
 
-(setenv "PATH" (concat (getenv "PATH") ":" (getenv "HOME") "/.node/bin"))
+;; Stop me from pressing the wrong key all the time on OSX
+(setq mac-command-modifier 'meta)
+(setq-default indent-tabs-mode nil)
+
+(setenv "PATH" (concat (getenv "PATH") ":" (getenv "HOME") "/.node/bin" ":/usr/local/bin"))
+(add-to-list 'exec-path "/usr/local/bin")
 
 ;;; Disable keyboard fumble of death
 (global-unset-key "\C-x\C-c")
@@ -42,39 +47,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(coffee-tab-width 2)
- '(current-language-environment "UTF-8")
  '(custom-safe-themes
    (quote
-    ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
- '(global-font-lock-mode t nil (font-lock))
- '(helm-follow-mode-persistent t)
- '(indent-tabs-mode nil)
- '(org-agenda-files (quote ("~/Documents/TODO.org")))
+    ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" default)))
  '(package-selected-packages
    (quote
-    (indium intero docker-compose-mode yarn-mode npm-mode ivy-pass counsel-projectile request-deferred projectile magit helm-git-grep helm-ls-git rainbow-mode helm which-key avy counsel dockerfile-mode scion svg editorconfig fci-mode helm-ag helm-grepint org auto-virtualenv restclient restclient-mode flycheck ts-comint default-text-scale tide helm-config yaml-mode web-mode virtualenvwrapper use-package solarized-theme smartparens smart-mode-line slime rainbow-identifiers rainbow-delimiters python-mode powershell php-mode password-store omnisharp nvm mo-git-blame markdown-mode magit-find-file magit-filenotify lua-mode less-css-mode json-mode js2-mode jinja2-mode jedi iy-go-to-char helm-dash graphviz-dot-mode gnuplot-mode fsharp-mode flymake-haskell-multi flycheck-pos-tip flycheck-clojure find-file-in-project expand-region exec-path-from-shell csv-mode color-theme coffee-mode clojure-mode-extra-font-locking autopair aggressive-indent ac-haskell-process ac-cider)))
- '(require-final-newline t)
- '(safe-local-variable-values
-   (quote
-    ((eval set
-           (make-local-variable
-            (quote tide-tsserver-executable))
-           (expand-file-name "scripts/node_modules/typescript/bin/tsserver"
-                             (file-name-directory
-                              (let
-                                  ((d
-                                    (dir-locals-find-file ".")))
-                                (if
-                                    (stringp d)
-                                    d
-                                  (car d)))))))))
- '(select-enable-clipboard t)
- '(show-paren-mode t nil (paren))
- '(show-paren-style (quote expression))
- '(show-trailing-whitespace t)
- '(tab-width 4)
- '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
+    (yarn-mode web-mode which-key ts-comint tide solarized-theme smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
 
 (use-package aggressive-indent
   :config
@@ -201,11 +179,7 @@
 
 (defun use-tsserver-from-node-modules ()
   "Check for NAME in project root node_modules, then from the current directory and up."
-  (when-let ((executable (find-from-node-modules
-                          (concat
-                           (file-name-as-directory "typescript")
-                           (file-name-as-directory "bin")
-                           "tsserver"))))
+  (when-let ((executable (find-executable-from-node-modules "tsserver")))
     (setq-local tide-tsserver-executable executable)))
 
 (defun use-tslint-from-node-modules ()
@@ -239,11 +213,11 @@
   :bind ("C-x C-g" . helm-browse-project))
 
 (use-package helm-git-grep
-  :bind (("C-c g" . helm-git-grep)
-         ("C-x g" . helm-git-grep-at-point))
   :config
-  (if (eq system-type 'windows-nt)
-      (defun helm-git-grep-submodule-grep-process ())))
+  (when (eq system-type 'windows-nt)
+    (defun helm-git-grep-submodule-grep-process ())
+    (bind-key "C-c g" 'helm-git-grep)
+    (bind-key "C-x g" 'helm-git-grep-at-point)))
 
 (use-package indium)
 
@@ -293,10 +267,6 @@
   :config
   (setq npm-global-mode t))
 
-(use-package nxml
-  :config
-  (setq nxml-slash-auto-complete-flag t))
-
 (use-package omnisharp
   :bind (("M-." . omnisharp-go-to-definition)
          ("M-," . pop-tag-mark))
@@ -341,6 +311,7 @@
   (add-hook 'clojure-mode-hook 'smartparens-strict-mode)
   (add-hook 'emacs-lisp-mode-hook 'smartparens-strict-mode)
   (smartparens-global-mode 1)
+  (show-smartparens-global-mode)
   :config
   (require 'smartparens-config))
 
@@ -385,7 +356,9 @@ tide-setup will crash otherwise."
               ;; Don't die horribly in magit ediff, where buffer-file-name is nil
               (when (and buffer-file-name
                          (string-equal "tsx" (file-name-extension buffer-file-name)))
-                (setup-tide-mode)))))
+                (setup-tide-mode))))
+  :config
+  (setq web-mode-enable-auto-quoting nil))
 
 (use-package yaml-mode)
 
@@ -403,13 +376,10 @@ tide-setup will crash otherwise."
                  ;; Small Display
                  18)
              ;; Low resolution
-             12))
-          (font (if (eq system-type 'windows-nt)
-                    ;; Windows
-                    "Consolas"
-                  ;; Proper OS
-                  "Inconsolata")))
-      (set-frame-font (format "-outline-%s-normal-r-normal-normal-%d-97-96-96-c-*-iso8859-1" font size)))))
+             12)))
+      (when (eq system-type 'windows-nt) (set-frame-font (format "-outline-Consolas-normal-r-normal-normal-%d-97-96-96-c-*-iso8859-1" size)))
+      (when (eq system-type 'gnu/linux) (set-frame-font (format "-outline-Inconsolata-normal-r-normal-normal-%d-97-96-96-c-*-iso8859-1" size)))
+      )))
 
 ;; Fontify current frame
 (fontify-frame nil)
