@@ -27,9 +27,11 @@
 ;;; Disable keyboard fumble of death
 (global-unset-key "\C-x\C-c")
 
+;; Org config
 (setq org-directory "~")
 (setq org-default-notes-file (concat org-directory "/notes.org"))
 (add-hook 'org-mode-hook #'flyspell-mode)
+(setq org-src-fontify-natively t)
 
 ;; Put autosave and backups out of the way
 (setq backup-directory-alist
@@ -52,7 +54,7 @@
     ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" default)))
  '(package-selected-packages
    (quote
-    (yarn-mode web-mode which-key ts-comint tide solarized-theme smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
+    (ob-restclient yarn-mode web-mode which-key ts-comint tide solarized-theme smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
 
 (use-package aggressive-indent
   :config
@@ -99,7 +101,6 @@
   :diminish ivy-mode
   :bind (("C-s" . swiper)
          ("C-r" . swiper)
-         ("C-c g" . counsel-git-grep)
          ("C-x C-g" . counsel-projectile-find-file)
          ("C-x C-f" . counsel-find-file)
          ("C-x C-l" . counsel-esh-history)
@@ -213,11 +214,11 @@
   :bind ("C-x C-g" . helm-browse-project))
 
 (use-package helm-git-grep
+  :bind (("C-c g" . helm-git-grep)
+         ("C-x g" . helm-git-grep-at-point))
   :config
   (when (eq system-type 'windows-nt)
-    (defun helm-git-grep-submodule-grep-process ())
-    (bind-key "C-c g" 'helm-git-grep)
-    (bind-key "C-x g" 'helm-git-grep-at-point)))
+    (defun helm-git-grep-submodule-grep-process ())))
 
 (use-package indium)
 
@@ -266,6 +267,8 @@
 (use-package npm-mode
   :config
   (setq npm-global-mode t))
+
+(use-package ob-restclient)
 
 (use-package omnisharp
   :bind (("M-." . omnisharp-go-to-definition)
