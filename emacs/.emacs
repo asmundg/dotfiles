@@ -54,7 +54,7 @@
     ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" default)))
  '(package-selected-packages
    (quote
-    (ob-restclient yarn-mode web-mode which-key ts-comint tide solarized-theme smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
+    (git-timemachine git-gutter ob-restclient yarn-mode web-mode which-key ts-comint tide solarized-theme smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
 
 (use-package aggressive-indent
   :config
@@ -135,6 +135,12 @@
 (use-package flow-minor-mode)
 
 (use-package flx)
+
+(use-package git-gutter
+  :config
+  (global-git-gutter-mode 1))
+
+(use-package git-timemachine)
 
 ;; Haskell devenv
 (use-package intero
@@ -274,11 +280,9 @@
   :bind (("M-." . omnisharp-go-to-definition)
          ("M-," . pop-tag-mark))
   :config
-  (if (eq system-type 'windows-nt)
-      (progn
-        (setq omnisharp-use-http t)
-                                        ; Fake it, we need to launch manually on windows
-        (setq omnisharp--server-info t))))
+  (when (eq system-type 'windows-nt)
+    (setq omnisharp-use-http t) ; Fake it, we need to launch manually on windows
+    (setq omnisharp--server-info t)))
 
 (use-package projectile)
 
