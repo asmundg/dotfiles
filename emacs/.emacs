@@ -184,8 +184,11 @@
                           (locate-dominating-file default-directory "node_modules"))))
     (seq-find 'file-exists-p (list closest-parent toplevel))))
 
+(defun use-prettier-from-node-modules ()
+  (when-let ((executable (find-executable-from-node-modules "prettier")))
+    (setq-local prettier-js-command executable)))
+
 (defun use-tsserver-from-node-modules ()
-  "Check for NAME in project root node_modules, then from the current directory and up."
   (when-let ((executable (find-executable-from-node-modules "tsserver")))
     (setq-local tide-tsserver-executable executable)))
 
@@ -292,6 +295,8 @@
   :config
   (powerline-moe-theme))
 
+(use-package prettier-js)
+
 (use-package projectile)
 
 (use-package request-deferred)
@@ -334,20 +339,20 @@
   "Only enable tide if we have a file buffer.
 
 tide-setup will crash otherwise."
-  (if (not (eq buffer-file-name nil))
-      (progn
-        (use-tsserver-from-node-modules)
-        (tide-setup)))
-  (set-fill-column 140)
-  (add-hook 'before-save-hook 'tide-format-before-save))
+  (when (not (eq buffer-file-name nil))
+    (tide-setup))
+  (set-fill-column 140))
 
 ;; This requires node
 (use-package tide
   :init
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   (add-hook 'tide-mode-hook #'use-tslint-from-node-modules)
+  (add-hook 'tide-mode-hook #'use-tsserver-from-node-modules)
   (add-hook 'tide-mode-hook #'use-tsun-from-node-modules)
+  (add-hook 'tide-mode-hook #'use-prettier-from-node-modules)
   (add-hook 'tide-mode-hook #'flyspell-prog-mode)
+  (add-hook 'tide-mode-hook #'prettier-js-mode)
   :config
   (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
   (flycheck-add-mode 'typescript-tslint 'web-mode))
