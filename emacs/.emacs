@@ -51,10 +51,10 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" default)))
+    ("b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" default)))
  '(package-selected-packages
    (quote
-    (git-gutter-fringe git-timemachine ob-restclient yarn-mode web-mode which-key ts-comint tide solarized-theme smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
+    (moe-theme powerline git-gutter-fringe git-timemachine ob-restclient yarn-mode web-mode which-key ts-comint tide smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
 
 (use-package aggressive-indent
   :config
@@ -270,6 +270,10 @@
 (use-package multiple-cursors
   :bind (("C-S-c C-S-c" . mc/edit-lines)))
 
+(use-package moe-theme
+  :config
+  (load-theme 'moe-dark))
+
 (use-package npm-mode
   :config
   (setq npm-global-mode t))
@@ -283,6 +287,10 @@
   (when (eq system-type 'windows-nt)
     (setq omnisharp-use-http t) ; Fake it, we need to launch manually on windows
     (setq omnisharp--server-info t)))
+
+(use-package powerline
+  :config
+  (powerline-moe-theme))
 
 (use-package projectile)
 
@@ -321,10 +329,6 @@
   (show-smartparens-global-mode)
   :config
   (require 'smartparens-config))
-
-(use-package solarized-theme
-  :config
-  (load-theme 'solarized-dark))
 
 (defun setup-tide-mode ()
   "Only enable tide if we have a file buffer.
