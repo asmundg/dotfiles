@@ -17,12 +17,16 @@
 (setq use-package-always-ensure t)
 (setq visible-bell 1)
 
-;; Stop me from pressing the wrong key all the time on OSX
-(setq mac-command-modifier 'meta)
+;; Assuming we switched option and command keys in OSX
+(setq mac-option-modifier 'meta)
 (setq-default indent-tabs-mode nil)
 
 (setenv "PATH" (concat (getenv "PATH") ":" (getenv "HOME") "/.node/bin" ":/usr/local/bin"))
 (add-to-list 'exec-path "/usr/local/bin")
+
+;; Python
+(when (eq system-type 'darwin)
+  (setq python-environment-virtualenv (list (expand-file-name "~/Library/Python/2.7/bin/virtualenv") "--system-site-packages" "--quiet")))
 
 ;;; Disable keyboard fumble of death
 (global-unset-key "\C-x\C-c")
@@ -54,7 +58,7 @@
     ("b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" default)))
  '(package-selected-packages
    (quote
-    (moe-theme powerline git-gutter-fringe git-timemachine ob-restclient yarn-mode web-mode which-key ts-comint tide smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
+    (flycheck-swift swift-mode moe-theme powerline git-gutter-fringe git-timemachine ob-restclient yarn-mode web-mode which-key ts-comint tide smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
 
 (use-package aggressive-indent
   :config
@@ -101,10 +105,12 @@
   :diminish ivy-mode
   :bind (("C-s" . swiper)
          ("C-r" . swiper)
+         ("C-c g" . counsel-rg)
          ("C-x C-g" . counsel-projectile-find-file)
          ("C-x C-f" . counsel-find-file)
          ("C-x C-l" . counsel-esh-history)
-         ("M-x" . counsel-M-x))
+         ("M-x" . counsel-M-x)
+         ("C-c C-r" . ivy-resume))
   :config
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers 1)
@@ -114,13 +120,7 @@
   (setq ivy-re-builders-alist
         '((t . ivy--regex-ignore-order)))
   (setq ivy-initial-inputs-alist nil)
-  (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word)
-
-                                        ; Partial workaround for broken grepping on windows (it's still
-                                        ; broken due to a really slow start, see
-                                        ; https://github.com/abo-abo/swiper/issues/786)
-  (when (eq system-type 'windows-nt)
-    (setq counsel-git-grep-cmd-default "git --no-pager grep --full-name -n --no-color -i -e \"%s\"")))
+  (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word))
 
 (use-package counsel-projectile)
 
@@ -137,6 +137,7 @@
 (use-package flx)
 
 (use-package git-gutter-fringe
+  :diminish git-gutter-mode
   :config
   (global-git-gutter-mode 1))
 
@@ -152,8 +153,10 @@
 (use-package jedi
   :init
   (add-hook 'python-mode-hook 'jedi:setup)
-  :bind (("M-." . jedi:goto-definition)
-         ("M-," . jedi:goto-definition-pop-marker))
+  :bind (
+         :map jedi-mode-map
+              ("M-." . jedi:goto-definition)
+              ("M-," . jedi:goto-definition-pop-marker))
   :config
   (setq jedi:complete-on-dot t))
 
@@ -211,6 +214,13 @@
   (with-eval-after-load 'flycheck
     (flycheck-pos-tip-mode)))
 
+(use-package flycheck-swift
+  :config
+  (setq flycheck-swift-sdk-path "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk")
+  ;; ↑ Select the appropriate SDK version you use
+  (setq flycheck-swift-target "arm64-apple-ios10")
+  (eval-after-load 'flycheck '(flycheck-swift-setup)))
+
 (use-package fsharp-mode
   :config
   (if (eq system-type 'windows-nt)
@@ -223,8 +233,6 @@
   :bind ("C-x C-g" . helm-browse-project))
 
 (use-package helm-git-grep
-  :bind (("C-c g" . helm-git-grep)
-         ("C-x g" . helm-git-grep-at-point))
   :config
   (when (eq system-type 'windows-nt)
     (defun helm-git-grep-submodule-grep-process ())))
@@ -264,6 +272,7 @@
   :bind (("C-x v s" . magit-status)
          ("C-x v b" . magit-blame))
   :config
+  (magit-add-section-hook 'magit-status-sections-hook 'magit-insert-local-branches 'magit-insert-stashes)
   (setq
    magit-last-seen-setup-instructions "1.4.0"
    magit-push-always-verify nil
@@ -275,7 +284,8 @@
 
 (use-package moe-theme
   :config
-  (load-theme 'moe-dark))
+  (load-theme 'moe-dark)
+  (eval-after-load 'powerline '(powerline-moe-theme)))
 
 (use-package npm-mode
   :config
@@ -284,16 +294,16 @@
 (use-package ob-restclient)
 
 (use-package omnisharp
-  :bind (("M-." . omnisharp-go-to-definition)
-         ("M-," . pop-tag-mark))
+  :bind (
+         :map omnisharp-mode-map
+              ("M-." . omnisharp-go-to-definition)
+              ("M-," . pop-tag-mark))
   :config
   (when (eq system-type 'windows-nt)
     (setq omnisharp-use-http t) ; Fake it, we need to launch manually on windows
     (setq omnisharp--server-info t)))
 
-(use-package powerline
-  :config
-  (powerline-moe-theme))
+(use-package powerline)
 
 (use-package prettier-js)
 
@@ -340,8 +350,9 @@
 
 tide-setup will crash otherwise."
   (when (not (eq buffer-file-name nil))
-    (tide-setup))
-  (set-fill-column 140))
+    (tide-setup)))
+
+(use-package swift-mode)
 
 ;; This requires node
 (use-package tide
@@ -441,12 +452,24 @@ With argument ARG, do this that many times."
 
 (put 'upcase-region 'disabled nil)
 
+;; Custom defun magic
+
 (defun url-decode-region (start end)
   "Replace a region with the same contents, only URL decoded."
   (interactive "r")
   (let ((text (url-unhex-string (buffer-substring start end))))
     (delete-region start end)
     (insert text)))
+
+(defun tide-eldoc-at-point ()
+  "print Typescript's idea of the type at the current point"
+  (interactive)
+  (if (tide-method-call-p) 
+      (tide-command:signatureHelp #'message) 
+    (when (looking-at "\\s_\\|\\sw") 
+      (tide-command:quickinfo 
+       (tide-on-response-success-callback response t 
+         (message (tide-doc-text (plist-get response :body)))))))) 
 
 (provide 'emacs)
 ;;; .emacs ends here
