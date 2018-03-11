@@ -110,7 +110,10 @@
          ("C-x C-f" . counsel-find-file)
          ("C-x C-l" . counsel-esh-history)
          ("M-x" . counsel-M-x)
-         ("C-c C-r" . ivy-resume))
+         ("C-c C-r" . ivy-resume)
+         ("M-y" . counsel-yank-pop)
+         :map ivy-minibuffer-map
+         ("M-y" . ivy-next-line))
   :config
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers 1)
