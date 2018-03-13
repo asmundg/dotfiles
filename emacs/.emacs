@@ -17,6 +17,10 @@
 (setq use-package-always-ensure t)
 (setq visible-bell 1)
 
+
+(setq server-socket-dir "~/.emacs.d/server")
+(server-start)
+
 ;; Assuming we switched option and command keys in OSX
 (setq mac-option-modifier 'meta)
 (setq-default indent-tabs-mode nil)
@@ -58,7 +62,7 @@
     ("b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" default)))
  '(package-selected-packages
    (quote
-    (flycheck-swift swift-mode moe-theme powerline git-gutter-fringe git-timemachine ob-restclient yarn-mode web-mode which-key ts-comint tide smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
+    (csv-mode flycheck-swift swift-mode moe-theme powerline git-gutter-fringe git-timemachine ob-restclient yarn-mode web-mode which-key ts-comint tide smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
 
 (use-package aggressive-indent
   :config
@@ -97,6 +101,8 @@
                                             (string-equal "tsx" (file-name-extension buffer-file-name)))
                                    (omnisharp-mode)))))
 
+(use-package csv-mode)
+
 (use-package company
   :config
   (global-company-mode 1))
@@ -123,6 +129,7 @@
   (setq ivy-re-builders-alist
         '((t . ivy--regex-ignore-order)))
   (setq ivy-initial-inputs-alist nil)
+  (setq ivy-height 30)
   (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word))
 
 (use-package counsel-projectile)
