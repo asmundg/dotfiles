@@ -32,8 +32,9 @@
 (when (eq system-type 'darwin)
   (setq python-environment-virtualenv (list (expand-file-name "~/Library/Python/2.7/bin/virtualenv") "--system-site-packages" "--quiet")))
 
-;;; Disable keyboard fumble of death
+;;; Disable keyboard fumbles of death
 (global-unset-key "\C-x\C-c")
+(global-unset-key "\C-z")
 
 ;; Org config
 (setq org-directory "~")
@@ -52,6 +53,9 @@
 (when (eq system-type 'windows-nt)
   (setq create-lockfiles nil))
 
+;; Don't pop up extra windows in ediff
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -59,10 +63,10 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" default)))
+    ("b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
  '(package-selected-packages
    (quote
-    (csv-mode flycheck-swift swift-mode moe-theme powerline git-gutter-fringe git-timemachine ob-restclient yarn-mode web-mode which-key ts-comint tide smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
+    (clang-format prettier-js csv-mode flycheck-swift swift-mode powerline git-gutter-fringe git-timemachine ob-restclient yarn-mode web-mode which-key ts-comint tide smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
 
 (use-package aggressive-indent
   :config
@@ -85,6 +89,12 @@
 (use-package cider
   :config
   (add-hook 'clojure-mode-hook 'cider-mode))
+
+(use-package clang-format
+  :config
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (add-hook 'before-save-hook 'clang-format-buffer nil 'local))))
 
 (use-package clojure-mode)
 
@@ -315,7 +325,18 @@
 
 (use-package powerline)
 
-(use-package prettier-js)
+(use-package prettier-js
+  :config
+  (add-hook 'tide-mode-hook #'prettier-js-mode)
+  (add-hook 'tide-mode-hook #'configure-prettier)
+  (add-hook 'tide-mode-hook #'use-prettier-from-node-modules)
+  (add-hook 'js-mode-hook #'prettier-js-mode)
+  (add-hook 'js-mode-hook #'configure-prettier)
+  (add-hook 'js-mode-hook #'use-prettier-from-node-modules))
+
+(defun configure-prettier ()
+  "Find the appropriate prettierrc to use."
+  (setq-local prettier-js-args `(,(concat "--config " (expand-file-name ".prettierrc" (projectile-project-root))) "--write")))
 
 (use-package projectile)
 
@@ -366,14 +387,15 @@ tide-setup will crash otherwise."
 
 ;; This requires node
 (use-package tide
+  :bind (
+         :map tide-mode-map
+              ("C-M-." . tide-references))
   :init
-  (add-hook 'typescript-mode-hook #'setup-tide-mode)
   (add-hook 'tide-mode-hook #'use-tslint-from-node-modules)
   (add-hook 'tide-mode-hook #'use-tsserver-from-node-modules)
   (add-hook 'tide-mode-hook #'use-tsun-from-node-modules)
-  (add-hook 'tide-mode-hook #'use-prettier-from-node-modules)
   (add-hook 'tide-mode-hook #'flyspell-prog-mode)
-  (add-hook 'tide-mode-hook #'prettier-js-mode)
+  (add-hook 'typescript-mode-hook #'setup-tide-mode)
   :config
   (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
   (flycheck-add-mode 'typescript-tslint 'web-mode))
@@ -457,6 +479,7 @@ With argument ARG, do this that many times."
 ;; Also auto refresh dired, but be quiet about it
 (setq global-auto-revert-non-file-buffers t)
 (setq auto-revert-verbose nil)
+(setq dired-recursive-deletes 'always)
 
 (require 'uniquify)
 
@@ -494,6 +517,7 @@ With argument ARG, do this that many times."
      '(swiper-current-match ((t :background "dark slate gray")))
      '(swiper-line-face ((t :background "dark slate gray")))
      '(swiper-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
