@@ -249,9 +249,6 @@
 
 (use-package haskell-mode)
 
-(use-package helm-ls-git
-  :bind ("C-x C-g" . helm-browse-project))
-
 (use-package helm-git-grep
   :config
   (when (eq system-type 'windows-nt)
@@ -339,7 +336,9 @@
   "Find the appropriate prettierrc to use."
   (setq-local prettier-js-args `(,(concat "--config " (expand-file-name ".prettierrc" (projectile-project-root))) "--write")))
 
-(use-package projectile)
+(use-package projectile
+  :config
+  (setq projectile-require-project-root nil))
 
 (use-package request-deferred)
 
@@ -398,6 +397,7 @@ tide-setup will crash otherwise."
   (add-hook 'tide-mode-hook #'flyspell-prog-mode)
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   :config
+  (setq tide-always-show-documentation t)
   (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
   (flycheck-add-mode 'typescript-tslint 'web-mode))
 
@@ -447,18 +447,6 @@ tide-setup will crash otherwise."
 ;; Fontify any future frames
 (push 'fontify-frame after-make-frame-functions)
 
-(global-set-key (kbd "C-c c") 'org-capture)
-(global-set-key (kbd "M-n") 'forward-paragraph)
-(global-set-key (kbd "M-p") 'backward-paragraph)
-(global-set-key (kbd "C-w") 'backward-delete-word)
-(global-set-key (kbd "C-q") 'kill-region)
-(global-set-key (kbd "M-q") 'copy-region-as-kill)
-(global-set-key (kbd "M-e") 'fill-paragraph)
-(global-set-key (kbd "C-x C-m") 'execute-extended-command)
-(global-set-key (kbd "C-l") 'goto-line)
-(global-set-key (kbd "C-v") 'hippie-expand)
-(global-set-key (kbd "C-x C-M-f") 'find-file-in-project)
-
 (defun backward-delete-word (arg)
   "Delete characters backward until encountering the beginning of a word.
 With argument ARG, do this that many times."
@@ -504,6 +492,26 @@ With argument ARG, do this that many times."
       (tide-command:quickinfo 
        (tide-on-response-success-callback response t 
          (message (tide-doc-text (plist-get response :body)))))))) 
+
+;;; Stefan Monnier <foo at acm.org>. It is the opposite of fill-paragraph
+(defun unfill-paragraph (&optional region)
+  "Takes a multi-line paragraph and makes it into a single line of text."
+  (interactive (progn (barf-if-buffer-read-only) '(t)))
+  (let ((fill-column (point-max))
+        ;; This would override `fill-column' if it's an integer.
+        (emacs-lisp-docstring-fill-column t))
+    (fill-paragraph nil region)))
+
+(global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "M-n") 'forward-paragraph)
+(global-set-key (kbd "M-p") 'backward-paragraph)
+(global-set-key (kbd "C-w") 'backward-delete-word)
+(global-set-key (kbd "C-q") 'kill-region)
+(global-set-key (kbd "M-e") 'fill-paragraph)
+(global-set-key (kbd "M-q") 'unfill-paragraph)
+(global-set-key (kbd "C-x C-m") 'execute-extended-command)
+(global-set-key (kbd "C-l") 'goto-line)
+(global-set-key (kbd "C-v") 'hippie-expand)
 
 (provide 'emacs)
 ;;; .emacs ends here
