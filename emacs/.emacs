@@ -5,8 +5,7 @@
 ;; Bootstrap use-package
 (require 'package)
 (package-initialize)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -36,12 +35,6 @@
 (global-unset-key "\C-x\C-c")
 (global-unset-key "\C-z")
 
-;; Org config
-(setq org-directory "~")
-(setq org-default-notes-file (concat org-directory "/notes.org"))
-(add-hook 'org-mode-hook #'flyspell-mode)
-(setq org-src-fontify-natively t)
-
 ;; Put autosave and backups out of the way
 (setq backup-directory-alist
       `((".*" . ,temporary-file-directory)))
@@ -66,7 +59,7 @@
     ("b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
  '(package-selected-packages
    (quote
-    (clang-format prettier-js csv-mode flycheck-swift swift-mode powerline git-gutter-fringe git-timemachine ob-restclient yarn-mode web-mode which-key ts-comint tide smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
+    (ob-http org clang-format prettier-js csv-mode flycheck-swift swift-mode powerline git-gutter-fringe git-timemachine yarn-mode web-mode which-key ts-comint tide smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
 
 (use-package aggressive-indent
   :config
@@ -309,7 +302,7 @@
   :config
   (setq npm-global-mode t))
 
-(use-package ob-restclient)
+(use-package ob-http)
 
 (use-package omnisharp
   :bind (
@@ -320,6 +313,24 @@
   (when (eq system-type 'windows-nt)
     (setq omnisharp-use-http t) ; Fake it, we need to launch manually on windows
     (setq omnisharp--server-info t)))
+
+;; Org config
+(use-package org
+  :config
+  (setq org-directory "~")
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
+  (setq org-src-fontify-natively t)
+  (add-hook 'org-mode-hook #'flyspell-mode)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '(
+     (http . t)
+     (sh . t)
+     (python . t)
+     ))
+  (defun my-org-confirm-babel-evaluate (lang body)
+    (not (string= lang "http")))
+  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate))
 
 (use-package powerline)
 
@@ -334,7 +345,9 @@
 
 (defun configure-prettier ()
   "Find the appropriate prettierrc to use."
-  (setq-local prettier-js-args `(,(concat "--config " (expand-file-name ".prettierrc" (projectile-project-root))) "--write")))
+  (let ((rc (expand-file-name ".prettierrc" (projectile-project-root))))
+    (when (file-exists-p rc)
+      (setq-local prettier-js-args `(,(concat "--config " rc) "--write")))))
 
 (use-package projectile
   :config
@@ -509,7 +522,7 @@ With argument ARG, do this that many times."
 (global-set-key (kbd "C-q") 'kill-region)
 (global-set-key (kbd "M-e") 'fill-paragraph)
 (global-set-key (kbd "M-q") 'unfill-paragraph)
-(global-set-key (kbd "C-x C-m") 'execute-extended-command)
+(global-set-key (kbd "C-x C-m") 'counsel-M-x)
 (global-set-key (kbd "C-l") 'goto-line)
 (global-set-key (kbd "C-v") 'hippie-expand)
 
