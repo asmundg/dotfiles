@@ -5,7 +5,18 @@
 ;; Bootstrap use-package
 (require 'package)
 (package-initialize)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+
+(setq package-archives
+      '(("GNU ELPA"     . "http://elpa.gnu.org/packages/")
+        ("MELPA Stable" . "https://stable.melpa.org/packages/")
+        ("MELPA"        . "https://melpa.org/packages/"))
+      package-archive-priorities
+      '(("MELPA Stable" . 10)
+        ("GNU ELPA"     . 5)
+        ("MELPA"        . 0)))
+(setq package-pinned-packages
+      '((moe-theme . "MELPA")))
+
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -59,9 +70,10 @@
     ("b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
  '(package-selected-packages
    (quote
-    (ob-http org clang-format prettier-js csv-mode flycheck-swift swift-mode powerline git-gutter-fringe git-timemachine yarn-mode web-mode which-key ts-comint tide smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred omnisharp npm-mode multiple-cursors magit markdown-mode json-mode indium helm-git-grep helm-ls-git fsharp-mode flycheck-pos-tip expand-region default-text-scale jedi ivy-pass intero flx flow-minor-mode editorconfig dockerfile-mode docker-compose-mode counsel-projectile counsel company csharp-mode cider avy auto-virtualenv aggressive-indent use-package))))
+    (yarn-mode web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred prettier-js use-package powerline omnisharp ob-http npm-mode multiple-cursors moe-theme markdown-mode magit json-mode jedi ivy-pass intero indium helm-git-grep git-timemachine git-gutter-fringe fsharp-mode flycheck-swift flycheck-pos-tip flx flow-minor-mode expand-region editorconfig dockerfile-mode docker-compose-mode default-text-scale csv-mode counsel-projectile clang-format cider avy auto-virtualenv aggressive-indent))))
 
 (use-package aggressive-indent
+  :diminish aggressive-indent-mode
   :config
   ;;   (add-to-list
   ;;    'aggressive-indent-dont-indent-if
@@ -107,6 +119,7 @@
 (use-package csv-mode)
 
 (use-package company
+  :diminish company-mode
   :config
   (global-company-mode 1))
 
@@ -142,6 +155,7 @@
 (use-package dockerfile-mode)
 
 (use-package editorconfig
+  :diminish editorconfig-mode
   :config
   (editorconfig-mode 1))
 
@@ -242,11 +256,6 @@
 
 (use-package haskell-mode)
 
-(use-package helm-git-grep
-  :config
-  (when (eq system-type 'windows-nt)
-    (defun helm-git-grep-submodule-grep-process ())))
-
 (use-package indium)
 
 (use-package json-mode
@@ -294,9 +303,10 @@
   :bind (("C-S-c C-S-c" . mc/edit-lines)))
 
 (use-package moe-theme
+  :after powerline
   :config
   (load-theme 'moe-dark)
-  (eval-after-load 'powerline '(powerline-moe-theme)))
+  (powerline-moe-theme))
 
 (use-package npm-mode
   :config
@@ -380,6 +390,7 @@
   (sml/setup))
 
 (use-package smartparens
+  :diminish smartparens-mode
   :bind (("C-M-)" . sp-forward-slurp-sexp)
          ("C-M-(" . sp-forward-barf-sexp))
   :init
@@ -479,6 +490,7 @@ With argument ARG, do this that many times."
 
 ;; Auto refresh buffers
 (global-auto-revert-mode 1)
+(diminish 'auto-revert-mode)
 
 ;; Also auto refresh dired, but be quiet about it
 (setq global-auto-revert-non-file-buffers t)
@@ -547,4 +559,4 @@ With argument ARG, do this that many times."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(default ((((class color) (min-colors 4096)) (:foreground "#5f5f5f" :background "#fdfde7")) (((class color) (min-colors 256)) (:foreground "#5f5f5f" :background "#fdfde7")) (((class color) (min-colors 89)) (:foreground "#5f5f5f" :background "#fdfde7")))))
