@@ -114,8 +114,8 @@
   :diminish ivy-mode
   :bind (("C-s" . swiper)
          ("C-r" . swiper)
-         ("C-c g" . counsel-rg)
-         ("C-x C-g" . counsel-projectile-find-file)
+         ("C-c f" . counsel-rg)
+         ("C-c C-f" . counsel-projectile-find-file)
          ("C-x C-f" . counsel-find-file)
          ("C-x C-l" . counsel-esh-history)
          ("M-x" . counsel-M-x)
@@ -341,7 +341,8 @@
   (add-hook 'tide-mode-hook #'use-prettier-from-node-modules)
   (add-hook 'js-mode-hook #'prettier-js-mode)
   (add-hook 'js-mode-hook #'configure-prettier)
-  (add-hook 'js-mode-hook #'use-prettier-from-node-modules))
+  (add-hook 'js-mode-hook #'use-prettier-from-node-modules)
+  (add-hook 'markdown-mode-hook #'prettier-js-mode))
 
 (defun configure-prettier ()
   "Find the appropriate prettierrc to use."
@@ -423,6 +424,7 @@ tide-setup will crash otherwise."
 
 (use-package web-mode
   :mode "\\.tsx\\'"
+  :bind (("C-c C-f" . counsel-projectile-find-file))
   :init
   (add-hook 'web-mode-hook
             (lambda ()
