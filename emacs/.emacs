@@ -67,10 +67,10 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
+    ("26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
  '(package-selected-packages
    (quote
-    (yarn-mode web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred prettier-js use-package powerline omnisharp ob-http npm-mode multiple-cursors moe-theme markdown-mode magit json-mode jedi ivy-pass intero indium helm-git-grep git-timemachine git-gutter-fringe fsharp-mode flycheck-swift flycheck-pos-tip flx flow-minor-mode expand-region editorconfig dockerfile-mode docker-compose-mode default-text-scale csv-mode counsel-projectile clang-format cider avy auto-virtualenv aggressive-indent))))
+    (org yarn-mode web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred prettier-js use-package powerline omnisharp ob-http npm-mode multiple-cursors moe-theme markdown-mode magit json-mode jedi ivy-pass intero indium helm-git-grep git-timemachine git-gutter-fringe fsharp-mode flycheck-swift flycheck-pos-tip flx flow-minor-mode expand-region editorconfig dockerfile-mode docker-compose-mode default-text-scale csv-mode counsel-projectile clang-format cider avy auto-virtualenv aggressive-indent))))
 
 (use-package aggressive-indent
   :diminish aggressive-indent-mode
@@ -127,8 +127,8 @@
   :diminish ivy-mode
   :bind (("C-s" . swiper)
          ("C-r" . swiper)
-         ("C-c f" . counsel-rg)
-         ("C-c C-f" . counsel-projectile-find-file)
+         ("C-c s" . counsel-rg)
+         ("C-c f" . counsel-projectile-find-file)
          ("C-x C-f" . counsel-find-file)
          ("C-x C-l" . counsel-esh-history)
          ("M-x" . counsel-M-x)
@@ -435,7 +435,6 @@ tide-setup will crash otherwise."
 
 (use-package web-mode
   :mode "\\.tsx\\'"
-  :bind (("C-c C-f" . counsel-projectile-find-file))
   :init
   (add-hook 'web-mode-hook
             (lambda ()
@@ -479,28 +478,6 @@ With argument ARG, do this that many times."
   (interactive "p")
   (delete-region (point) (progn (backward-word arg) (point))))
 
-(setq inhibit-splash-screen t)
-(line-number-mode 1)
-(column-number-mode 1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-(menu-bar-mode -1)
-(global-linum-mode -1)
-(delete-selection-mode 1)
-
-;; Auto refresh buffers
-(global-auto-revert-mode 1)
-(diminish 'auto-revert-mode)
-
-;; Also auto refresh dired, but be quiet about it
-(setq global-auto-revert-non-file-buffers t)
-(setq auto-revert-verbose nil)
-(setq dired-recursive-deletes 'always)
-
-(require 'uniquify)
-
-(put 'upcase-region 'disabled nil)
-
 ;; Custom defun magic
 
 (defun url-decode-region (start end)
@@ -540,6 +517,30 @@ With argument ARG, do this that many times."
 (global-set-key (kbd "C-l") 'goto-line)
 (global-set-key (kbd "C-v") 'hippie-expand)
 
+(setq inhibit-splash-screen t)
+(line-number-mode 1)
+(column-number-mode 1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(menu-bar-mode -1)
+(global-linum-mode -1)
+(delete-selection-mode 1)
+
+;; Auto refresh buffers
+(global-auto-revert-mode 1)
+(diminish 'auto-revert-mode)
+
+;; Also auto refresh dired, but be quiet about it
+(setq global-auto-revert-non-file-buffers t)
+(setq auto-revert-verbose nil)
+(setq dired-recursive-deletes 'always)
+
+(add-hook 'js-mode-hook #'flyspell-prog-mode)
+
+(require 'uniquify)
+
+(put 'upcase-region 'disabled nil)
+
 (provide 'emacs)
 ;;; .emacs ends here
 (if (eq system-type 'windows-nt)
@@ -553,10 +554,3 @@ With argument ARG, do this that many times."
      '(swiper-current-match ((t :background "dark slate gray")))
      '(swiper-line-face ((t :background "dark slate gray")))
      '(swiper-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((((class color) (min-colors 4096)) (:foreground "#5f5f5f" :background "#fdfde7")) (((class color) (min-colors 256)) (:foreground "#5f5f5f" :background "#fdfde7")) (((class color) (min-colors 89)) (:foreground "#5f5f5f" :background "#fdfde7")))))
