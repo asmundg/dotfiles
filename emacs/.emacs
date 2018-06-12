@@ -145,7 +145,9 @@
   (setq ivy-re-builders-alist
         '((t . ivy--regex-ignore-order)))
   (setq ivy-initial-inputs-alist nil)
-  (setq ivy-height 30)
+  (setq ivy-height 20
+        counsel-rg-base-command "rg -i --hidden --no-heading --line-number --color never %s .")
+  
   (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word))
 
 (use-package counsel-projectile)
