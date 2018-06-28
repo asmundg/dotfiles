@@ -258,6 +258,12 @@
 
 (use-package haskell-mode)
 
+(use-package helpful
+  :bind (("C-h f" . helpful-callable)
+         ("C-h v" . helpful-variable)
+         ("C-h k" . helpful-key)
+         ("C-c C-d" . helpful-at-point)))
+
 (use-package indium)
 
 (use-package json-mode
