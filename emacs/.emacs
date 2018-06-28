@@ -314,6 +314,8 @@
   :config
   (setq npm-global-mode t))
 
+(use-package mustache-mode)
+
 (use-package ob-http)
 
 (use-package omnisharp
@@ -363,6 +365,8 @@
       (setq-local prettier-js-args `(,(concat "--config " rc) "--write")))))
 
 (use-package projectile
+  :init
+  (projectile-global-mode)
   :config
   (setq projectile-require-project-root nil))
 
