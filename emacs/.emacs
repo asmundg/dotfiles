@@ -172,6 +172,17 @@
 
 (use-package git-timemachine)
 
+(use-package goto-addr
+  :init
+  (add-hook 'compilation-mode-hook 'goto-address-mode)
+  (add-hook 'prog-mode-hook 'goto-address-mode)
+  (add-hook 'eshell-mode-hook 'goto-address-mode)
+  (add-hook 'shell-mode-hook 'goto-address-mode)
+  :bind (:map goto-address-highlight-keymap
+              ("M-<RET>" . goto-address-at-point))
+  :commands (goto-address-prog-mode
+             goto-address-mode))
+
 ;; Haskell devenv
 (use-package intero
   :config
