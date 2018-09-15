@@ -70,7 +70,7 @@
     ("26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
  '(package-selected-packages
    (quote
-    (graphviz-dot-mode wgrep helpful mustache-mode org yarn-mode web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred prettier-js use-package powerline omnisharp ob-http npm-mode multiple-cursors moe-theme markdown-mode magit json-mode jedi ivy-pass intero indium helm-git-grep git-timemachine git-gutter-fringe fsharp-mode flycheck-swift flycheck-pos-tip flx flow-minor-mode expand-region editorconfig dockerfile-mode docker-compose-mode default-text-scale csv-mode counsel-projectile clang-format cider avy auto-virtualenv aggressive-indent))))
+    (wgrep helpful mustache-mode org yarn-mode web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred prettier-js use-package powerline omnisharp ob-http npm-mode multiple-cursors moe-theme markdown-mode magit json-mode ivy-pass intero indium helm-git-grep git-timemachine git-gutter-fringe fsharp-mode flycheck-swift flycheck-pos-tip flx flow-minor-mode expand-region editorconfig dockerfile-mode docker-compose-mode default-text-scale csv-mode counsel-projectile clang-format cider avy auto-virtualenv aggressive-indent))))
 
 (use-package aggressive-indent
   :diminish aggressive-indent-mode
@@ -102,6 +102,14 @@
               (add-hook 'before-save-hook 'clang-format-buffer nil 'local))))
 
 (use-package clojure-mode)
+
+(use-package company-jedi
+  :config
+  (add-to-list 'company-backends 'company-jedi)
+  :bind (
+         :map python-mode-map
+         ("M-." . jedi:goto-definition)
+         ("M-," . jedi:goto-definition-pop-marker)))
 
 (use-package csharp-mode
   :config
@@ -190,16 +198,6 @@
 
 (use-package ivy-pass)
 
-(use-package jedi
-  :init
-  (add-hook 'python-mode-hook 'jedi:setup)
-  :bind (
-         :map jedi-mode-map
-              ("M-." . jedi:goto-definition)
-              ("M-," . jedi:goto-definition-pop-marker))
-  :config
-  (setq jedi:complete-on-dot t))
-
 (use-package default-text-scale
   :bind (("C-M-=" . default-text-scale-increase)
          ("C-M--" . default-text-scale-decrease)))
@@ -261,8 +259,6 @@
   (if (eq system-type 'windows-nt)
       (setq inferior-fsharp-program "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsi.exe\"")
     (setq fsharp-compile-command "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsc.exe\"")))
-
-(use-package graphviz-dot-mode)
 
 (use-package haskell-mode)
 
@@ -354,7 +350,6 @@
    '(
      (dot . t)
      (http . t)
-     (sh . t)
      (python . t)
      ))
   (defun my-org-confirm-babel-evaluate (lang body)
@@ -388,6 +383,10 @@
 (use-package request-deferred)
 
 (use-package powershell)
+
+(use-package py-autopep8
+  :config
+  (add-hook 'python-mode-hook #'py-autopep8-enable-on-save))
 
 (use-package rainbow-delimiters
   :config
