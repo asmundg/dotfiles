@@ -70,7 +70,7 @@
     ("26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
  '(package-selected-packages
    (quote
-    (wgrep helpful mustache-mode org yarn-mode web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred prettier-js use-package powerline omnisharp ob-http npm-mode multiple-cursors moe-theme markdown-mode magit json-mode jedi ivy-pass intero indium helm-git-grep git-timemachine git-gutter-fringe fsharp-mode flycheck-swift flycheck-pos-tip flx flow-minor-mode expand-region editorconfig dockerfile-mode docker-compose-mode default-text-scale csv-mode counsel-projectile clang-format cider avy auto-virtualenv aggressive-indent))))
+    (graphviz-dot-mode wgrep helpful mustache-mode org yarn-mode web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred prettier-js use-package powerline omnisharp ob-http npm-mode multiple-cursors moe-theme markdown-mode magit json-mode jedi ivy-pass intero indium helm-git-grep git-timemachine git-gutter-fringe fsharp-mode flycheck-swift flycheck-pos-tip flx flow-minor-mode expand-region editorconfig dockerfile-mode docker-compose-mode default-text-scale csv-mode counsel-projectile clang-format cider avy auto-virtualenv aggressive-indent))))
 
 (use-package aggressive-indent
   :diminish aggressive-indent-mode
@@ -214,18 +214,13 @@
                            name
                            (if (eq system-type 'windows-nt) ".cmd" ""))))
 
-(defun find-from-node-modules (name)
+(defun find-from-node-modules (path)
   "Check for executable NAME in project root node_modules, then from the current directory and up."
-  (let* ((relative-executable-path (concat
-                                    (file-name-as-directory "node_modules")
-                                    name))
-         (toplevel (expand-file-name
-                    relative-executable-path
-                    (projectile-project-root)))
-         (closest-parent (expand-file-name
-                          relative-executable-path
-                          (locate-dominating-file default-directory "node_modules"))))
-    (seq-find 'file-exists-p (list closest-parent toplevel))))
+  (file-truename
+   (let ((search-path (concat (file-name-as-directory "node_modules") path)))
+     (concat (locate-dominating-file
+              default-directory (lambda (d) (file-exists-p (concat d search-path))))
+             search-path))))
 
 (defun use-prettier-from-node-modules ()
   (when-let ((executable (find-executable-from-node-modules "prettier")))
@@ -266,6 +261,8 @@
   (if (eq system-type 'windows-nt)
       (setq inferior-fsharp-program "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsi.exe\"")
     (setq fsharp-compile-command "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsc.exe\"")))
+
+(use-package graphviz-dot-mode)
 
 (use-package haskell-mode)
 
@@ -355,6 +352,7 @@
   (org-babel-do-load-languages
    'org-babel-load-languages
    '(
+     (dot . t)
      (http . t)
      (sh . t)
      (python . t)
