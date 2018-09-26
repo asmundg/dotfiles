@@ -16,7 +16,8 @@
         ("MELPA"        . 0)))
 (setq package-pinned-packages
       '((moe-theme . "MELPA")
-        (flycheck . "MELPA")))
+        (flycheck . "MELPA")
+        (use-package . "MELPA")))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -68,13 +69,10 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
- '(package-selected-packages
-   (quote
-    (wgrep helpful mustache-mode org yarn-mode web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred prettier-js use-package powerline omnisharp ob-http npm-mode multiple-cursors moe-theme markdown-mode magit json-mode ivy-pass intero indium helm-git-grep git-timemachine git-gutter-fringe fsharp-mode flycheck-swift flycheck-pos-tip flx flow-minor-mode expand-region editorconfig dockerfile-mode docker-compose-mode default-text-scale csv-mode counsel-projectile clang-format cider avy auto-virtualenv aggressive-indent))))
+    ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default))))
 
 (use-package aggressive-indent
-  :diminish aggressive-indent-mode
+  :delight
   :config
   ;;   (add-to-list
   ;;    'aggressive-indent-dont-indent-if
@@ -128,12 +126,12 @@
 (use-package csv-mode)
 
 (use-package company
-  :diminish company-mode
+  :delight
   :config
   (global-company-mode 1))
 
 (use-package counsel
-  :diminish ivy-mode
+  :delight ivy-mode
   :bind (("C-s" . swiper)
          ("C-r" . swiper)
          ("C-c s" . counsel-rg)
@@ -159,14 +157,20 @@
   
   (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word))
 
+(use-package counsel-dash
+  :config
+  (setq counsel-dash-common-docsets '("Javascript" "HTML" "React")))
+
 (use-package counsel-projectile)
 
 (use-package docker-compose-mode)
 
 (use-package dockerfile-mode)
 
+(use-package delight)
+
 (use-package editorconfig
-  :diminish editorconfig-mode
+  :delight
   :config
   (editorconfig-mode 1))
 
@@ -175,7 +179,7 @@
 (use-package flx)
 
 (use-package git-gutter-fringe
-  :diminish git-gutter-mode
+  :delight git-gutter-mode
   :config
   (global-git-gutter-mode 1))
 
@@ -214,7 +218,7 @@
                            (if (eq system-type 'windows-nt) ".cmd" ""))))
 
 (defun find-from-node-modules (path)
-  "Check for executable NAME in project root node_modules, then from the current directory and up."
+  "Check for path in project root node_modules, then from the current directory and up."
   (file-truename
    (let ((search-path (concat (file-name-as-directory "node_modules") path)))
      (concat (locate-dominating-file
@@ -321,11 +325,14 @@
   (moe-dark)
   (powerline-moe-theme))
 
-(add-to-list 'load-path (concat (file-name-directory (file-truename "~/.emacs")) "elisp"))
-(require 'moe-flycheck-mode-line)
+(eval-and-compile
+  (defun elisp-load-path ()
+    (concat (file-name-directory (file-truename "~/.emacs")) "elisp")))
 
-(eval-after-load "flycheck"
-  '(add-hook 'flycheck-mode-hook 'moe-flycheck-mode-line-mode))
+(use-package moe-flycheck-mode-line
+  :load-path (lambda () (elisp-load-path))
+  :after flycheck
+  :hook (flycheck-mode . moe-flycheck-mode-line-mode))
 
 (use-package npm-mode
   :config
@@ -395,6 +402,10 @@
   :config
   (add-hook 'python-mode-hook #'py-autopep8-enable-on-save))
 
+(use-package elpy)
+
+(setq python-shell-interpreter "python3")
+
 (use-package rainbow-delimiters
   :config
   (add-hook 'python-mode-hook #'rainbow-delimiters-mode)
@@ -417,7 +428,7 @@
   (sml/setup))
 
 (use-package smartparens
-  :diminish smartparens-mode
+  :delight
   :bind (("C-M-)" . sp-forward-slurp-sexp)
          ("C-M-(" . sp-forward-barf-sexp))
   :init
@@ -456,7 +467,7 @@ tide-setup will crash otherwise."
 (use-package ts-comint)
 
 (use-package which-key
-  :diminish which-key-mode
+  :delight
   :init
   (which-key-mode))
 
@@ -510,14 +521,14 @@ With argument ARG, do this that many times."
 ;; Custom defun magic
 
 (defun url-decode-region (start end)
-  "Replace a region with the same contents, only URL decoded."
+  "Replace a region between start and end in buffer, with the same contents, only URL decoded."
   (interactive "r")
   (let ((text (url-unhex-string (buffer-substring start end))))
     (delete-region start end)
     (insert text)))
 
 (defun tide-eldoc-at-point ()
-  "print Typescript's idea of the type at the current point"
+  "print Typescript's idea of the type at the current point."
   (interactive)
   (if (tide-method-call-p) 
       (tide-command:signatureHelp #'message) 
@@ -528,7 +539,7 @@ With argument ARG, do this that many times."
 
 ;;; Stefan Monnier <foo at acm.org>. It is the opposite of fill-paragraph
 (defun unfill-paragraph (&optional region)
-  "Takes a multi-line paragraph and makes it into a single line of text."
+  "Take a multi-line paragraph and make it into a single line of text."
   (interactive (progn (barf-if-buffer-read-only) '(t)))
   (let ((fill-column (point-max))
         ;; This would override `fill-column' if it's an integer.
@@ -557,7 +568,7 @@ With argument ARG, do this that many times."
 
 ;; Auto refresh buffers
 (global-auto-revert-mode 1)
-(diminish 'auto-revert-mode)
+(delight 'auto-revert-mode)
 
 ;; Also auto refresh dired, but be quiet about it
 (setq global-auto-revert-non-file-buffers t)
