@@ -15,7 +15,8 @@
         ("GNU ELPA"     . 5)
         ("MELPA"        . 0)))
 (setq package-pinned-packages
-      '((moe-theme . "MELPA")))
+      '((moe-theme . "MELPA")
+        (flycheck . "MELPA")))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -317,8 +318,14 @@
 (use-package moe-theme
   :after powerline
   :config
-  (load-theme 'moe-dark)
+  (moe-dark)
   (powerline-moe-theme))
+
+(add-to-list 'load-path (concat (file-name-directory (file-truename "~/.emacs")) "elisp"))
+(require 'moe-flycheck-mode-line)
+
+(eval-after-load "flycheck"
+  '(add-hook 'flycheck-mode-hook 'moe-flycheck-mode-line-mode))
 
 (use-package npm-mode
   :config
