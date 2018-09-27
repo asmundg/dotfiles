@@ -354,6 +354,7 @@
 
 ;; Org config
 (use-package org
+  :hook (org-babel-after-execute . org-redisplay-inline-images)
   :config
   (setq org-directory "~")
   (setq org-default-notes-file (concat org-directory "/notes.org"))
