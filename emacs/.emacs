@@ -15,7 +15,8 @@
         ("GNU ELPA"     . 5)
         ("MELPA"        . 0)))
 (setq package-pinned-packages
-      '((moe-theme . "MELPA")
+      '((jedi-core . "MELPA")
+        (moe-theme . "MELPA")
         (flycheck . "MELPA")
         (use-package . "MELPA")))
 
@@ -29,7 +30,6 @@
 (setq use-package-always-ensure t)
 (setq visible-bell 1)
 
-
 (setq server-socket-dir "~/.emacs.d/server")
 (server-start)
 
@@ -39,10 +39,7 @@
 
 (setenv "PATH" (concat (getenv "PATH") ":" (getenv "HOME") "/.node/bin" ":/usr/local/bin"))
 (add-to-list 'exec-path "/usr/local/bin")
-
-;; Python
-(when (eq system-type 'darwin)
-  (setq python-environment-virtualenv (list (expand-file-name "~/Library/Python/2.7/bin/virtualenv") "--system-site-packages" "--quiet")))
+(add-to-list 'exec-path (concat (getenv "HOME") "/.pyenv/shims"))
 
 ;;; Disable keyboard fumbles of death
 (global-unset-key "\C-x\C-c")
@@ -84,10 +81,6 @@
 
 (winner-mode 1)
 
-(use-package auto-virtualenv
-  :init
-  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
-
 (use-package avy)
 
 (use-package cider
@@ -115,7 +108,6 @@
   (add-hook 'csharp-mode-hook '(lambda ()
                                  (c-set-offset 'arglist-intro '+)
                                  (set-fill-column 140)
-                                 (setq-local show-trailing-whitespace t)
                                  (setq-local company-backends '(company-omnisharp company-dabbrev-code company-keywords))
                                  (company-mode)
                                  ;; Don't die horribly in magit ediff, where buffer-file-name is nil
@@ -172,7 +164,8 @@
 (use-package editorconfig
   :delight
   :config
-  (editorconfig-mode 1))
+  (editorconfig-mode 1)
+  (add-to-list 'editorconfig-indentation-alist '(swift-mode swift-mode:basic-offset)))
 
 (use-package flow-minor-mode)
 
@@ -246,6 +239,9 @@
   (global-flycheck-mode 1)
   (setq flycheck-display-errors-delay 0.1
         flycheck-pos-tip-timeout 0))
+
+(use-package flycheck-objc-clang
+  :hook (flycheck-mode . flycheck-objc-clang-setup))
 
 (use-package flycheck-pos-tip
   :init
@@ -397,29 +393,25 @@
 
 (use-package request-deferred)
 
+(use-package pipenv
+  :hook (python-mode . pipenv-mode)
+  :config
+  (setenv "PIPENV_MAX_DEPTH" "10"))
+
 (use-package powershell)
 
 (use-package py-autopep8
-  :config
-  (add-hook 'python-mode-hook #'py-autopep8-enable-on-save))
+  :hook (python-mode . py-autopep8-enable-on-save))
 
 (use-package elpy)
 
 (setq python-shell-interpreter "python3")
 
 (use-package rainbow-delimiters
-  :config
-  (add-hook 'python-mode-hook #'rainbow-delimiters-mode)
-  (add-hook 'csharp-mode-hook #'rainbow-delimiters-mode)
-  (add-hook 'tide-mode-hook #'rainbow-delimiters-mode)
-  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
+  :hook ((python-mode csharp-mode tide-mode clojure-mode objc-mode) . rainbow-delimiters-mode))
 
 (use-package rainbow-identifiers
-  :config
-  (add-hook 'python-mode-hook #'rainbow-identifiers-mode)
-  (add-hook 'csharp-mode-hook #'rainbow-identifiers-mode)
-  (add-hook 'tide-mode-hook #'rainbow-identifiers-mode)
-  (add-hook 'clojure-mode-hook #'rainbow-identifiers-mode))
+  :hook ((python-mode csharp-mode tide-mode clojure-mode objc-mode) . rainbow-identifiers-mode))
 
 (use-package restclient)
 
@@ -485,6 +477,10 @@ tide-setup will crash otherwise."
   (setq web-mode-enable-auto-quoting nil))
 
 (use-package wgrep)
+
+(use-package ws-butler
+  :init
+  (ws-butler-global-mode))
 
 (use-package yaml-mode)
 
@@ -581,6 +577,15 @@ With argument ARG, do this that many times."
 (require 'uniquify)
 
 (put 'upcase-region 'disabled nil)
+
+;; Blink modeline on bell
+(setq ring-bell-function
+      (lambda ()
+        (let ((orig-fg (face-foreground 'mode-line)))
+          (set-face-foreground 'mode-line "#F2804F")
+          (run-with-idle-timer 0.1 nil
+                               (lambda (fg) (set-face-foreground 'mode-line fg))
+                               orig-fg))))
 
 (provide 'emacs)
 ;;; .emacs ends here
