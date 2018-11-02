@@ -238,7 +238,7 @@
   :config
   (global-flycheck-mode 1)
   (setq flycheck-display-errors-delay 0.1
-        flycheck-pos-tip-timeout 0))
+        flycheck-pos-tip-timeout 600))
 
 (use-package flycheck-objc-clang
   :hook (flycheck-mode . flycheck-objc-clang-setup))
@@ -354,7 +354,8 @@
   :config
   (setq org-directory "~")
   (setq org-default-notes-file (concat org-directory "/notes.org"))
-  (setq org-src-fontify-natively t)
+  (setq org-src-fontify-natively t
+        org-startup-truncated nil)
   (add-hook 'org-mode-hook #'flyspell-mode)
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -414,6 +415,10 @@
   :hook ((python-mode csharp-mode tide-mode clojure-mode objc-mode) . rainbow-identifiers-mode))
 
 (use-package restclient)
+
+(use-package shell-switcher
+  :init
+  (setq shell-switcher-mode t))
 
 (use-package smart-mode-line
   :config
@@ -485,6 +490,12 @@ tide-setup will crash otherwise."
 (use-package yaml-mode)
 
 (use-package yarn-mode)
+
+(use-package xterm-color
+  :init
+  (setq xterm-color-preserve-properties t
+        eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
+  (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter))
 
 ;; Quick and dirty font selection scheme
 (defun fontify-frame (frame)
