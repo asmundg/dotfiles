@@ -18,7 +18,9 @@
       '((jedi-core . "MELPA")
         (moe-theme . "MELPA")
         (flycheck . "MELPA")
-        (use-package . "MELPA")))
+        (use-package . "MELPA")
+        ;; https://github.com/ppareit/graphviz-dot-mode/pull/24
+        (graphviz-dot-mode . "MELPA" )))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -66,18 +68,18 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default))))
+    ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
+ '(package-selected-packages
+   (quote
+    (bazel-mode graphviz-dot-mode delight wgrep helpful mustache-mode org yarn-mode web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred prettier-js use-package powerline omnisharp ob-http npm-mode multiple-cursors moe-theme markdown-mode magit json-mode ivy-pass intero indium helm-git-grep git-timemachine git-gutter-fringe fsharp-mode flycheck-swift flycheck-pos-tip flx flow-minor-mode expand-region editorconfig dockerfile-mode docker-compose-mode default-text-scale csv-mode counsel-projectile clang-format cider avy auto-virtualenv aggressive-indent))))
+
+(use-package delight)
 
 (use-package aggressive-indent
   :delight
-  :config
-  ;;   (add-to-list
-  ;;    'aggressive-indent-dont-indent-if
-  ;;    '(and (derived-mode-p 'csharp-mode)
-  ;;          (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
-  ;;                              (thing-at-point 'line)))))
-  (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode)
-  (add-hook 'csharp-mode-hook 'aggressive-indent-mode))
+  :hook ((emacs-lisp-mode
+          csharp-mode
+          graphviz-dot-mode) . aggressive-indent-mode))
 
 (winner-mode 1)
 
@@ -159,8 +161,6 @@
 
 (use-package dockerfile-mode)
 
-(use-package delight)
-
 (use-package editorconfig
   :delight
   :config
@@ -238,10 +238,9 @@
   :config
   (global-flycheck-mode 1)
   (setq flycheck-display-errors-delay 0.1
-        flycheck-pos-tip-timeout 600))
-
-(use-package flycheck-objc-clang
-  :hook (flycheck-mode . flycheck-objc-clang-setup))
+        flycheck-pos-tip-timeout 600)
+  ;; Patch flycheck to avoid huge latencies when tsserver blocks while it loads temp files
+  (setcar (memq 'source-inplace (flycheck-checker-get 'typescript-tslint 'command)) 'source-original))
 
 (use-package flycheck-pos-tip
   :init
@@ -260,6 +259,8 @@
   (if (eq system-type 'windows-nt)
       (setq inferior-fsharp-program "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsi.exe\"")
     (setq fsharp-compile-command "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsc.exe\"")))
+
+(use-package graphviz-dot-mode)
 
 (use-package haskell-mode)
 
@@ -341,8 +342,8 @@
 (use-package omnisharp
   :bind (
          :map omnisharp-mode-map
-              ("M-." . omnisharp-go-to-definition)
-              ("M-," . pop-tag-mark))
+         ("M-." . omnisharp-go-to-definition)
+         ("M-," . pop-tag-mark))
   :config
   (when (eq system-type 'windows-nt)
     (setq omnisharp-use-http t) ; Fake it, we need to launch manually on windows
@@ -366,7 +367,21 @@
      ))
   (defun my-org-confirm-babel-evaluate (lang body)
     (not (string= lang "http")))
-  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate))
+  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
+        org-src-lang-modes '(("http" . "ob-http")
+                             ("ocaml" . tuareg)
+                             ("elisp" . emacs-lisp)
+                             ("ditaa" . artist)
+                             ("asymptote" . asy)
+                             ("dot" . graphviz-dot)
+                             ("sqlite" . sql)
+                             ("calc" . fundamental)
+                             ("C" . c)
+                             ("cpp" . c++)
+                             ("C++" . c++)
+                             ("screen" . shell-script)
+                             ("shell" . sh)
+                             ("bash" . sh))))
 
 (use-package powerline)
 
@@ -450,7 +465,7 @@ tide-setup will crash otherwise."
 (use-package tide
   :bind (
          :map tide-mode-map
-              ("C-M-." . tide-references))
+         ("C-M-." . tide-references))
   :init
   (add-hook 'tide-mode-hook #'use-tslint-from-node-modules)
   (add-hook 'tide-mode-hook #'use-tsserver-from-node-modules)
