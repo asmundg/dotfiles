@@ -364,9 +364,11 @@
      (dot . t)
      (http . t)
      (python . t)
+     (shell . t)
      ))
   (defun my-org-confirm-babel-evaluate (lang body)
-    (not (string= lang "http")))
+    (and (not (string= lang "http"))
+         (not (string= lang "dot"))))
   (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
         org-src-lang-modes '(("http" . "ob-http")
                              ("ocaml" . tuareg)
