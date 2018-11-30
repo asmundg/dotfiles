@@ -53,6 +53,9 @@
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
 
+;; Disable lockfiles, to avoid triggering automatic dev tools all the time
+(setq create-lockfiles nil)
+
 ;; Disable lockfiles on Windows, as they create all sorts of weird
 ;; file system effects
 (when (eq system-type 'windows-nt)
@@ -71,15 +74,14 @@
     ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
  '(package-selected-packages
    (quote
-    (bazel-mode graphviz-dot-mode delight wgrep helpful mustache-mode org yarn-mode web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters powershell request-deferred prettier-js use-package powerline omnisharp ob-http npm-mode multiple-cursors moe-theme markdown-mode magit json-mode ivy-pass intero indium helm-git-grep git-timemachine git-gutter-fringe fsharp-mode flycheck-swift flycheck-pos-tip flx flow-minor-mode expand-region editorconfig dockerfile-mode docker-compose-mode default-text-scale csv-mode counsel-projectile clang-format cider avy auto-virtualenv aggressive-indent))))
-
-(use-package delight)
+    (format-all graphviz-dot-mode x509-mode xterm-color shell-switcher flycheck-objc-clang ws-butler pipenv yarn-mode wgrep web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters elpy py-autopep8 powershell request-deferred prettier-js powerline omnisharp ob-http mustache-mode npm-mode moe-theme multiple-cursors magit markdown-mode json-mode indium helpful fsharp-mode flycheck-swift flycheck-pos-tip expand-region default-text-scale ivy-pass intero git-timemachine git-gutter-fringe flx flow-minor-mode editorconfig delight dockerfile-mode docker-compose-mode counsel-projectile counsel-dash counsel csv-mode csharp-mode company-jedi clang-format cider avy auto-virtualenv aggressive-indent use-package))))
 
 (use-package aggressive-indent
   :delight
   :hook ((emacs-lisp-mode
           csharp-mode
-          graphviz-dot-mode) . aggressive-indent-mode))
+          graphviz-dot-mode
+          swift-mode) . aggressive-indent-mode))
 
 (winner-mode 1)
 
@@ -88,12 +90,6 @@
 (use-package cider
   :config
   (add-hook 'clojure-mode-hook 'cider-mode))
-
-(use-package clang-format
-  :config
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (add-hook 'before-save-hook 'clang-format-buffer nil 'local))))
 
 (use-package clojure-mode)
 
@@ -148,7 +144,7 @@
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-height 20
         counsel-rg-base-command "rg -i --hidden --no-heading --line-number --color never %s .")
-  
+
   (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word))
 
 (use-package counsel-dash
@@ -170,6 +166,11 @@
 (use-package flow-minor-mode)
 
 (use-package flx)
+
+(use-package format-all
+  :hook ((clang-mode
+          elisp-mode
+          swift-mode) . format-all-mode))
 
 (use-package git-gutter-fringe
   :delight git-gutter-mode
@@ -388,20 +389,15 @@
 (use-package powerline)
 
 (use-package prettier-js
-  :config
-  (add-hook 'tide-mode-hook #'prettier-js-mode)
-  (add-hook 'tide-mode-hook #'configure-prettier)
-  (add-hook 'tide-mode-hook #'use-prettier-from-node-modules)
-  (add-hook 'js-mode-hook #'prettier-js-mode)
-  (add-hook 'js-mode-hook #'configure-prettier)
-  (add-hook 'js-mode-hook #'use-prettier-from-node-modules)
-  (add-hook 'markdown-mode-hook #'prettier-js-mode))
+  :hook ((tide-mode js-mode markdown-mode yaml-mode) . prettier-js-mode))
 
 (defun configure-prettier ()
   "Find the appropriate prettierrc to use."
-  (let ((rc (expand-file-name ".prettierrc" (projectile-project-root))))
-    (when (file-exists-p rc)
-      (setq-local prettier-js-args `(,(concat "--config " rc) "--write")))))
+  (let* ((rc (expand-file-name ".prettierrc" (projectile-project-root)))
+         (rc-config (if (file-exists-p rc) (list "--config" rc) '()))
+         (ignore (expand-file-name ".prettierignore" (projectile-project-root)))
+         (ignored-config (if (file-exists-p ignore) (list "--ignore-path" ignore) '())))
+    (setq-local prettier-js-args (append rc-config ignored-config '("--write")))))
 
 (use-package projectile
   :init
@@ -551,16 +547,6 @@ With argument ARG, do this that many times."
   (let ((text (url-unhex-string (buffer-substring start end))))
     (delete-region start end)
     (insert text)))
-
-(defun tide-eldoc-at-point ()
-  "print Typescript's idea of the type at the current point."
-  (interactive)
-  (if (tide-method-call-p) 
-      (tide-command:signatureHelp #'message) 
-    (when (looking-at "\\s_\\|\\sw") 
-      (tide-command:quickinfo 
-       (tide-on-response-success-callback response t 
-         (message (tide-doc-text (plist-get response :body)))))))) 
 
 ;;; Stefan Monnier <foo at acm.org>. It is the opposite of fill-paragraph
 (defun unfill-paragraph (&optional region)
