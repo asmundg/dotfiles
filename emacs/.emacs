@@ -403,7 +403,8 @@
   :init
   (projectile-global-mode)
   :config
-  (setq projectile-require-project-root nil))
+  (setq projectile-require-project-root nil
+    projectile-enable-caching t))
 
 (use-package request-deferred)
 
