@@ -65,16 +65,16 @@
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
- '(package-selected-packages
-   (quote
-    (format-all graphviz-dot-mode x509-mode xterm-color shell-switcher flycheck-objc-clang ws-butler pipenv yarn-mode wgrep web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters elpy py-autopep8 powershell request-deferred prettier-js powerline omnisharp ob-http mustache-mode npm-mode moe-theme multiple-cursors magit markdown-mode json-mode indium helpful fsharp-mode flycheck-swift flycheck-pos-tip expand-region default-text-scale ivy-pass intero git-timemachine git-gutter-fringe flx flow-minor-mode editorconfig delight dockerfile-mode docker-compose-mode counsel-projectile counsel-dash counsel csv-mode csharp-mode company-jedi clang-format cider avy auto-virtualenv aggressive-indent use-package))))
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+  '(custom-safe-themes
+     (quote
+       ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
+  '(package-selected-packages
+     (quote
+       (beacon format-all graphviz-dot-mode x509-mode xterm-color shell-switcher flycheck-objc-clang ws-butler pipenv yarn-mode wgrep web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters elpy py-autopep8 powershell request-deferred prettier-js powerline omnisharp ob-http mustache-mode npm-mode moe-theme multiple-cursors magit markdown-mode json-mode indium helpful fsharp-mode flycheck-swift flycheck-pos-tip expand-region default-text-scale ivy-pass intero git-timemachine git-gutter-fringe flx flow-minor-mode editorconfig delight dockerfile-mode docker-compose-mode counsel-projectile counsel-dash counsel csv-mode csharp-mode company-jedi clang-format cider avy auto-virtualenv aggressive-indent use-package))))
 
 (use-package aggressive-indent
   :delight
@@ -86,6 +86,10 @@
 (winner-mode 1)
 
 (use-package avy)
+
+(use-package beacon
+  :config
+  (beacon-mode 1))
 
 (use-package cider
   :config
@@ -103,36 +107,29 @@
 
 (use-package csharp-mode
   :config
-  (add-hook 'csharp-mode-hook '(lambda ()
-                                 (c-set-offset 'arglist-intro '+)
-                                 (set-fill-column 140)
-                                 (setq-local company-backends '(company-omnisharp company-dabbrev-code company-keywords))
-                                 (company-mode)
-                                 ;; Don't die horribly in magit ediff, where buffer-file-name is nil
-                                 (when (and buffer-file-name
-                                            (string-equal "tsx" (file-name-extension buffer-file-name)))
-                                   (omnisharp-mode)))))
+  (setq-local company-backends '(company-omnisharp company-dabbrev-code company-keywords)))
 
 (use-package csv-mode)
 
 (use-package company
   :delight
+  :hook ((csharp-mode) . company-mode)
   :config
   (global-company-mode 1))
 
 (use-package counsel
   :delight ivy-mode
   :bind (("C-s" . swiper)
-         ("C-r" . swiper)
-         ("C-c s" . counsel-rg)
-         ("C-c f" . counsel-projectile-find-file)
-         ("C-x C-f" . counsel-find-file)
-         ("C-x C-l" . counsel-esh-history)
-         ("M-x" . counsel-M-x)
-         ("C-c C-r" . ivy-resume)
-         ("M-y" . counsel-yank-pop)
-         :map ivy-minibuffer-map
-         ("M-y" . ivy-next-line))
+          ("C-r" . swiper)
+          ("C-c s" . counsel-rg)
+          ("C-c f" . counsel-projectile-find-file)
+          ("C-x C-f" . counsel-find-file)
+          ("C-x C-l" . counsel-esh-history)
+          ("M-x" . counsel-M-x)
+          ("C-c C-r" . ivy-resume)
+          ("M-y" . counsel-yank-pop)
+          :map ivy-minibuffer-map
+          ("M-y" . ivy-next-line))
   :config
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers 1)
@@ -140,10 +137,11 @@
   (setq ivy-wrap 1)
   (setq ivy-use-selectable-prompt t)
   (setq ivy-re-builders-alist
-        '((t . ivy--regex-ignore-order)))
+    '((swiper . ivy--regex-ignore-order)
+       (t . ivy--regex-fuzzy)))
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-height 20
-        counsel-rg-base-command "rg -i --hidden --no-heading --line-number --color never %s .")
+    counsel-rg-base-command "rg -i --hidden --no-heading --line-number --color never %s .")
 
   (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word))
 
@@ -169,8 +167,10 @@
 
 (use-package format-all
   :hook ((clang-mode
-          elisp-mode
-          swift-mode) . format-all-mode))
+           elisp-mode
+           markdown-mode
+           objc-mode
+           swift-mode) . format-all-mode))
 
 (use-package git-gutter-fringe
   :delight git-gutter-mode
@@ -403,7 +403,8 @@
   :init
   (projectile-global-mode)
   :config
-  (setq projectile-require-project-root nil
+  (setq
+    projectile-require-project-root nil
     projectile-enable-caching t))
 
 (use-package request-deferred)
@@ -605,19 +606,19 @@ With argument ARG, do this that many times."
 (provide 'emacs)
 ;;; .emacs ends here
 (if (eq system-type 'windows-nt)
-    (custom-set-faces
-     ;; custom-set-faces was added by Custom.
-     ;; If you edit it by hand, you could mess it up, so be careful.
-     ;; Your init file should contain only one such instance.
-     ;; If there is more than one, they won't work right.
-     '(ivy-current-match ((t :background "dark slate gray")))
-     '(ivy-minibuffer-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))
-     '(swiper-current-match ((t :background "dark slate gray")))
-     '(swiper-line-face ((t :background "dark slate gray")))
-     '(swiper-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))))
+  (custom-set-faces
+    ;; custom-set-faces was added by Custom.
+    ;; If you edit it by hand, you could mess it up, so be careful.
+    ;; Your init file should contain only one such instance.
+    ;; If there is more than one, they won't work right.
+    '(ivy-current-match ((t :background "dark slate gray")))
+    '(ivy-minibuffer-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))
+    '(swiper-current-match ((t :background "dark slate gray")))
+    '(swiper-line-face ((t :background "dark slate gray")))
+    '(swiper-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))))
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+  )
