@@ -348,6 +348,8 @@
 
 (use-package ob-http)
 
+(use-package oer-reveal)
+
 (use-package omnisharp
     :bind (
               :map omnisharp-mode-map
