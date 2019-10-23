@@ -396,6 +396,9 @@
                                 ("shell" . sh)
                                 ("bash" . sh))))
 
+(use-package org-bullets
+    :hook (org-mode) . (lambda () (org-bullets-mode 1)))
+
 (use-package org-present)
 
 (use-package powerline)
@@ -490,6 +493,8 @@ tide-setup will crash otherwise."
     (flycheck-add-mode 'typescript-tslint 'web-mode))
 
 (use-package ts-comint)
+
+(use-package uuidgen)
 
 (use-package which-key
     :delight
