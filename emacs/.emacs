@@ -196,6 +196,10 @@
     :commands (goto-address-prog-mode
                   goto-address-mode))
 
+(use-package grip-mode
+    :ensure t
+    :hook ((markdown-mode org-mode) . grip-mode))
+
 ;; Haskell devenv
 (use-package intero
     :config
