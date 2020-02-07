@@ -1,12 +1,8 @@
-# Emacs
-*~
-\#*#
-
-.emacs.d/.python-environments
-.emacs.d/ac-comphist.dat
-.emacs.d/auto-save-list
-.emacs.d/elpa/
-.emacs.d/eshell/
-.emacs.d/recentf
-.emacs.d/tramp
-.emacs.d/url
+!.emacs.d/
+.emacs.d/*
+!.emacs.d/elisp/
+!.emacs.d/straight/
+.emacs.d/straight/*
+!.emacs.d/straight/versions/
+.emacs.d/straight/versions/*
+!.emacs.d/straight/versions/default.el
