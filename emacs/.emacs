@@ -15,12 +15,13 @@
          ("GNU ELPA"     . 5)
          ("MELPA"        . 0)))
 (setq package-pinned-packages
-    '((jedi-core . "MELPA")
-         (moe-theme . "MELPA")
-         (flycheck . "MELPA")
-         (use-package . "MELPA")
-         ;; https://github.com/ppareit/graphviz-dot-mode/pull/24
-         (graphviz-dot-mode . "MELPA" )))
+      '((jedi-core . "MELPA")
+        (moe-theme . "MELPA")
+        (flycheck . "MELPA")
+        (tide . "MELPA")
+        (use-package . "MELPA")
+        ;; https://github.com/ppareit/graphviz-dot-mode/pull/24
+        (graphviz-dot-mode . "MELPA" )))
 
 (unless (package-installed-p 'use-package)
     (package-refresh-contents)
@@ -65,16 +66,16 @@
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 
 (custom-set-variables
-    ;; custom-set-variables was added by Custom.
-    ;; If you edit it by hand, you could mess it up, so be careful.
-    ;; Your init file should contain only one such instance.
-    ;; If there is more than one, they won't work right.
-    '(custom-safe-themes
-         (quote
-             ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
-    '(package-selected-packages
-         (quote
-             (org-present beacon format-all graphviz-dot-mode x509-mode xterm-color shell-switcher flycheck-objc-clang ws-butler pipenv yarn-mode wgrep web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters elpy py-autopep8 powershell request-deferred prettier-js powerline omnisharp ob-http mustache-mode npm-mode moe-theme multiple-cursors magit markdown-mode json-mode indium helpful fsharp-mode flycheck-swift flycheck-pos-tip expand-region default-text-scale ivy-pass intero git-timemachine git-gutter-fringe flx flow-minor-mode editorconfig delight dockerfile-mode docker-compose-mode counsel-projectile counsel-dash counsel csv-mode csharp-mode company-jedi clang-format cider avy auto-virtualenv aggressive-indent use-package))))
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default)))
+ '(package-selected-packages
+   (quote
+    (uuidgen org-bullets grip-mode org-present beacon format-all graphviz-dot-mode x509-mode xterm-color shell-switcher flycheck-objc-clang ws-butler pipenv yarn-mode wgrep web-mode which-key ts-comint tide swift-mode smartparens smart-mode-line restclient rainbow-identifiers rainbow-delimiters elpy py-autopep8 powershell request-deferred prettier-js powerline omnisharp ob-http mustache-mode npm-mode moe-theme multiple-cursors magit markdown-mode json-mode indium helpful fsharp-mode flycheck-swift flycheck-pos-tip expand-region default-text-scale ivy-pass intero git-timemachine git-gutter-fringe flx flow-minor-mode editorconfig delight dockerfile-mode docker-compose-mode counsel-projectile counsel-dash counsel csv-mode csharp-mode company-jedi clang-format cider avy auto-virtualenv aggressive-indent use-package))))
 
 (use-package delight)
 
@@ -124,32 +125,31 @@
     (global-company-mode 1))
 
 (use-package counsel
-    :delight ivy-mode
-    :bind (("C-s" . swiper)
-              ("C-r" . swiper)
-              ("C-c s" . counsel-rg)
-              ("C-c f" . counsel-projectile-find-file)
-              ("C-x C-f" . counsel-find-file)
-              ("C-x C-l" . counsel-esh-history)
-              ("M-x" . counsel-M-x)
-              ("C-c C-r" . ivy-resume)
-              ("M-y" . counsel-yank-pop)
-              :map ivy-minibuffer-map
-              ("M-y" . ivy-next-line))
-    :config
-    (ivy-mode 1)
-    (setq ivy-use-virtual-buffers 1)
-    (setq ivy-count-format "(%d/%d)")
-    (setq ivy-wrap 1)
-    (setq ivy-use-selectable-prompt t)
-    (setq ivy-re-builders-alist
+  :delight ivy-mode
+  :bind (("C-s" . swiper)
+         ("C-r" . swiper)
+         ("C-c s" . counsel-rg)
+         ("C-c f" . counsel-projectile-find-file)
+         ("C-x C-f" . counsel-find-file)
+         ("C-x C-l" . counsel-esh-history)
+         ("M-x" . counsel-M-x)
+         ("C-c C-r" . ivy-resume)
+         ("M-y" . counsel-yank-pop)
+         :map ivy-minibuffer-map
+         ("M-y" . ivy-next-line))
+  :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers 1)
+  (setq ivy-count-format "(%d/%d)")
+  (setq ivy-wrap 1)
+  (setq ivy-use-selectable-prompt t)
+  (setq ivy-re-builders-alist
         '((swiper . ivy--regex-ignore-order)
-             (t . ivy--regex-ignore-order)))
-    (setq ivy-initial-inputs-alist nil)
-    (setq ivy-height 20
-        counsel-rg-base-command "rg -i --hidden --no-heading --line-number --color never %s .")
+          (t . ivy--regex-ignore-order)))
+  (setq ivy-initial-inputs-alist nil)
+  (setq ivy-height 20)
 
-    (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word))
+  (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word))
 
 (use-package counsel-dash
     :config
@@ -162,10 +162,14 @@
 (use-package dockerfile-mode)
 
 (use-package editorconfig
-    :delight
-    :config
-    (editorconfig-mode 1)
-    (add-to-list 'editorconfig-indentation-alist '(swift-mode swift-mode:basic-offset)))
+  :delight
+  :config
+  (editorconfig-mode 1)
+  (add-to-list 'editorconfig-indentation-alist '(swift-mode swift-mode:basic-offset)))
+
+(use-package exec-path-from-shell
+  :config
+  (exec-path-from-shell-initialize))
 
 (use-package flow-minor-mode)
 
@@ -196,9 +200,7 @@
     :commands (goto-address-prog-mode
                   goto-address-mode))
 
-(use-package grip-mode
-    :ensure t
-    :hook ((markdown-mode org-mode) . grip-mode))
+(use-package grip-mode)
 
 ;; Haskell devenv
 (use-package intero
@@ -482,19 +484,20 @@ tide-setup will crash otherwise."
 
 ;; This requires node
 (use-package tide
-    :bind (
-              :map tide-mode-map
-              ("C-M-." . tide-references))
-    :init
-    (add-hook 'tide-mode-hook #'use-tslint-from-node-modules)
-    (add-hook 'tide-mode-hook #'use-tsserver-from-node-modules)
-    (add-hook 'tide-mode-hook #'use-tsun-from-node-modules)
-    (add-hook 'tide-mode-hook #'flyspell-prog-mode)
-    (add-hook 'typescript-mode-hook #'setup-tide-mode)
-    :config
-    (setq tide-always-show-documentation t)
-    (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
-    (flycheck-add-mode 'typescript-tslint 'web-mode))
+  :bind (
+         :map tide-mode-map
+         ("C-M-." . tide-references))
+  :init
+  (add-hook 'tide-mode-hook #'use-tslint-from-node-modules)
+  (add-hook 'tide-mode-hook #'use-tsserver-from-node-modules)
+  (add-hook 'tide-mode-hook #'use-prettier-from-node-modules)
+  (add-hook 'tide-mode-hook #'use-tsun-from-node-modules)
+  (add-hook 'tide-mode-hook #'flyspell-prog-mode)
+  (add-hook 'typescript-mode-hook #'setup-tide-mode)
+  :config
+  (setq tide-always-show-documentation t)
+  (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
+  (flycheck-add-mode 'typescript-tslint 'web-mode))
 
 (use-package ts-comint)
 
@@ -612,6 +615,7 @@ With argument ARG, do this that many times."
 (add-hook 'js-mode-hook #'flyspell-prog-mode)
 
 (require 'uniquify)
+(require 'openapi-yaml-mode)
 
 (put 'upcase-region 'disabled nil)
 
@@ -628,18 +632,19 @@ With argument ARG, do this that many times."
 ;;; .emacs ends here
 (if (eq system-type 'windows-nt)
     (custom-set-faces
-        ;; custom-set-faces was added by Custom.
-        ;; If you edit it by hand, you could mess it up, so be careful.
-        ;; Your init file should contain only one such instance.
-        ;; If there is more than one, they won't work right.
-        '(ivy-current-match ((t :background "dark slate gray")))
-        '(ivy-minibuffer-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))
-        '(swiper-current-match ((t :background "dark slate gray")))
-        '(swiper-line-face ((t :background "dark slate gray")))
-        '(swiper-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))))
+     ;; custom-set-faces was added by Custom.
+     ;; If you edit it by hand, you could mess it up, so be careful.
+     ;; Your init file should contain only one such instance.
+     ;; If there is more than one, they won't work right.
+     '(ivy-current-match ((t :background "dark slate gray")))
+     '(ivy-minibuffer-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))
+     '(swiper-current-match ((t :background "dark slate gray")))
+     '(swiper-line-face ((t :background "dark slate gray")))
+     '(swiper-match-face-2 ((t :foreground "#002b36" :background "green" :weight bold)))))
 (custom-set-faces
-    ;; custom-set-faces was added by Custom.
-    ;; If you edit it by hand, you could mess it up, so be careful.
-    ;; Your init file should contain only one such instance.
-    ;; If there is more than one, they won't work right.
-    )
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+(put 'downcase-region 'disabled nil)
