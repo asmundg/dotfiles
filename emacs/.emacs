@@ -140,6 +140,33 @@ With argument ARG, do this that many times."
         (emacs-lisp-docstring-fill-column t))
     (fill-paragraph nil region)))
 
+(defun find-from-node-modules (path)
+  "Check for PATH in project root node_modules, then from the current directory and up."
+  (file-truename
+   (let ((search-path (concat (file-name-as-directory "node_modules") path)))
+     (concat (locate-dominating-file
+              default-directory (lambda (d) (file-exists-p (concat d search-path))))
+             search-path))))
+
+(defun find-executable-from-node-modules (name)
+  "Check for executable NAME in project root node_modules, then from the current directory and up."
+  (find-from-node-modules (concat
+                           (file-name-as-directory ".bin")
+                           name
+                           (if (eq system-type 'windows-nt) ".cmd" ""))))
+
+(defun use-prettier-from-node-modules ()
+  (when-let ((executable (find-executable-from-node-modules "prettier")))
+    (setq-local prettier-js-command executable)))
+
+(defun use-tsserver-from-node-modules ()
+  (when-let ((executable (find-executable-from-node-modules "tsserver")))
+    (setq-local tide-tsserver-executable executable)))
+
+(defun use-tslint-from-node-modules ()
+  (when-let ((tslint (find-executable-from-node-modules "tslint")))
+    (setq-local flycheck-typescript-tslint-executable tslint)))
+
 (if (eq system-type 'windows-nt)
     (custom-set-faces
      ;; custom-set-faces was added by Custom.
@@ -205,13 +232,10 @@ With argument ARG, do this that many times."
 ;;               ("M-." . jedi:goto-definition)
 ;;               ("M-," . jedi:goto-definition-pop-marker)))
 
-;; (use-package csharp-mode
-;;     :hook
-;;     ((csharp-mode) . (lambda ()
-;;                          (c-set-offset 'brace-list-open 0)
-;;                          (c-set-offset 'arglist-intro '+)))
-;;     :config
-;;     (setq-local company-backends '(company-omnisharp company-dabbrev-code company-keywords)))
+(use-package csharp-mode
+  :straight t
+  :config
+  (setq-local company-backends '(company-omnisharp company-dabbrev-code company-keywords)))
 
 ;; (use-package csv-mode)
 
@@ -269,9 +293,10 @@ With argument ARG, do this that many times."
   (editorconfig-mode 1)
   (add-to-list 'editorconfig-indentation-alist '(swift-mode swift-mode:basic-offset)))
 
-;; (use-package exec-path-from-shell
-;;   :config
-;;   (exec-path-from-shell-initialize))
+(use-package exec-path-from-shell
+  :straight t
+  :config
+  (exec-path-from-shell-initialize))
 
 ;; (use-package flow-minor-mode)
 
@@ -285,7 +310,9 @@ With argument ARG, do this that many times."
           emacs-lisp-mode
           markdown-mode
           objc-mode
-          swift-mode) . format-all-mode))
+          swift-mode
+          typescript-mode
+          web-mode) . format-all-mode))
 
 ;; Show git line status in buffer gutter
 (use-package git-gutter-fringe
@@ -321,42 +348,16 @@ With argument ARG, do this that many times."
   :bind (("C-M-=" . default-text-scale-increase)
          ("C-M--" . default-text-scale-decrease)))
 
-;; (use-package expand-region
-;;     :bind ("C-=" . er/expand-region))
-
-;; (defun find-executable-from-node-modules (name)
-;;     "Check for executable NAME in project root node_modules, then from the current directory and up."
-;;     (find-from-node-modules (concat
-;;                                 (file-name-as-directory ".bin")
-;;                                 name
-;;                                 (if (eq system-type 'windows-nt) ".cmd" ""))))
-
-;; (defun find-from-node-modules (path)
-;;     "Check for path in project root node_modules, then from the current directory and up."
-;;     (file-truename
-;;         (let ((search-path (concat (file-name-as-directory "node_modules") path)))
-;;             (concat (locate-dominating-file
-;;                         default-directory (lambda (d) (file-exists-p (concat d search-path))))
-;;                 search-path))))
-
-;; (defun use-prettier-from-node-modules ()
-;;     (when-let ((executable (find-executable-from-node-modules "prettier")))
-;;         (setq-local prettier-js-command executable)))
-
-;; (defun use-tsserver-from-node-modules ()
-;;     (when-let ((executable (find-executable-from-node-modules "tsserver")))
-;;         (setq-local tide-tsserver-executable executable)))
-
-;; (defun use-tslint-from-node-modules ()
-;;     (when-let ((tslint (find-executable-from-node-modules "tslint")))
-;;         (setq-local flycheck-typescript-tslint-executable tslint)))
-
-;; (defun use-tsun-from-node-modules ()
-;;     (when-let ((tsun (find-executable-from-node-modules "tsun")))
-;;         (setq-local ts-comint-program-command tsun)))
+(use-package expand-region
+  :straight t
+  :bind ("C-=" . er/expand-region))
 
 (use-package flycheck
   :straight t
+  :init
+  ;; Patch flycheck to avoid triggering tsserver updates all over the place (https://github.com/flycheck/flycheck/issues/1472)
+  (eval-after-load 'flycheck
+    '(setcar (memq 'source-inplace (flycheck-checker-get 'typescript-tslint 'command)) 'source-original))
   :config
   (global-flycheck-mode 1)
   (setq flycheck-display-errors-delay 0.1
@@ -523,7 +524,8 @@ With argument ARG, do this that many times."
   :straight t
   :hook (org-mode) . (lambda () (org-bullets-mode 1)))
 
-(use-package org-present)
+(use-package org-present
+  :straight t)
 
 ;; (use-package prettier-js
 ;;     :hook ((tide-mode js-mode markdown-mode yaml-mode) . prettier-js-mode))
@@ -605,21 +607,22 @@ With argument ARG, do this that many times."
 ;; (use-package swift-mode)
 
 ;; ;; This requires node
-;; (use-package tide
-;;   :bind (
-;;          :map tide-mode-map
-;;          ("C-M-." . tide-references))
-;;   :init
-;;   (add-hook 'tide-mode-hook #'use-tslint-from-node-modules)
-;;   (add-hook 'tide-mode-hook #'use-tsserver-from-node-modules)
-;;   (add-hook 'tide-mode-hook #'use-prettier-from-node-modules)
-;;   (add-hook 'tide-mode-hook #'use-tsun-from-node-modules)
-;;   (add-hook 'tide-mode-hook #'flyspell-prog-mode)
-;;   (add-hook 'typescript-mode-hook #'setup-tide-mode)
-;;   :config
-;;   (setq tide-always-show-documentation t)
-;;   (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
-;;   (flycheck-add-mode 'typescript-tslint 'web-mode))
+(use-package tide
+  :straight t
+  :bind (
+         :map tide-mode-map
+         ("C-M-." . tide-references))
+  :init
+  (add-hook 'tide-mode-hook #'use-tslint-from-node-modules)
+  (add-hook 'tide-mode-hook #'use-tsserver-from-node-modules)
+  (add-hook 'tide-mode-hook #'use-prettier-from-node-modules)
+  (add-hook 'tide-mode-hook #'flyspell-prog-mode)
+  (add-hook 'typescript-mode-hook #'tide-setup)
+  :config
+  (setq tide-always-show-documentation t
+        company-tooltip-align-annotations t)
+  (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
+  (flycheck-add-mode 'typescript-tslint 'web-mode))
 
 ;; (use-package ts-comint)
 
@@ -632,17 +635,18 @@ With argument ARG, do this that many times."
   :init
   (which-key-mode))
 
-;; (use-package web-mode
-;;     :mode "\\.tsx\\'"
-;;     :init
-;;     (add-hook 'web-mode-hook
-;;         (lambda ()
-;;             ;; Don't die horribly in magit ediff, where buffer-file-name is nil
-;;             (when (and buffer-file-name
-;;                       (string-equal "tsx" (file-name-extension buffer-file-name)))
-;;                 (setup-tide-mode))))
-;;     :config
-;;     (setq web-mode-enable-auto-quoting nil))
+(use-package web-mode
+  :straight t
+  :mode "\\.tsx\\'"
+  :init
+  (add-hook 'web-mode-hook
+            (lambda ()
+              ;; Don't die horribly in magit ediff, where buffer-file-name is nil
+              (when (and buffer-file-name
+                         (string-equal "tsx" (file-name-extension buffer-file-name)))
+                (tide-setup))))
+  :config
+  (setq web-mode-enable-auto-quoting nil))
 
 ;; (use-package wgrep)
 
