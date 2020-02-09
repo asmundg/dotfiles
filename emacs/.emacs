@@ -400,6 +400,10 @@ With argument ARG, do this that many times."
 ;;     (setq js-indent-level 2)
 ;;     (add-hook 'json-mode-hook #'prettier-js-mode))
 
+(use-package lsp-java
+  :straight t
+  :hook (java-mode . lsp))
+
 ;; (use-package markdown-mode
 ;;     :bind (:map markdown-mode-map
 ;;               ("M-n" . forward-paragraph)
