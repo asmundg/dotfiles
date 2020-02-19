@@ -42,7 +42,7 @@
  ("nadvice" . "2dfcf614dc5472fb21e48f93d0ebb4546276377f")
  ("ob-http" . "b1428ea2a63bcb510e7382a1bf5fe82b19c104a7")
  ("openapi-yaml-mode" . "f3d4b5b0d6aaf73e4c79ed2bb0d3502ee10bb9a7")
- ("org" . "4fe4d12a799ab89258c37a26a8476b6c6079ad1f")
+ ("org" . "release_9.3.6")
  ("org-bullets" . "c19b13be00df8d8dc596e4f1aef4a094b08ac801")
  ("org-present" . "9709ca2d04a59959354222ac4d3f8b750785739a")
  ("pfuture" . "fbecd1562b34fcd15563b7cc00d98e5af0d7e43d")

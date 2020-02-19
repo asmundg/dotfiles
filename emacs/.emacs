@@ -18,6 +18,49 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+;; Load org early to avoid the old version bundled with emacs getting required
+
+;; Add straight support for use-package
+(straight-use-package 'use-package)
+
+;; Org config
+(use-package org
+  :straight t
+  :hook (org-babel-after-execute . org-redisplay-inline-images)
+  :config
+  (setq org-directory "~")
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
+  (setq org-src-fontify-natively t
+        org-startup-truncated nil)
+  (add-hook 'org-mode-hook #'flyspell-mode)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '(
+     (dot . t)
+     (http . t)
+     (python . t)
+     (shell . t)
+     ))
+  (defun my-org-confirm-babel-evaluate (lang body)
+    (and (not (string= lang "http"))
+         (not (string= lang "dot"))))
+  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
+        org-src-lang-modes '(("http" . "ob-http")
+                             ("ocaml" . tuareg)
+                             ("elisp" . emacs-lisp)
+                             ("ditaa" . artist)
+                             ("asymptote" . asy)
+                             ("dot" . graphviz-dot)
+                             ("sqlite" . sql)
+                             ("calc" . fundamental)
+                             ("C" . c)
+                             ("cpp" . c++)
+                             ("C++" . c++)
+                             ("screen" . shell-script)
+                             ("shell" . sh)
+                             ("bash" . sh))))
+
+
 (require 'uniquify)
 
 (setq server-socket-dir "~/.emacs.d/server")
@@ -194,9 +237,6 @@ With argument ARG, do this that many times."
  '(custom-safe-themes
    (quote
     ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "291588d57d863d0394a0d207647d9f24d1a8083bb0c9e8808280b46996f3eb83" default))))
-
-;; Add straight support for use-package
-(straight-use-package 'use-package)
 
 (use-package delight
   :straight t
@@ -446,6 +486,9 @@ With argument ARG, do this that many times."
 ;; (use-package multiple-cursors
 ;;     :bind (("C-S-c C-S-c" . mc/edit-lines)))
 
+(use-package powerline
+  :straight t)
+
 (use-package moe-theme
   :straight t
   :after (powerline)
@@ -487,43 +530,6 @@ With argument ARG, do this that many times."
   :after (yaml-mode)
   :straight (openapi-yaml-mode :type git :host github :repo "magoyette/openapi-yaml-mode"))
 
-;; Org config
-(use-package org
-  :straight t
-  :hook (org-babel-after-execute . org-redisplay-inline-images)
-  :config
-  (setq org-directory "~")
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
-  (setq org-src-fontify-natively t
-        org-startup-truncated nil)
-  (add-hook 'org-mode-hook #'flyspell-mode)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '(
-     (dot . t)
-     (http . t)
-     (python . t)
-     (shell . t)
-     ))
-  (defun my-org-confirm-babel-evaluate (lang body)
-    (and (not (string= lang "http"))
-         (not (string= lang "dot"))))
-  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
-        org-src-lang-modes '(("http" . "ob-http")
-                             ("ocaml" . tuareg)
-                             ("elisp" . emacs-lisp)
-                             ("ditaa" . artist)
-                             ("asymptote" . asy)
-                             ("dot" . graphviz-dot)
-                             ("sqlite" . sql)
-                             ("calc" . fundamental)
-                             ("C" . c)
-                             ("cpp" . c++)
-                             ("C++" . c++)
-                             ("screen" . shell-script)
-                             ("shell" . sh)
-                             ("bash" . sh))))
-
 (use-package org-bullets
   :straight t
   :hook (org-mode) . (lambda () (org-bullets-mode 1)))
@@ -556,9 +562,6 @@ With argument ARG, do this that many times."
 ;;     :hook (python-mode . pipenv-mode)
 ;;     :config
 ;;     (setenv "PIPENV_MAX_DEPTH" "10"))
-
-(use-package powerline
-  :straight t)
 
 ;; (use-package powershell)
 
