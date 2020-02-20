@@ -23,6 +23,9 @@
 ;; Add straight support for use-package
 (straight-use-package 'use-package)
 
+(use-package ob-http
+  :straight t)
+
 ;; Org config
 (use-package org
   :straight t
@@ -510,9 +513,6 @@ With argument ARG, do this that many times."
 ;;     (setq npm-global-mode t))
 
 ;; (use-package mustache-mode)
-
-(use-package ob-http
-  :straight t)
 
 ;; (use-package oer-reveal)
 
