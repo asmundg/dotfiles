@@ -23,6 +23,9 @@
 ;; Add straight support for use-package
 (straight-use-package 'use-package)
 
+(defun locate-dominating-file-concat (file name)
+  (concat (locate-dominating-file file name) name))
+
 (use-package ob-http
   :straight t)
 
@@ -30,6 +33,7 @@
 (use-package org
   :straight t
   :hook (org-babel-after-execute . org-redisplay-inline-images)
+  :bind (:map org-mode-map ("M-e" . org-fill-paragraph))
   :config
   (setq org-directory "~")
   (setq org-default-notes-file (concat org-directory "/notes.org"))
@@ -153,6 +157,7 @@
              ;; Low resolution
              12)))
       (when (eq system-type 'windows-nt) (set-frame-font (format "-outline-Consolas-normal-r-normal-normal-%d-97-96-96-c-*-iso8859-1" size)))
+      (when (eq system-type 'darwin) (set-frame-font (format "-*-Cascadia Code-normal-normal-normal-*-*-*-*-*-m-0-iso10646-1" size)))
       (when (eq system-type 'gnu/linux) (set-frame-font (format "-outline-Inconsolata-normal-r-normal-normal-%d-97-96-96-c-*-iso8859-1" size)))
       )))
 
@@ -355,7 +360,13 @@ With argument ARG, do this that many times."
           objc-mode
           swift-mode
           typescript-mode
-          web-mode) . format-all-mode))
+          web-mode) . format-all-mode)
+  :config
+  (define-format-all-formatter swiftformat
+    (:executable "swiftformat")
+    (:install (macos "brew install swiftformat"))
+    (:modes swift-mode swift3-mode)
+    (:format (format-all--buffer-easy executable "--config" (locate-dominating-file-concat default-directory ".swiftformat")))))
 
 ;; Show git line status in buffer gutter
 (use-package git-gutter-fringe
@@ -411,6 +422,13 @@ With argument ARG, do this that many times."
   :init
   (with-eval-after-load 'flycheck
     (flycheck-pos-tip-mode)))
+
+(use-package flycheck-swiftlint
+  :straight t
+  :config
+  (with-eval-after-load 'flycheck
+    (flycheck-swiftlint-setup)))
+
 
 ;; (use-package flycheck-swift
 ;;     :config
@@ -477,7 +495,7 @@ With argument ARG, do this that many times."
   :hook
   (git-commit-mode . (lambda () (setq fill-column 72)))
   :bind (("C-x v s" . magit-status)
-         ("C-x v b" . magit-blame))
+         ("C-x v b" . magit-blame-addition))
   :config
   (magit-add-section-hook 'magit-status-sections-hook 'magit-insert-local-branches 'magit-insert-stashes)
   (setq
@@ -611,7 +629,8 @@ With argument ARG, do this that many times."
 ;;     (when (not (eq buffer-file-name nil))
 ;;         (tide-setup)))
 
-;; (use-package swift-mode)
+(use-package swift-mode
+  :straight t)
 
 ;; ;; This requires node
 (use-package tide
