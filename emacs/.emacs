@@ -67,7 +67,7 @@
                              ("shell" . sh)
                              ("bash" . sh))))
 
-
+(require 'org-tempo)
 (require 'uniquify)
 
 (setq server-socket-dir "~/.emacs.d/server")
@@ -443,7 +443,8 @@ With argument ARG, do this that many times."
 ;;         (setq inferior-fsharp-program "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsi.exe\"")
 ;;         (setq fsharp-compile-command "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsc.exe\"")))
 
-;; (use-package graphviz-dot-mode)
+(use-package graphviz-dot-mode
+:straight t)
 
 ;; (use-package haskell-mode)
 
@@ -530,7 +531,8 @@ With argument ARG, do this that many times."
 ;;     :config
 ;;     (setq npm-global-mode t))
 
-;; (use-package mustache-mode)
+(use-package mustache-mode
+  :straight t)
 
 ;; (use-package oer-reveal)
 
