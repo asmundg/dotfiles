@@ -26,9 +26,6 @@
 (defun locate-dominating-file-concat (file name)
   (concat (locate-dominating-file file name) name))
 
-(use-package ob-http
-  :straight t)
-
 ;; Org config
 (use-package org
   :straight t
@@ -66,6 +63,9 @@
                              ("screen" . shell-script)
                              ("shell" . sh)
                              ("bash" . sh))))
+
+(use-package ob-http
+  :straight t)
 
 (require 'org-tempo)
 (require 'uniquify)
@@ -441,7 +441,7 @@ With argument ARG, do this that many times."
 ;;         (setq fsharp-compile-command "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsc.exe\"")))
 
 (use-package graphviz-dot-mode
-:straight t)
+  :straight t)
 
 ;; (use-package haskell-mode)
 
