@@ -407,11 +407,8 @@ With argument ARG, do this that many times."
   :bind ("C-=" . er/expand-region))
 
 (use-package flycheck
-  :straight t
-  :init
-  ;; Patch flycheck to avoid triggering tsserver updates all over the place (https://github.com/flycheck/flycheck/issues/1472)
-  (eval-after-load 'flycheck
-    '(setcar (memq 'source-inplace (flycheck-checker-get 'typescript-tslint 'command)) 'source-original))
+  :straight (flycheck :type git :host github :repo "flycheck/flycheck"
+                      :fork (:host github :repo "asmundg/flycheck" :branch "asmundg/tslint-tsserver"))
   :config
   (global-flycheck-mode 1)
   (setq flycheck-display-errors-delay 0.1
