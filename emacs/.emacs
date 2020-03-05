@@ -463,10 +463,11 @@ With argument ARG, do this that many times."
 
 ;; (use-package indium)
 
-;; (use-package json-mode
-;;     :config
-;;     (setq js-indent-level 2)
-;;     (add-hook 'json-mode-hook #'prettier-js-mode))
+(use-package json-mode
+  :straight t
+  :config
+  (setq js-indent-level 2)
+  (add-hook 'json-mode-hook #'prettier-js-mode))
 
 (use-package lsp-java
   :straight t
@@ -698,6 +699,12 @@ With argument ARG, do this that many times."
 ;;     (setq xterm-color-preserve-properties t
 ;;         eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
 ;;     (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter))
+
+;; Find high frequency/recent files
+(use-package zel
+  :straight t
+  :bind (("C-x C-r" . zel-find-file-frecent))
+  :config (zel-install))
 
 ;; (add-hook 'js-mode-hook #'flyspell-prog-mode)
 
