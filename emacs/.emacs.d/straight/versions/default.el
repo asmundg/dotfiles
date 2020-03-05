@@ -6,6 +6,7 @@
  ("counsel-dash" . "370d5f6f14b5294d0eb717f7b2a6a8e93df1ed24")
  ("counsel-projectile" . "47fcb4e0ebc9c9a3c47622912a00189005b092a3")
  ("csharp-mode" . "57bd21bda4edc16671a85c7d6d51484e40a6e640")
+ ("csv-mode" . "635337407c44c1c3e9f7052afda7e27cf8a05c14")
  ("dash-docs" . "111fd9b97001f1ad887b45e5308a14ddd68ce70a")
  ("dash.el" . "721436b04da4e2795387cb48a98ac6de37ece0fd")
  ("default-text-scale" . "bfc0987c37e93742255d3b23d86c17096fda8e7e")

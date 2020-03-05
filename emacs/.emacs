@@ -285,7 +285,8 @@ With argument ARG, do this that many times."
   :config
   (setq-local company-backends '(company-omnisharp company-dabbrev-code company-keywords)))
 
-;; (use-package csv-mode)
+(use-package csv-mode
+  :straight t)
 
 (use-package company
   :straight t
