@@ -3,6 +3,23 @@
 
 ;;; Code:
 
+;; Interface reduction
+(setq inhibit-splash-screen t)
+(line-number-mode 1)
+(column-number-mode 1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(menu-bar-mode -1)
+(global-linum-mode -1)
+
+;; Remove the built-in version of Org from the load-path
+(require 'cl-seq)
+(setq load-path
+      (cl-remove-if
+       (lambda (x)
+         (string-match-p "org$" x))
+       load-path))
+
 ;; straight.el setup
 (defvar bootstrap-version)
 ;;(setq straight-vc-git-default-protocol 'ssh)
@@ -114,16 +131,7 @@
 ;; Don't pop up extra windows in ediff
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 
-;; Interface reduction
-(setq inhibit-splash-screen t)
-(line-number-mode 1)
-(column-number-mode 1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-(menu-bar-mode -1)
-(global-linum-mode -1)
 (delete-selection-mode 1)
-
 (winner-mode 1)
 
 ;; Auto refresh buffers
