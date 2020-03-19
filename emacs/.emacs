@@ -100,6 +100,7 @@
 
 ;; Don't indent using tabs
 (setq-default indent-tabs-mode nil)
+(setq system-time-locale "C")
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
