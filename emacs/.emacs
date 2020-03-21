@@ -364,7 +364,8 @@ With argument ARG, do this that many times."
 
 ;; Auto format
 (use-package format-all
-  :straight t
+  :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code"
+                        :fork (:host github :repo "asmundg/emacs-format-all-the-code" :branch "asmundg/expose-formatter-definition"))
   :hook ((clang-mode
           elisp-mode
           emacs-lisp-mode
