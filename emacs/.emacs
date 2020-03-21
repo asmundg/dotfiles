@@ -468,7 +468,8 @@ With argument ARG, do this that many times."
          ("C-h k" . helpful-key)
          ("C-c C-d" . helpful-at-point)))
 
-;; (use-package indium)
+(use-package indium
+  :straight t)
 
 (use-package json-mode
   :straight t
