@@ -58,13 +58,15 @@
    'org-babel-load-languages
    '(
      (dot . t)
+     (gnuplot . t)
      (http . t)
      (python . t)
      (shell . t)
      ))
   (defun my-org-confirm-babel-evaluate (lang body)
     (and (not (string= lang "http"))
-         (not (string= lang "dot"))))
+         (not (string= lang "dot"))
+         (not (string= lang "gnuplot"))))
   (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
         org-src-lang-modes '(("http" . "ob-http")
                              ("ocaml" . tuareg)
@@ -450,6 +452,9 @@ With argument ARG, do this that many times."
 ;;         (setq inferior-fsharp-program "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsi.exe\"")
 ;;         (setq fsharp-compile-command "\"C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\fsc.exe\"")))
 
+(use-package gnuplot
+  :straight t)
+
 (use-package graphviz-dot-mode
   :straight t)
 
@@ -700,12 +705,6 @@ With argument ARG, do this that many times."
 ;;     (setq xterm-color-preserve-properties t
 ;;         eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
 ;;     (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter))
-
-;; Find high frequency/recent files
-(use-package zel
-  :straight t
-  :bind (("C-x C-r" . zel-find-file-frecent))
-  :config (zel-install))
 
 ;; (add-hook 'js-mode-hook #'flyspell-prog-mode)
 
