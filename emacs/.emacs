@@ -690,7 +690,9 @@ With argument ARG, do this that many times."
   :config
   (setq web-mode-enable-auto-quoting nil))
 
-;; (use-package wgrep)
+;; Use for editing in ivy-occur
+(use-package wgrep
+  :straight t)
 
 ;; (use-package ws-butler
 ;;     :init
