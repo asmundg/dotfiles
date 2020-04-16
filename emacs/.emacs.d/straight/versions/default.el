@@ -43,6 +43,7 @@
  ("json-process-client" . "422606a7bf08d13646e3db4f6c2bddb69bd61dec")
  ("json-reformat" . "8eb6668ed447988aea06467ba8f42e1f2178246f")
  ("json-snatcher" . "c4cecc0a5051bd364373aa499c47a1bb7a5ac51c")
+ ("ledger-mode" . "4dd9b65184fbdac2499368160e9eee5732788399")
  ("let-alist" . "ef3c02fa292b6e32769945bbbfb7f2e5ac574b64")
  ("loop.el" . "e22807f83a0890dc8a904c51ee0742c34efccc6c")
  ("lsp-java" . "dbeeee9c74db25db217059011935b882f7ec1257")

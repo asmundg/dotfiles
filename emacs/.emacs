@@ -477,6 +477,9 @@ With argument ARG, do this that many times."
   (setq js-indent-level 2)
   (add-hook 'json-mode-hook #'prettier-js-mode))
 
+(use-package ledger-mode
+  :straight t)
+
 (use-package lsp-java
   :straight t
   :hook (java-mode . lsp))
