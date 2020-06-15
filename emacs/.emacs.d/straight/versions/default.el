@@ -33,6 +33,7 @@
  ("fringe-helper.el" . "ef4a9c023bae18ec1ddd7265f1f2d6d2e775efdd")
  ("gnu-elpa-mirror" . "3decb53aacf461b99799351f549a9b0f93eb80f8")
  ("gnuplot" . "5fdef540080582914d3b49256e04c33368ed503c")
+ ("graphql-mode" . "7c37aee28bf8c8ffb3da73df5571c4e1e352562b")
  ("graphviz-dot-mode" . "3642a0a5f41a80c8ecef7c6143d514200b80e194")
  ("helpful" . "c54e9ddbd6a77858048c1a4c4b549de98af8f88e")
  ("ht.el" . "66c5f9131242697fabaede5566d87ecda4c14b1f")

@@ -388,6 +388,9 @@ With argument ARG, do this that many times."
   :config
   (global-git-gutter-mode 1))
 
+(use-package graphql-mode
+  :straight t)
+
 ;; (use-package git-timemachine)
 
 ;; (use-package goto-addr
@@ -468,6 +471,7 @@ With argument ARG, do this that many times."
          ("C-h k" . helpful-key)
          ("C-c C-d" . helpful-at-point)))
 
+;; JS Debugging
 (use-package indium
   :straight t)
 
@@ -592,7 +596,8 @@ With argument ARG, do this that many times."
   (projectile-global-mode)
   :config
   (setq
-   projectile-require-project-root nil))
+   projectile-require-project-root nil
+   projectile-enable-caching t))
 
 ;; (use-package request-deferred)
 
@@ -652,6 +657,10 @@ With argument ARG, do this that many times."
 (use-package swift-mode
   :straight t)
 
+(use-package typescript-mode
+  :straight t
+  :mode "\\.tsx\\'")
+
 ;; ;; This requires node
 (use-package tide
   :straight t
@@ -667,8 +676,7 @@ With argument ARG, do this that many times."
   :config
   (setq tide-always-show-documentation t
         company-tooltip-align-annotations t)
-  (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append)
-  (flycheck-add-mode 'typescript-tslint 'web-mode))
+  (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append))
 
 ;; (use-package ts-comint)
 
@@ -683,14 +691,6 @@ With argument ARG, do this that many times."
 
 (use-package web-mode
   :straight t
-  :mode "\\.tsx\\'"
-  :init
-  (add-hook 'web-mode-hook
-            (lambda ()
-              ;; Don't die horribly in magit ediff, where buffer-file-name is nil
-              (when (and buffer-file-name
-                         (string-equal "tsx" (file-name-extension buffer-file-name)))
-                (tide-setup))))
   :config
   (setq web-mode-enable-auto-quoting nil))
 
