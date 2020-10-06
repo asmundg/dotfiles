@@ -369,6 +369,7 @@ With argument ARG, do this that many times."
   :hook ((clang-mode
           elisp-mode
           emacs-lisp-mode
+          graphql-mode
           markdown-mode
           objc-mode
           swift-mode
@@ -379,7 +380,7 @@ With argument ARG, do this that many times."
     (:executable "swiftformat")
     (:install (macos "brew install swiftformat"))
     (:modes swift-mode swift3-mode)
-    (:format (format-all--buffer-easy executable "--config" (locate-dominating-file-concat default-directory ".swiftformat")))))
+    (:format (format-all--buffer-easy executable "--quiet" "--config" (locate-dominating-file-concat default-directory ".swiftformat")))))
 
 ;; Show git line status in buffer gutter
 (use-package git-gutter-fringe
