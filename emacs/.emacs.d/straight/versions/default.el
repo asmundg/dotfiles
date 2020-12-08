@@ -26,6 +26,7 @@
  ("emacs-format-all-the-code" . "dd389e99c45ca6fafe9a5040f9f1593dcc5e192a")
  ("emacs-htmlize" . "49205105898ba8993b5253beec55d8bddd820a70")
  ("emacs-jedi" . "9d5f29116c4d42cae561a9d69e6fba2b61e2cf43")
+ ("emacs-language-id" . "61907b8a8d2ad99ba184ae9611b51dc2a48ac2c1")
  ("emacs-python-environment" . "401006584e32864a10c69d29f14414828909362e")
  ("emacs-request" . "d02d1347ffdf138cffd380cbeac62ac8732036ef")
  ("emacs-which-key" . "e48e190a75a0c176e1deac218b891e77792d6921")
