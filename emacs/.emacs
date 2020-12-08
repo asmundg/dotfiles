@@ -46,7 +46,8 @@
 ;; Org config
 (use-package org
   :straight t
-  :hook (org-babel-after-execute . org-redisplay-inline-images)
+  :hook ((org-babel-after-execute . org-redisplay-inline-images)
+         (org-mode . org-indent-mode))
   :bind (:map org-mode-map ("M-e" . org-fill-paragraph))
   :config
   (setq org-directory "~")
@@ -94,6 +95,7 @@
 
 ;; System paths
 (setenv "PATH" (concat (getenv "PATH") ":" (getenv "HOME") "/.node/bin" ":/usr/local/bin"))
+(setenv "NODE_OPTIONS" "--max-old-space-size=8192")
 (add-to-list 'exec-path "/usr/local/bin")
 (add-to-list 'exec-path (concat (getenv "HOME") "/.pyenv/shims"))
 
@@ -221,13 +223,9 @@ With argument ARG, do this that many times."
   (when-let ((executable (find-executable-from-node-modules "prettier")))
     (setq-local prettier-js-command executable)))
 
-(defun use-tsserver-from-node-modules ()
-  (when-let ((executable (find-executable-from-node-modules "tsserver")))
-    (setq-local tide-tsserver-executable executable)))
-
 (defun use-tslint-from-node-modules ()
   (when-let ((tslint (find-executable-from-node-modules "tslint")))
-    (setq-local flycheck-typescript-tslint-executable tslint)))
+    (setq-local flycheck-typescript-tslint-original-source-executable tslint)))
 
 (if (eq system-type 'windows-nt)
     (custom-set-faces
@@ -370,7 +368,9 @@ With argument ARG, do this that many times."
           elisp-mode
           emacs-lisp-mode
           graphql-mode
+          js-mode
           markdown-mode
+          nix-mode
           objc-mode
           swift-mode
           typescript-mode
@@ -379,7 +379,7 @@ With argument ARG, do this that many times."
   (define-format-all-formatter swiftformat
     (:executable "swiftformat")
     (:install (macos "brew install swiftformat"))
-    (:modes swift-mode swift3-mode)
+    (:languages "Swift")
     (:format (format-all--buffer-easy executable "--quiet" "--config" (locate-dominating-file-concat default-directory ".swiftformat")))))
 
 ;; Show git line status in buffer gutter
@@ -424,12 +424,40 @@ With argument ARG, do this that many times."
   :bind ("C-=" . er/expand-region))
 
 (use-package flycheck
-  :straight (flycheck :type git :host github :repo "flycheck/flycheck"
-                      :fork (:host github :repo "asmundg/flycheck" :branch "asmundg/tslint-tsserver"))
+  :straight t
   :config
   (global-flycheck-mode 1)
+
+  (flycheck-define-checker proselint
+    "A linter for prose."
+    :command ("proselint" source-inplace)
+    :error-patterns
+    ((warning line-start (file-name) ":" line ":" column ": "
+	      (id (one-or-more (not (any " "))))
+	      (message) line-end))
+    :modes (text-mode markdown-mode gfm-mode org-mode))
+
+  (flycheck-define-checker typescript-tslint-original-source
+    "TypeScript style checker using TSLint.
+
+Note that this syntax checker is not used if
+`flycheck-typescript-tslint-config' is nil or refers to a
+non-existing file.
+
+See URL `https://github.com/palantir/tslint'."
+    :command ("tslint" "--format" "json"
+              (config-file "--config" flycheck-typescript-tslint-config)
+              (option "--rules-dir" flycheck-typescript-tslint-rulesdir)
+              (eval flycheck-tslint-args)
+              source-original)
+    :error-parser flycheck-parse-tslint
+    :modes (typescript-mode))
+  
   (setq flycheck-display-errors-delay 0.1
-        flycheck-pos-tip-timeout 600))
+        flycheck-pos-tip-timeout 600)
+
+  (add-to-list 'flycheck-checkers 'proselint)
+  (add-to-list 'flycheck-checkers 'typescript-tslint-original-source))
 
 (use-package flycheck-pos-tip
   :straight t
@@ -442,7 +470,6 @@ With argument ARG, do this that many times."
   :config
   (with-eval-after-load 'flycheck
     (flycheck-swiftlint-setup)))
-
 
 ;; (use-package flycheck-swift
 ;;     :config
@@ -463,7 +490,12 @@ With argument ARG, do this that many times."
 (use-package graphviz-dot-mode
   :straight t)
 
-;; (use-package haskell-mode)
+(use-package lsp-haskell
+  :straight t
+  :config)
+
+(use-package haskell-mode
+  :straight t)
 
 (use-package helpful
   :straight t
@@ -484,6 +516,30 @@ With argument ARG, do this that many times."
 
 (use-package ledger-mode
   :straight t)
+
+(defun lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (flycheck-add-next-checker 'lsp '(warning . typescript-tslint-original-source))
+  (lsp-headerline-breadcrumb-mode))
+
+(use-package lsp-mode
+  :straight t
+  :after (flycheck which-key)
+  :hook ((typescript-mode . lsp-deferred)
+         (haskell-mode . lsp)
+         (pytnon-mode . lsp)
+         (lsp-mode . lsp-mode-setup))
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :config
+  (lsp-enable-which-key-integration))
+
+(use-package lsp-ui
+  :straight t
+  :after lsp-mode
+  :hook lsp-mode
+  :config
+  (setq lsp-ui-doc-position 'bottom))
 
 (use-package lsp-java
   :straight t
@@ -523,6 +579,7 @@ With argument ARG, do this that many times."
   :config
   (magit-add-section-hook 'magit-status-sections-hook 'magit-insert-local-branches 'magit-insert-stashes)
   (setq
+   magit-git-executable (if (eq system-type 'darwin) "/usr/local/bin/git" "git")
    magit-last-seen-setup-instructions "1.4.0"
    magit-push-always-verify nil
    ;; Always on linux, never on Windows, due to slooow
@@ -554,10 +611,14 @@ With argument ARG, do this that many times."
 ;;     :config
 ;;     (setq npm-global-mode t))
 
+(use-package nix-mode
+  :straight t)
+
 (use-package mustache-mode
   :straight t)
 
-;; (use-package oer-reveal)
+(use-package org-re-reveal
+  :straight t)
 
 ;; (use-package omnisharp
 ;;     :bind (
@@ -579,6 +640,13 @@ With argument ARG, do this that many times."
 
 (use-package org-present
   :straight t)
+
+(use-package org-tanglesync
+  :straight t
+  :hook ((org-mode . org-tanglesync-mode)
+         ;; enable watch-mode globally:
+         ((prog-mode text-mode) . org-tanglesync-watch-mode))
+  )
 
 ;; (use-package prettier-js
 ;;     :hook ((tide-mode js-mode markdown-mode yaml-mode) . prettier-js-mode))
@@ -618,17 +686,18 @@ With argument ARG, do this that many times."
 
 (use-package rainbow-delimiters
   :straight t
-  :hook ((python-mode csharp-mode tide-mode clojure-mode objc-mode) . rainbow-delimiters-mode))
+  :hook ((python-mode csharp-mode typescript-mode clojure-mode objc-mode) . rainbow-delimiters-mode))
 
 (use-package rainbow-identifiers
   :straight t
-  :hook ((python-mode csharp-mode tide-mode clojure-mode objc-mode) . rainbow-identifiers-mode))
+  :hook ((python-mode csharp-mode typescript-mode clojure-mode objc-mode) . rainbow-identifiers-mode))
 
 ;; (use-package restclient)
 
-;; (use-package shell-switcher
-;;     :init
-;;     (setq shell-switcher-mode t))
+(use-package shell-switcher
+  :straight t
+  :init
+  (setq shell-switcher-mode t))
 
 ;; (use-package smart-mode-line
 ;;     :config
@@ -660,24 +729,27 @@ With argument ARG, do this that many times."
 
 (use-package typescript-mode
   :straight t
+  :after flycheck
+  :hook ((typescript-mode . use-tslint-from-node-modules)
+         (typescript-mode . use-prettier-from-node-modules)
+         (typescript-mode . flyspell-prog-mode))
   :mode "\\.tsx\\'")
 
 ;; ;; This requires node
-(use-package tide
-  :straight t
-  :bind (
-         :map tide-mode-map
-         ("C-M-." . tide-references))
-  :init
-  (add-hook 'tide-mode-hook #'use-tslint-from-node-modules)
-  (add-hook 'tide-mode-hook #'use-tsserver-from-node-modules)
-  (add-hook 'tide-mode-hook #'use-prettier-from-node-modules)
-  (add-hook 'tide-mode-hook #'flyspell-prog-mode)
-  (add-hook 'typescript-mode-hook #'tide-setup)
-  :config
-  (setq tide-always-show-documentation t
-        company-tooltip-align-annotations t)
-  (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append))
+;; (use-package tide
+;;   :straight t
+;;   :bind (
+;;          :map tide-mode-map
+;;          ("C-M-." . tide-references))
+;;   :init
+;;   (add-hook 'tide-mode-hook #'use-tslint-from-node-modules)
+;;   (add-hook 'tide-mode-hook #'use-prettier-from-node-modules)
+;;   (add-hook 'tide-mode-hook #'flyspell-prog-mode)
+;;   (add-hook 'typescript-mode-hook #'tide-setup)
+;;   :config
+;;   (setq tide-always-show-documentation t
+;;         company-tooltip-align-annotations t)
+;;   (flycheck-add-next-checker 'tsx-tide '(warning . typescript-tslint) 'append))
 
 ;; (use-package ts-comint)
 
