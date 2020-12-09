@@ -389,7 +389,9 @@ With argument ARG, do this that many times."
     (:executable "swiftformat")
     (:install (macos "brew install swiftformat"))
     (:languages "Swift")
-    (:format (format-all--buffer-easy executable "--quiet" "--config" (locate-dominating-file-concat default-directory ".swiftformat")))))
+    (:format (format-all--buffer-easy executable "--quiet" "--config" (locate-dominating-file-concat default-directory ".swiftformat"))))
+  (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
+  (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp))))))
 
 ;; Show git line status in buffer gutter
 (use-package git-gutter-fringe
@@ -688,8 +690,6 @@ See URL `https://github.com/palantir/tslint'."
 
 ;; (use-package py-autopep8
 ;;     :hook (python-mode . py-autopep8-enable-on-save))
-
-;; (use-package elpy)
 
 ;; (setq python-shell-interpreter "python3")
 
