@@ -351,6 +351,12 @@ With argument ARG, do this that many times."
   (editorconfig-mode 1)
   (add-to-list 'editorconfig-indentation-alist '(swift-mode swift-mode:basic-offset)))
 
+(use-package elpy
+  :straight t
+  :defer t
+  :init
+  (advice-add 'python-mode :before 'elpy-enable))
+
 (use-package exec-path-from-shell
   :straight t
   :config
@@ -369,9 +375,12 @@ With argument ARG, do this that many times."
           emacs-lisp-mode
           graphql-mode
           js-mode
+          json-mode
+          nix-mode
           markdown-mode
           nix-mode
           objc-mode
+          python-mode
           swift-mode
           typescript-mode
           web-mode) . format-all-mode)
@@ -452,7 +461,7 @@ See URL `https://github.com/palantir/tslint'."
               source-original)
     :error-parser flycheck-parse-tslint
     :modes (typescript-mode))
-  
+
   (setq flycheck-display-errors-delay 0.1
         flycheck-pos-tip-timeout 600)
 
