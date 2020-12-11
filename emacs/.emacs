@@ -392,7 +392,8 @@ With argument ARG, do this that many times."
     (:format (format-all--buffer-easy executable "--quiet" "--config" (locate-dominating-file-concat default-directory ".swiftformat"))))
   (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
   (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
-  (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier))))))
+  (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
+  (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier))))))
 
 ;; Show git line status in buffer gutter
 (use-package git-gutter-fringe
