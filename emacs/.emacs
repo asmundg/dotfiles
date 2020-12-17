@@ -354,12 +354,6 @@ With argument ARG, do this that many times."
   (editorconfig-mode 1)
   (add-to-list 'editorconfig-indentation-alist '(swift-mode swift-mode:basic-offset)))
 
-(use-package elpy
-  :straight t
-  :defer t
-  :init
-  (advice-add 'python-mode :before 'elpy-enable))
-
 (use-package exec-path-from-shell
   :straight t
   :config
@@ -543,7 +537,6 @@ See URL `https://github.com/palantir/tslint'."
   :after (flycheck which-key)
   :hook ((typescript-mode . lsp-deferred)
          (haskell-mode . lsp)
-         (pytnon-mode . lsp)
          (lsp-mode . lsp-mode-setup))
   :init
   (setq lsp-keymap-prefix "C-c l")
@@ -560,6 +553,13 @@ See URL `https://github.com/palantir/tslint'."
 (use-package lsp-java
   :straight t
   :hook (java-mode . lsp))
+
+
+(use-package lsp-pyright
+  :straight t
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-pyright)
+                         (lsp))))
 
 ;; (use-package markdown-mode
 ;;     :bind (:map markdown-mode-map
