@@ -46,6 +46,7 @@
 ;; Org config
 (use-package org
   :straight t
+  :after (ob-mermaid)
   :hook ((org-babel-after-execute . org-redisplay-inline-images)
          (org-mode . org-indent-mode))
   :bind (:map org-mode-map ("M-e" . org-fill-paragraph))
@@ -63,11 +64,13 @@
      (http . t)
      (python . t)
      (shell . t)
+     (mermaid . t)
      ))
   (defun my-org-confirm-babel-evaluate (lang body)
     (and (not (string= lang "http"))
          (not (string= lang "dot"))
-         (not (string= lang "gnuplot"))))
+         (not (string= lang "gnuplot"))
+         (not (string= lang "mermaid"))))
   (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
         org-src-lang-modes '(("http" . "ob-http")
                              ("ocaml" . tuareg)
@@ -690,10 +693,10 @@ See URL `https://github.com/palantir/tslint'."
 
 ;; (use-package powershell)
 
-;; (use-package py-autopep8
-;;     :hook (python-mode . py-autopep8-enable-on-save))
-
 ;; (setq python-shell-interpreter "python3")
+
+(use-package ob-mermaid
+  :straight t)
 
 (use-package rainbow-delimiters
   :straight t
