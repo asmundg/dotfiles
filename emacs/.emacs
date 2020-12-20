@@ -546,7 +546,7 @@ See URL `https://github.com/palantir/tslint'."
 (use-package lsp-ui
   :straight t
   :after lsp-mode
-  :hook lsp-mode
+  :hook (lsp-mode . lsp-ui-mode)
   :config
   (setq lsp-ui-doc-position 'bottom))
 
