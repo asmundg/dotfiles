@@ -390,7 +390,8 @@ With argument ARG, do this that many times."
   (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
   (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
   (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
-  (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier))))))
+  (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
+  (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier))))))
 
 ;; Show git line status in buffer gutter
 (use-package git-gutter-fringe
@@ -513,6 +514,10 @@ See URL `https://github.com/palantir/tslint'."
          ("C-h v" . helpful-variable)
          ("C-h k" . helpful-key)
          ("C-c C-d" . helpful-at-point)))
+
+(use-package highlight-indentation
+  :straight t
+  :hook (prog-mode . highlight-indentation-mode))
 
 ;; JS Debugging
 (use-package indium
