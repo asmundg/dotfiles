@@ -226,9 +226,20 @@ With argument ARG, do this that many times."
   (when-let ((executable (find-executable-from-node-modules "prettier")))
     (setq-local prettier-js-command executable)))
 
+(defun use-eslint-from-node-modules ()
+  (when-let ((eslint (find-executable-from-node-modules "eslint")))
+    (setq-local flycheck-javascript-eslint-executable eslint)))
+
 (defun use-tslint-from-node-modules ()
   (when-let ((tslint (find-executable-from-node-modules "tslint")))
     (setq-local flycheck-typescript-tslint-original-source-executable tslint)))
+
+;; This doesn't completely work as intended, since it's a global
+;; setting. But as long as you're only running in one TS repo at the
+;; time (or they are uusing compatible TS versions), you'll be fine.
+(defun use-lsp-tsserver-from-node-modules ()
+  (when-let ((tsserver (find-executable-from-node-modules "tsserver")))
+    (lsp-dependency 'typescript `(:system, tsserver))))
 
 (if (eq system-type 'windows-nt)
     (custom-set-faces
@@ -382,7 +393,7 @@ With argument ARG, do this that many times."
           typescript-mode
           web-mode) . format-all-mode)
   :config
-  (define-format-all-formatter swiftformat
+  (define-format-all-formatter swiftformat-with-config
     (:executable "swiftformat")
     (:install (macos "brew install swiftformat"))
     (:languages "Swift")
@@ -390,8 +401,9 @@ With argument ARG, do this that many times."
   (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
   (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
   (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
-  (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
-  (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier))))))
+  (add-hook 'json-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
+  (add-hook 'swift-mode-hook (lambda () (setq-local format-all-formatters '(("Swift" swiftformat-with-config)))))
+  (add-hook 'javascript-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier))))))
 
 ;; Show git line status in buffer gutter
 (use-package git-gutter-fringe
@@ -526,8 +538,7 @@ See URL `https://github.com/palantir/tslint'."
 (use-package json-mode
   :straight t
   :config
-  (setq js-indent-level 2)
-  (add-hook 'json-mode-hook #'prettier-js-mode))
+  (setq js-indent-level 2))
 
 (use-package ledger-mode
   :straight t)
@@ -535,6 +546,7 @@ See URL `https://github.com/palantir/tslint'."
 (defun lsp-mode-setup ()
   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (flycheck-add-next-checker 'lsp '(warning . typescript-tslint-original-source))
+  (flycheck-add-next-checker 'lsp '(warning . javascript-eslint))
   (lsp-headerline-breadcrumb-mode))
 
 (use-package lsp-mode
@@ -750,7 +762,9 @@ See URL `https://github.com/palantir/tslint'."
   :straight t
   :after flycheck
   :hook ((typescript-mode . use-tslint-from-node-modules)
+         (typescript-mode . use-eslint-from-node-modules)
          (typescript-mode . use-prettier-from-node-modules)
+         (typescript-mode . use-lsp-tsserver-from-node-modules)
          (typescript-mode . flyspell-prog-mode))
   :mode "\\.tsx\\'")
 
