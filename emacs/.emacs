@@ -565,6 +565,7 @@ See URL `https://github.com/palantir/tslint'."
   :after lsp-mode
   :hook (lsp-mode . lsp-ui-mode)
   :config
+  (setq lsp-ui-sideline-diagnostic-max-lines 5)
   (setq lsp-ui-doc-position 'bottom))
 
 (use-package lsp-java
