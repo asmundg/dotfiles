@@ -651,6 +651,19 @@ See URL `https://github.com/palantir/tslint'."
 (use-package mustache-mode
   :straight t)
 
+(use-package org-download
+  :straight t
+  :after org
+  :custom
+  (org-download-method 'directory)
+  (org-download-image-dir "images")
+  (org-download-heading-lvl nil)
+  (org-download-timestamp "%Y%m%d-%H%M%S_")
+  (org-image-actual-width 300)
+  (org-download-screenshot-method "/usr/local/bin/pngpaste %s")
+  :bind
+  ("C-M-y" . org-download-screenshot))
+
 (use-package org-re-reveal
   :straight t)
 
