@@ -1,0 +1,762 @@
+:DOC-CONFIG:
+#+property: header-args:emacs-lisp :tangle ".emacs.el"
+#+property: header-args :mkdirp yes :comments no
+#+startup: fold
+:END:
+* Bootstrap
+** Straight
+ Straight is a package manager producing consistent configurations via
+ git and lockfile: https://github.com/raxod502/straight.el
+
+ #+begin_src emacs-lisp
+   ;; Disable internal package manager
+   (setq package-enable-at-startup nil)
+
+   (defvar bootstrap-version)
+   (let ((bootstrap-file
+          (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+         (bootstrap-version 5))
+     (unless (file-exists-p bootstrap-file)
+       (with-current-buffer
+           (url-retrieve-synchronously
+            "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+            'silent 'inhibit-cookies)
+         (goto-char (point-max))
+         (eval-print-last-sexp)))
+     (load bootstrap-file nil 'nomessage))
+
+   ;; This installs and integrates straight with use-package, making
+   ;; use-package use straight as long as we provide a :straight t
+   ;; keyword.
+   (straight-use-package 'use-package)
+ #+end_src
+
+** UI cleanups
+
+ Disable various buttons and things we don't need
+
+ #+begin_src emacs-lisp
+ (setq inhibit-splash-screen t)
+ (setq inhibit-startup-message t)
+ (setq visible-bell t)
+ (tool-bar-mode -1)
+ (scroll-bar-mode -1)
+ (menu-bar-mode -1)
+
+ (global-linum-mode -1)
+ (line-number-mode 1)
+ (column-number-mode 1)
+ #+end_src
+
+ Blink modeline on visual bell, to make it a bit more obvious.
+
+ #+begin_src emacs-lisp
+ (setq ring-bell-function
+       (lambda ()
+         (let ((orig-fg (face-foreground 'mode-line)))
+           (set-face-foreground 'mode-line "#F2804F")
+           (run-with-idle-timer 0.1 nil
+				(lambda (fg) (set-face-foreground 'mode-line fg))
+				orig-fg))))
+ #+end_src
+  
+** Fonts
+
+ Fira Code is pretty nice.
+
+*** Installing the font
+**** MacOS
+
+ #+begin_src shell :tangle bootstrap-mac.sh
+ brew install font-fira-code
+ #+end_src
+
+*** Config
+
+ #+begin_src emacs-lisp
+ (set-face-attribute 'default nil :font "Fira Code" :height 160)
+ #+end_src
+
+** General editing
+*** Tabs
+Disable tab indents. They tend to clash with just about any other
+tool, since spaces are the standard.
+
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil)
+#+end_src
+*** Temp files
+
+ Lockfiles has a tendency to trigger dev tools when editing source
+ files, generating excessive resource usage. We don't really need
+ lockfiles, so just disable them.
+
+ #+begin_src emacs-lisp
+ (setq create-lockfiles nil)
+ #+end_src
+
+ We get the same issue with auto-save and backup files, so put those in
+ the temp dir. This can lose information if the computer suddenly
+ switches off and tmp is wiped on start.
+
+ #+begin_src emacs-lisp
+ (setq backup-directory-alist
+       `((".*" . ,temporary-file-directory)))
+ (setq auto-save-file-name-transforms
+       `((".*" ,temporary-file-directory t)))
+ #+end_src
+
+*** Navigation
+
+ #+begin_src emacs-lisp
+   (global-set-key (kbd "M-n") 'forward-paragraph)
+   (global-set-key (kbd "M-p") 'backward-paragraph)
+
+   ;; Assuming we switched option and command keys in OSX
+   (setq mac-option-modifier 'meta)
+ #+end_src
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-q") 'kill-region)
+  (global-set-key (kbd "M-e") 'fill-paragraph)
+  (global-set-key (kbd "M-q") 'unfill-paragraph)
+  (global-set-key (kbd "C-l") 'goto-line)
+#+end_src
+
+*** Delete section mode
+
+ Instead of having to kill a selection before adding the replacement
+ text, just instantly replace selection with new text.
+
+ #+begin_src emacs-lisp
+   (delete-selection-mode 1)
+ #+end_src
+
+*** Winner mode
+
+ Winner mode allows undo/redo for window layouts with C-c <left> and
+ C-c <right>.
+
+ #+begin_src emacs-lisp
+   (winner-mode 1)
+ #+end_src
+
+*** Auto revert
+
+ Instead of manually having to update file buffers when files are
+ changed by external processes, just automatically revert when a change
+ is detected.
+
+ #+begin_src emacs-lisp
+   (global-auto-revert-mode 1)
+   (setq auto-revert-verbose nil)
+ #+end_src
+
+ Also revert dired (and other non-file) buffers.
+
+ #+begin_src emacs-lisp
+   (setq global-auto-revert-non-file-buffers t)
+ #+end_src
+
+*** Backward-delete-word
+
+ For some reason, "delete the previous word" isn't a built-in
+ function. Let's fix that.
+
+    #+begin_src emacs-lisp
+    (defun backward-delete-word (arg)
+   "Delete characters backward until encountering the beginning of a word.
+ With argument ARG, do this that many times."
+   (interactive "p")
+   (delete-region (point) (progn (backward-word arg) (point))))
+
+   (global-set-key (kbd "C-w") 'backward-delete-word)
+    #+end_src
+
+*** Fat finger traps
+
+ These are often pressed, never intentionally, and cause catastrophic
+ results. Just turn them off.
+
+ #+begin_src emacs-lisp
+   ;; No quick exit emacs
+   (global-unset-key "\C-x\C-c")
+
+   ;; No suspend
+   (global-unset-key "\C-z")
+ #+end_src
+
+*** Text size
+Fast mechanism for zooming that applies to all buffers. Very useful
+when presenting and needing to show more than one thing.
+
+#+begin_src emacs-lisp
+(use-package default-text-scale
+  :straight t
+  :bind (("C-M-=" . default-text-scale-increase)
+         ("C-M--" . default-text-scale-decrease)))
+#+end_src
+** System
+
+Grab configured PATH from environment
+
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :straight t
+    :config
+    (exec-path-from-shell-initialize))
+#+end_src
+#+begin_src shell :tangle bootstrap-mac.sh
+nix-env -i ispell
+#+end_src
+* Counsel
+Search and and occur tool. Counsel/swiper/ivy is a framework for
+incrementally searching everything.
+
+#+begin_src emacs-lisp
+  (use-package counsel
+    :straight t
+    :after (counsel-projectile)
+    :delight ivy-mode
+    :bind (("C-s" . swiper)
+           ("C-r" . swiper)
+           ("C-c s" . counsel-rg)
+           ("C-c f" . counsel-projectile-find-file)
+           ("C-x C-f" . counsel-find-file)
+           ("C-x C-l" . counsel-esh-history)
+           ("M-x" . counsel-M-x)
+           ("C-c C-r" . ivy-resume)
+           ("M-y" . counsel-yank-pop)
+           :map ivy-minibuffer-map
+           ("M-y" . ivy-next-line))
+    :config
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers 1)
+    (setq ivy-count-format "(%d/%d)")
+    (setq ivy-wrap 1)
+    (setq ivy-use-selectable-prompt t)
+    (setq ivy-re-builders-alist
+          '((swiper . ivy--regex-ignore-order)
+            (t . ivy--regex-ignore-order)))
+    (setq ivy-initial-inputs-alist nil)
+    (setq ivy-height 20)
+
+    (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package counsel-projectile
+    :straight t)
+#+end_src
+
+* Company
+Completion framework.
+
+#+begin_src emacs-lisp
+  (use-package company
+    :straight t
+    :delight
+    :config
+    (global-company-mode 1))
+#+end_src
+* Ediff
+
+Avoid popping up new frames when ediffing, and just use a fancy window
+layout.
+
+#+begin_src emacs-lisp
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+#+end_src
+
+* Flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :straight t
+    :config
+    (global-flycheck-mode 1)
+
+    (flycheck-define-checker proselint
+      "A linter for prose."
+      :command ("proselint" source-inplace)
+      :error-patterns
+      ((warning line-start (file-name) ":" line ":" column ": "
+               (id (one-or-more (not (any " "))))
+               (message) line-end))
+      :modes (text-mode markdown-mode gfm-mode org-mode))
+
+    (flycheck-define-checker typescript-tslint-original-source
+      "TypeScript style checker using TSLint.
+
+  Note that this syntax checker is not used if
+  `flycheck-typescript-tslint-config' is nil or refers to a
+  non-existing file.
+
+  See URL `https://github.com/palantir/tslint'."
+      :command ("tslint" "--format" "json"
+                (config-file "--config" flycheck-typescript-tslint-config)
+                (option "--rules-dir" flycheck-typescript-tslint-rulesdir)
+                (eval flycheck-tslint-args)
+                source-original)
+      :error-parser flycheck-parse-tslint
+      :modes (typescript-mode))
+
+    (setq flycheck-display-errors-delay 0.1
+          flycheck-pos-tip-timeout 600)
+
+    (add-to-list 'flycheck-checkers 'proselint)
+    (add-to-list 'flycheck-checkers 'typescript-tslint-original-source))
+
+  (use-package flycheck-pos-tip
+    :straight t
+    :init
+    (with-eval-after-load 'flycheck
+      (flycheck-pos-tip-mode)))
+
+  (use-package flycheck-swiftlint
+    :straight t
+    :config
+    (with-eval-after-load 'flycheck
+      (flycheck-swiftlint-setup)))
+#+end_src
+
+* Formatting
+Format-all is a generic framework for auto-formatting source code. It needs to be explicitly configured per mode.
+
+#+begin_src emacs-lisp
+  (use-package format-all
+    :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code"
+                          :fork (:host github :repo "asmundg/emacs-format-all-the-code" :branch "asmundg/expose-formatter-definition"))
+    :hook ((clang-mode
+            elisp-mode
+            emacs-lisp-mode
+            graphql-mode
+            js-mode
+            json-mode
+            nix-mode
+            markdown-mode
+            nix-mode
+            objc-mode
+            python-mode
+            sh-mode
+            swift-mode
+            typescript-mode
+            web-mode) . format-all-mode)
+    :config
+    (define-format-all-formatter swiftformat-with-config
+      (:executable "swiftformat")
+      (:install (macos "brew install swiftformat"))
+      (:languages "Swift")
+      (:format (format-all--buffer-easy executable "--quiet" "--config" (locate-dominating-file-concat default-directory ".swiftformat"))))
+    (define-format-all-formatter shfmt-with-options
+      (:executable "shfmt")
+      (:install
+       (macos "brew install shfmt")
+       (windows "scoop install shfmt"))
+      (:languages "Shell")
+      (:format
+       (format-all--buffer-easy
+        executable
+        (if (buffer-file-name)
+            (list "-filename" (buffer-file-name))
+          (list "-ln" (cl-case (and (eql major-mode 'sh-mode)
+                                    (boundp 'sh-shell)
+                                    (symbol-value 'sh-shell))
+                        (bash "bash")
+                        (mksh "mksh")
+                        (t "posix"))))
+        (list "-i" "4"))))
+    (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
+    (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
+    (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
+    (add-hook 'json-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
+    (add-hook 'swift-mode-hook (lambda () (setq-local format-all-formatters '(("Swift" swiftformat-with-config)))))
+    (add-hook 'javascript-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier)))))
+    (add-hook 'sh-mode-hook (lambda () (setq-local format-all-formatters '(("Shell" shfmt-with-options))))))
+#+end_src
+
+Auto format org source buffers when exiting them. Since these buffers
+aren't backed by files, the normal format-all save hook doesn't work.
+
+#+begin_src emacs-lisp
+  (define-advice org-edit-src-exit (:before (&rest _args) format-buffer)
+    "Format source blocks before exit"
+    (format-all-buffer))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package editorconfig
+    :straight t
+    :delight
+    :config
+    (editorconfig-mode 1)
+    (add-to-list 'editorconfig-indentation-alist '(swift-mode swift-mode:basic-offset)))
+#+end_src
+
+* Helpful
+More contextual information in help buffers
+
+#+begin_src emacs-lisp
+  (use-package helpful
+    :straight t
+    :bind (("C-h f" . helpful-callable)
+           ("C-h v" . helpful-variable)
+           ("C-h k" . helpful-key)
+           ("C-c C-d" . helpful-at-point)))
+#+end_src
+* LSP
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :straight t
+    :after (flycheck which-key)
+    :hook ((typescript-mode . lsp)
+           (haskell-mode . lsp)
+           (lsp-mode . lsp-enable-which-key-integration)
+           (lsp-mode . lsp-headerline-breadcrumb-mode))
+    :init
+    (setq lsp-keymap-prefix "s-l")
+    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+    :commands lsp lsp-deferred)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package lsp-ui
+    :straight t
+    :after lsp-mode
+    :hook (lsp-mode . lsp-ui-mode)
+    :config
+    (setq lsp-ui-sideline-diagnostic-max-lines 10)
+    (setq lsp-ui-doc-position 'bottom)
+    :commands lsp-ui-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+#+end_src
+* Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :straight t
+    :hook (git-commit-mode . (lambda () (setq fill-column 72)))
+    :bind (("C-x v s" . magit-status)
+           ("C-x v b" . magit-blame-addition))
+    :config
+    (magit-add-section-hook 'magit-status-sections-hook 'magit-insert-local-branches 'magit-insert-stashes)
+    (setq
+     magit-git-executable (if (eq system-type 'darwin) "/usr/local/bin/git" "git")
+     magit-last-seen-setup-instructions "1.4.0"
+     magit-push-always-verify nil
+     ;; Always on linux, never on Windows, due to slooow
+     magit-diff-refine-hunk (if (eq system-type 'windows-nt) nil 'all)))
+#+end_src
+* Delight
+Delight
+(https://git.savannah.gnu.org/cgit/delight.git/plain/delight.el)
+allows removal of mode names from the mode line. Use with use-package
+by adding the :delight keyword.
+
+#+begin_src emacs-lisp
+  (use-package delight
+    :straight t
+    ;; Hide auto-revert-mode
+    :config (delight 'auto-revert-mode))
+#+end_src
+
+* Org
+Org is a vast project management, note orchestration and spreadhsheet
+application. I only use a small fraction of it. See for example
+http://cachestocaches.com/2020/3/my-organized-life/ on how some people
+use it.
+
+Besides basic note taking, I'm using org quite a lot for mixing notes
+with data and executable code. This use case is supported by org
+itself, which supports native mode editing with C-c ', and org-babel,
+which supports execution of source blocks with C-c C-c.
+
+#+begin_src emacs-lisp
+    (use-package org
+      :straight t
+      :after (ob-http ob-mermaid)
+      :hook (
+             ;; Refresh any images after running org-babel, in case the
+             ;; command generated one.
+             (org-babel-after-execute . org-redisplay-inline-images)
+             (org-mode . org-indent-mode)
+             (org-mode . flyspell-mode))
+      ;; org has a custom fill-paragraph, which performs extra magic for
+      ;; tables etc.
+      :bind (:map org-mode-map ("M-e" . org-fill-paragraph))
+      :config
+      (setq org-directory "~")
+      (setq org-default-notes-file (concat org-directory "/notes.org"))
+      (setq
+       ;; Add syntax highlighting in src blocks
+       org-src-fontify-natively t
+       ;; Start org files with all trees collapsed
+       org-startup-truncated nil)
+
+      ;; org-babel allows execution of src blocks containing the following
+      ;; languages.
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '(
+         (dot . t)
+         (gnuplot . t)
+         (http . t)
+         (python . t)
+         (shell . t)
+         (mermaid . t)
+         ))
+
+      ;; Skip confirmation for src block execution for the following
+      ;; languages.
+      (defun my-org-confirm-babel-evaluate (lang body)
+        (and (not (string= lang "http"))
+             (not (string= lang "dot"))
+             (not (string= lang "gnuplot"))
+             (not (string= lang "mermaid"))))
+      (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+
+      ;; Configure executors for the given languages
+      (setq org-src-lang-modes '(("http" . "ob-http")
+                                 ("ocaml" . tuareg)
+                                 ("elisp" . emacs-lisp)
+                                 ("ditaa" . artist)
+                                 ("asymptote" . asy)
+                                 ("dot" . graphviz-dot)
+                                 ("sqlite" . sql)
+                                 ("calc" . fundamental)
+                                 ("C" . c)
+                                 ("cpp" . c++)
+                                 ("C++" . c++)
+                                 ("screen" . shell-script)
+                                 ("shell" . sh)
+                                 ("bash" . sh))))
+ #+end_src
+
+Org-tempo provides completion templates
+(https://github.com/dangom/org-mode/blob/master/lisp/org-tempo.el). Example:
+<s TAB.
+
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+#+end_src
+ 
+Org-download supports grabbing images from the OS clipboard and
+inserting them into org files.
+
+#+begin_src shell :tangle bootstrap-mac.sh
+   brew install pngpaste
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package org-download
+    :straight t
+    :after (org)
+    :custom
+    (org-download-method 'directory)
+    (org-download-image-dir "images")
+    (org-download-heading-lvl nil)
+    (org-download-timestamp "%Y%m%d-%H%M%S_")
+    (org-image-actual-width 300)
+    (org-download-screenshot-method "/usr/local/bin/pngpaste %s")
+    :bind
+    ("C-M-y" . org-download-screenshot))
+#+end_src
+
+** Babel extensions
+
+*** HTTP
+Ob-http provides a http client for org-babel, allowing inline
+execution of http requests. Think Postman.
+
+#+begin_src emacs-lisp
+  (use-package ob-http
+    :straight t)
+#+end_src
+
+*** Mermaid
+Ob-mermaid provides support for mermaid
+(https://mermaid-js.github.io/mermaid/#/) diagrams. While I use
+graphviz for graph diagrams, mermaid makes nice sequence diagrams.
+
+#+begin_src emacs-lisp
+  (use-package ob-mermaid
+    :straight t)
+#+end_src
+
+* Rainbow
+Visual aid, adding color identifies to variables and parens
+
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :straight t
+    :hook ((python-mode csharp-mode typescript-mode clojure-mode objc-mode swift-mode) . rainbow-delimiters-mode))
+
+  (use-package rainbow-identifiers
+    :straight t
+    :hook ((python-mode csharp-mode typescript-mode clojure-mode objc-mode swift-mode) . rainbow-identifiers-mode))
+#+end_src
+* Smart parens
+#+begin_src emacs-lisp
+  (use-package smartparens
+    :straight t
+    :delight
+    :bind (("C-M-)" . sp-forward-slurp-sexp)
+           ("C-M-(" . sp-forward-barf-sexp))
+    :init
+    (add-hook 'clojure-mode-hook 'smartparens-strict-mode)
+    (add-hook 'emacs-lisp-mode-hook 'smartparens-strict-mode)
+    (smartparens-global-mode 1)
+    (show-smartparens-global-mode)
+    :config
+    (require 'smartparens-config))
+#+end_src
+* Theme
+#+begin_src emacs-lisp
+  (use-package powerline
+    :straight t)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package moe-theme
+    :straight t
+    :after (powerline)
+    :config
+    (moe-dark)
+    (powerline-moe-theme))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package moe-flycheck-mode-line
+    :straight (moe-flycheck-mode-line :type git :host github :repo "choma/moe-flycheck-mode-line")
+    :after (flycheck)
+    :hook (flycheck-mode . moe-flycheck-mode-line-mode))
+#+end_src
+* Languages
+** C#
+#+begin_src emacs-lisp
+  (use-package csharp-mode
+    :straight t
+    :config
+    (setq-local company-backends '(company-dabbrev-code company-keywords)))
+#+end_src
+
+** CSV
+#+begin_src emacs-lisp
+  (use-package csv-mode
+    :straight t)
+#+end_src
+** GraphQL
+#+begin_src emacs-lisp
+  (use-package graphql-mode
+    :straight t)
+#+end_src
+** Groovy
+#+begin_src emacs-lisp
+  (use-package groovy-mode
+    :straight t)
+#+end_src
+** JSON
+#+begin_src emacs-lisp
+  (use-package json-mode
+    :straight t
+    :config
+    (setq js-indent-level 2))
+#+end_src
+** Swift
+#+begin_src emacs-lisp
+  (use-package swift-mode
+    :straight t)
+#+end_src
+** Typescript
+Tools like linters are often useful to run from the project's own
+dependencies, since behavior can vary between versions. We set up some
+hooks here to let flycheck figure out where the linters are, and use
+those instead of the system versions.
+
+#+begin_src emacs-lisp
+  (defun find-from-node-modules (path)
+    "Check for PATH in project root node_modules, then from the current directory and up."
+    (file-truename
+     (let ((search-path (concat (file-name-as-directory "node_modules") path)))
+       (concat (locate-dominating-file
+                default-directory (lambda (d) (file-exists-p (concat d search-path))))
+               search-path))))
+
+  (defun find-executable-from-node-modules (name)
+    "Check for executable NAME in project root node_modules, then from the current directory and up."
+    (find-from-node-modules (concat
+                             (file-name-as-directory ".bin")
+                             name
+                             (if (eq system-type 'windows-nt) ".cmd" ""))))
+
+  (defun use-eslint-from-node-modules ()
+    (when-let ((eslint (find-executable-from-node-modules "eslint")))
+      (setq-local flycheck-javascript-eslint-executable eslint)))
+
+  (defun use-tslint-from-node-modules ()
+    (when-let ((tslint (find-executable-from-node-modules "tslint")))
+      (setq-local flycheck-typescript-tslint-original-source-executable tslint)))
+
+  ;; This doesn't completely work as intended, since it's a global
+  ;; setting. But as long as you're only running in one TS repo at the
+  ;; time (or they are uusing compatible TS versions), you'll be fine.
+  (defun use-lsp-tsserver-from-node-modules ()
+    (when-let ((tsserver (find-executable-from-node-modules "tsserver")))
+      (lsp-dependency 'typescript `(:system, tsserver))))
+
+  (defun ts-lsp-flycheck ()
+    (flycheck-add-next-checker 'lsp '(warning . typescript-tslint-original-source)))
+#+end_src
+
+Order matters here, we need to make sure that we set the correct paths
+before enabling flycheck. Otherwise, the checkers may get disabled.
+
+#+begin_src emacs-lisp
+  (use-package typescript-mode
+    :straight t
+    :after flycheck
+    :hook ((typescript-mode . ts-lsp-flycheck)
+           (typescript-mode . use-tslint-from-node-modules)
+           (typescript-mode . use-eslint-from-node-modules)
+           (typescript-mode . use-lsp-tsserver-from-node-modules)
+           (typescript-mode . flyspell-prog-mode))
+    :mode "\\.tsx\\'")
+#+end_src
+* Utility
+Decode the selected url encoded text.
+
+#+begin_src emacs-lisp
+(defun url-decode-region (start end)
+  "Replace a region between start and end in buffer, with the same contents, only URL decoded."
+  (interactive "r")
+  (let ((text (url-unhex-string (buffer-substring start end))))
+    (delete-region start end)
+    (insert text)))
+#+end_src
+
+Invert a fill-paragraph. Very useful if we want to take a filled
+paragraph and paste it into an external tool like Word.
+
+#+begin_src emacs-lisp
+;;; Stefan Monnier <foo at acm.org>. It is the opposite of fill-paragraph
+(defun unfill-paragraph (&optional region)
+  "Take a multi-line paragraph and make it into a single line of text."
+  (interactive (progn (barf-if-buffer-read-only) '(t)))
+  (let ((fill-column (point-max))
+        ;; This would override `fill-column' if it's an integer.
+        (emacs-lisp-docstring-fill-column t))
+    (fill-paragraph nil region)))
+
+#+end_src
+
+* Which-key
+Show available chord completions
+
+#+begin_src emacs-lisp
+  (use-package which-key
+    :straight t
+    :delight
+    :init
+    (which-key-mode))
+#+end_src
