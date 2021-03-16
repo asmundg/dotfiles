@@ -407,12 +407,21 @@ See URL `https://github.com/palantir/tslint'."
   :after (flycheck)
   :hook (flycheck-mode . moe-flycheck-mode-line-mode))
 
+(use-package git-gutter-fringe
+  :straight t
+  :delight git-gutter-mode
+  :config
+  (global-git-gutter-mode 1))
+
 (use-package csharp-mode
   :straight t
   :config
   (setq-local company-backends '(company-dabbrev-code company-keywords)))
 
 (use-package csv-mode
+  :straight t)
+
+(use-package graphviz-dot-mode
   :straight t)
 
 (use-package graphql-mode
@@ -471,6 +480,9 @@ See URL `https://github.com/palantir/tslint'."
          (typescript-mode . use-lsp-tsserver-from-node-modules)
          (typescript-mode . flyspell-prog-mode))
   :mode "\\.tsx\\'")
+
+(use-package yaml-mode
+  :straight t)
 
 (defun url-decode-region (start end)
   "Replace a region between start and end in buffer, with the same contents, only URL decoded."

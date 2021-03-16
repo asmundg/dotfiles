@@ -632,6 +632,18 @@ Visual aid, adding color identifies to variables and parens
     :after (flycheck)
     :hook (flycheck-mode . moe-flycheck-mode-line-mode))
 #+end_src
+* Tools
+** Git
+Mark changed lines in tracked files in the "gutter" on the side of the
+buffer.
+
+#+begin_src emacs-lisp
+  (use-package git-gutter-fringe
+    :straight t
+    :delight git-gutter-mode
+    :config
+    (global-git-gutter-mode 1))
+#+end_src
 * Languages
 ** C#
 #+begin_src emacs-lisp
@@ -644,6 +656,11 @@ Visual aid, adding color identifies to variables and parens
 ** CSV
 #+begin_src emacs-lisp
   (use-package csv-mode
+    :straight t)
+#+end_src
+** Dot
+#+begin_src emacs-lisp
+  (use-package graphviz-dot-mode
     :straight t)
 #+end_src
 ** GraphQL
@@ -722,6 +739,11 @@ before enabling flycheck. Otherwise, the checkers may get disabled.
            (typescript-mode . use-lsp-tsserver-from-node-modules)
            (typescript-mode . flyspell-prog-mode))
     :mode "\\.tsx\\'")
+#+end_src
+** YAML
+#+begin_src emacs-lisp
+  (use-package yaml-mode
+    :straight t)
 #+end_src
 * Utility
 Decode the selected url encoded text.
