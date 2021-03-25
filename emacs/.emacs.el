@@ -198,6 +198,7 @@ See URL `https://github.com/palantir/tslint'."
           sh-mode
           swift-mode
           typescript-mode
+          yaml-mode
           web-mode) . format-all-mode)
   :config
   (define-format-all-formatter swiftformat-with-config
@@ -223,13 +224,16 @@ See URL `https://github.com/palantir/tslint'."
                       (mksh "mksh")
                       (t "posix"))))
       (list "-i" "4"))))
-  (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
+  (add-hook 'graphql-mode-hook (lambda () (setq-local format-all-formatters '(("GraphQL" prettier)))))
   (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
-  (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
+  (add-hook 'js-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier)))))
   (add-hook 'json-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
+  (add-hook 'sh-mode-hook (lambda () (setq-local format-all-formatters '(("Nix" nixfmt)))))
+  (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
   (add-hook 'swift-mode-hook (lambda () (setq-local format-all-formatters '(("Swift" swiftformat-with-config)))))
-  (add-hook 'javascript-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier)))))
-  (add-hook 'sh-mode-hook (lambda () (setq-local format-all-formatters '(("Shell" shfmt-with-options))))))
+  (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
+  (add-hook 'sh-mode-hook (lambda () (setq-local format-all-formatters '(("Shell" shfmt-with-options)))))
+  (add-hook 'yaml-mode-hook (lambda () (setq-local format-all-formatters '(("YAML" prettier))))))
 
 (define-advice org-edit-src-exit (:before (&rest _args) format-buffer)
   "Format source blocks before exit"
@@ -252,14 +256,21 @@ See URL `https://github.com/palantir/tslint'."
 (use-package lsp-mode
   :straight t
   :after (flycheck which-key)
-  :hook ((typescript-mode . lsp)
+  :hook ((js-mode . lsp)
+         (typescript-mode . lsp)
          (haskell-mode . lsp)
          (lsp-mode . lsp-enable-which-key-integration)
          (lsp-mode . lsp-headerline-breadcrumb-mode))
   :init
   (setq lsp-keymap-prefix "s-l")
   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-  :commands lsp lsp-deferred)
+  :config
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tcp-connection (lambda (port) `("graphql-lsp" "server" "-m" "socket" "-p" ,(number-to-string port))))
+                    :major-modes '(graphql-mode)
+                    :initialization-options (lambda () `())
+                    :server-id 'graphql))
+  (add-to-list 'lsp-language-id-configuration '(graphql-mode . "graphql")))
 
 (use-package lsp-ui
   :straight t
@@ -403,7 +414,7 @@ See URL `https://github.com/palantir/tslint'."
   (powerline-moe-theme))
 
 (use-package moe-flycheck-mode-line
-  :straight (moe-flycheck-mode-line :type git :host github :repo "choma/moe-flycheck-mode-line")
+  :straight (moe-flycheck-mode-line :type git :host github :repo "asmundg/moe-flycheck-mode-line" :branch "asmundg/support-new-mode-syntax")
   :after (flycheck)
   :hook (flycheck-mode . moe-flycheck-mode-line-mode))
 
@@ -430,10 +441,16 @@ See URL `https://github.com/palantir/tslint'."
 (use-package groovy-mode
   :straight t)
 
+(use-package indium
+  :straight t)
+
 (use-package json-mode
   :straight t
   :config
   (setq js-indent-level 2))
+
+(use-package nix-mode
+  :straight t)
 
 (use-package swift-mode
   :straight t)
