@@ -123,6 +123,10 @@ With argument ARG, do this that many times."
   (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word))
 
 (use-package counsel-projectile
+  :init
+  (projectile-global-mode)
+  :config
+  (setq projectile-enable-caching t)
   :straight t)
 
 (use-package company
@@ -228,6 +232,7 @@ See URL `https://github.com/palantir/tslint'."
   (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
   (add-hook 'js-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier)))))
   (add-hook 'json-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
+  (add-hook 'markdown-mode-hook (lambda () (setq-local format-all-formatters '(("Markdown" prettier)))))
   (add-hook 'sh-mode-hook (lambda () (setq-local format-all-formatters '(("Nix" nixfmt)))))
   (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
   (add-hook 'swift-mode-hook (lambda () (setq-local format-all-formatters '(("Swift" swiftformat-with-config)))))
@@ -384,11 +389,11 @@ See URL `https://github.com/palantir/tslint'."
 
 (use-package rainbow-delimiters
   :straight t
-  :hook ((python-mode csharp-mode typescript-mode clojure-mode objc-mode swift-mode) . rainbow-delimiters-mode))
+  :hook ((python-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-delimiters-mode))
 
 (use-package rainbow-identifiers
   :straight t
-  :hook ((python-mode csharp-mode typescript-mode clojure-mode objc-mode swift-mode) . rainbow-identifiers-mode))
+  :hook ((python-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-identifiers-mode))
 
 (use-package smartparens
   :straight t
@@ -424,6 +429,11 @@ See URL `https://github.com/palantir/tslint'."
   :config
   (global-git-gutter-mode 1))
 
+(use-package shell-switcher
+  :straight t
+  :init
+  (setq shell-switcher-mode t))
+
 (use-package csharp-mode
   :straight t
   :config
@@ -448,6 +458,9 @@ See URL `https://github.com/palantir/tslint'."
   :straight t
   :config
   (setq js-indent-level 2))
+
+(use-package mustache-mode
+  :straight t)
 
 (use-package nix-mode
   :straight t)
@@ -478,13 +491,6 @@ See URL `https://github.com/palantir/tslint'."
   (when-let ((tslint (find-executable-from-node-modules "tslint")))
     (setq-local flycheck-typescript-tslint-original-source-executable tslint)))
 
-;; This doesn't completely work as intended, since it's a global
-;; setting. But as long as you're only running in one TS repo at the
-;; time (or they are uusing compatible TS versions), you'll be fine.
-(defun use-lsp-tsserver-from-node-modules ()
-  (when-let ((tsserver (find-executable-from-node-modules "tsserver")))
-    (lsp-dependency 'typescript `(:system, tsserver))))
-
 (defun ts-lsp-flycheck ()
   (flycheck-add-next-checker 'lsp '(warning . typescript-tslint-original-source)))
 
@@ -494,7 +500,6 @@ See URL `https://github.com/palantir/tslint'."
   :hook ((typescript-mode . ts-lsp-flycheck)
          (typescript-mode . use-tslint-from-node-modules)
          (typescript-mode . use-eslint-from-node-modules)
-         (typescript-mode . use-lsp-tsserver-from-node-modules)
          (typescript-mode . flyspell-prog-mode))
   :mode "\\.tsx\\'")
 
