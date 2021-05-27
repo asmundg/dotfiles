@@ -683,6 +683,20 @@ Provides quick toggle between shells (C-')
   (setq shell-switcher-mode t))
 #+end_src
 
+** Direnv
+Auto load .envrc files for the current buffer and apply to launched
+processes, etc.
+
+#+begin_src emacs-lisp
+  (use-package direnv
+    :straight t
+    :config
+    (direnv-mode))
+#+end_src
+
+#+begin_src shell :tangle bootstrap-mac.sh
+nix-env -i direnv
+#+end_src
 * Languages
 ** C#
 #+begin_src emacs-lisp

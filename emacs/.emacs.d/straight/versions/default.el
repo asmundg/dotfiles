@@ -11,6 +11,7 @@
  ("elisp-refs" . "b3634a4567c655a1cda51b217629849cba0ac6a7")
  ("emacs" . "bf9897eb287ca47ced65d7d4e07ea61ea0aec39f")
  ("emacs-async" . "36a10151e70e956e2f766ed9e65f4a9cfc8479b2")
+ ("emacs-direnv" . "4b94393a9adf677c7c037215e233eef5fbca553d")
  ("emacs-format-all-the-code" . "dd389e99c45ca6fafe9a5040f9f1593dcc5e192a")
  ("emacs-language-id" . "61907b8a8d2ad99ba184ae9611b51dc2a48ac2c1")
  ("emacs-which-key" . "e48e190a75a0c176e1deac218b891e77792d6921")

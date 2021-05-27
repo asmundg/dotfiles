@@ -437,6 +437,11 @@ See URL `https://github.com/palantir/tslint'."
   :init
   (setq shell-switcher-mode t))
 
+(use-package direnv
+  :straight t
+  :config
+  (direnv-mode))
+
 (use-package csharp-mode
   :straight t
   :config
