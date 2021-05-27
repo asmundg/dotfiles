@@ -253,6 +253,19 @@ incrementally searching everything.
     :straight t)
 #+end_src
 
+Ivy can use wgrep for editing occur buffers:
+
+1. C-c s (counsel-rg)
+2. C-c C-o (ivy-occur)
+3. C-x C-q (ivy-wgrep-change-to-wgrep-mode)
+4. Edit via macro/replace
+5. C-c C-c (wgrep-finish-edit)
+
+#+begin_src emacs-lisp
+  (use-package wgrep
+    :straight t)
+#+end_src
+
 * Company
 Completion framework.
 

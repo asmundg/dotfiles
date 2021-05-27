@@ -129,6 +129,9 @@ With argument ARG, do this that many times."
   (setq projectile-enable-caching t)
   :straight t)
 
+(use-package wgrep
+  :straight t)
+
 (use-package company
   :straight t
   :delight
