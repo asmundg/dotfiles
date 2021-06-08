@@ -212,7 +212,7 @@ See URL `https://github.com/palantir/tslint'."
     (:executable "swiftformat")
     (:install (macos "brew install swiftformat"))
     (:languages "Swift")
-    (:format (format-all--buffer-easy executable "--quiet" "--config" (locate-dominating-file-concat default-directory ".swiftformat"))))
+    (:format (format-all--buffer-easy executable "--quiet" "--config" (concat (locate-dominating-file default-directory ".swiftformat") ".swiftformat"))))
   (define-format-all-formatter shfmt-with-options
     (:executable "shfmt")
     (:install
@@ -245,7 +245,8 @@ See URL `https://github.com/palantir/tslint'."
 
 (define-advice org-edit-src-exit (:before (&rest _args) format-buffer)
   "Format source blocks before exit"
-  (format-all-buffer))
+  (when 'format-all-formatters
+    (format-all-buffer)))
 
 (use-package editorconfig
   :straight t

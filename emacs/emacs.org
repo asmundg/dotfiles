@@ -364,7 +364,7 @@ Format-all is a generic framework for auto-formatting source code. It needs to b
       (:executable "swiftformat")
       (:install (macos "brew install swiftformat"))
       (:languages "Swift")
-      (:format (format-all--buffer-easy executable "--quiet" "--config" (locate-dominating-file-concat default-directory ".swiftformat"))))
+      (:format (format-all--buffer-easy executable "--quiet" "--config" (concat (locate-dominating-file default-directory ".swiftformat") ".swiftformat"))))
     (define-format-all-formatter shfmt-with-options
       (:executable "shfmt")
       (:install
@@ -402,7 +402,8 @@ aren't backed by files, the normal format-all save hook doesn't work.
 #+begin_src emacs-lisp
   (define-advice org-edit-src-exit (:before (&rest _args) format-buffer)
     "Format source blocks before exit"
-    (format-all-buffer))
+    (when 'format-all-formatters
+      (format-all-buffer)))
 #+end_src
 
 #+begin_src emacs-lisp
