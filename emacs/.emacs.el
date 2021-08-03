@@ -191,7 +191,7 @@ See URL `https://github.com/palantir/tslint'."
 (use-package format-all
   :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code"
                         :fork (:host github :repo "asmundg/emacs-format-all-the-code" :branch "asmundg/expose-formatter-definition"))
-  :hook ((clang-mode
+  :hook ((c-mode-common
           elisp-mode
           emacs-lisp-mode
           graphql-mode
@@ -231,12 +231,14 @@ See URL `https://github.com/palantir/tslint'."
                       (mksh "mksh")
                       (t "posix"))))
       (list "-i" "4"))))
+  (add-hook 'graphql-mode-hook (lambda () (setq-local format-all-formatters '(("C" clang-format)))))
   (add-hook 'graphql-mode-hook (lambda () (setq-local format-all-formatters '(("GraphQL" prettier)))))
   (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
   (add-hook 'js-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier)))))
   (add-hook 'json-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
   (add-hook 'markdown-mode-hook (lambda () (setq-local format-all-formatters '(("Markdown" prettier)))))
   (add-hook 'sh-mode-hook (lambda () (setq-local format-all-formatters '(("Nix" nixfmt)))))
+  (add-hook 'graphql-mode-hook (lambda () (setq-local format-all-formatters '(("Objective-C" clang-format)))))
   (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
   (add-hook 'swift-mode-hook (lambda () (setq-local format-all-formatters '(("Swift" swiftformat-with-config)))))
   (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
@@ -355,20 +357,21 @@ See URL `https://github.com/palantir/tslint'."
   (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
 
   ;; Configure executors for the given languages
-  (setq org-src-lang-modes '(("http" . "ob-http")
-                             ("ocaml" . tuareg)
-                             ("elisp" . emacs-lisp)
-                             ("ditaa" . artist)
-                             ("asymptote" . asy)
-                             ("dot" . graphviz-dot)
-                             ("sqlite" . sql)
-                             ("calc" . fundamental)
-                             ("C" . c)
-                             ("cpp" . c++)
+  (setq org-src-lang-modes '(("C" . c)
                              ("C++" . c++)
+                             ("asymptote" . asy)
+                             ("bash" . sh)
+                             ("calc" . fundamental)
+                             ("cpp" . c++)
+                             ("ditaa" . artist)
+                             ("dot" . graphviz-dot)
+                             ("elisp" . emacs-lisp)
+                             ("http" . "ob-http")
+                             ("mermaid" . mermaid)
+                             ("ocaml" . tuareg)
                              ("screen" . shell-script)
                              ("shell" . sh)
-                             ("bash" . sh))))
+                             ("sqlite" . sql))))
 
 (require 'org-tempo)
 

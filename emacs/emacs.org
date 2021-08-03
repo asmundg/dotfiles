@@ -343,7 +343,7 @@ Format-all is a generic framework for auto-formatting source code. It needs to b
   (use-package format-all
     :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code"
                           :fork (:host github :repo "asmundg/emacs-format-all-the-code" :branch "asmundg/expose-formatter-definition"))
-    :hook ((clang-mode
+    :hook ((c-mode-common
             elisp-mode
             emacs-lisp-mode
             graphql-mode
@@ -383,12 +383,14 @@ Format-all is a generic framework for auto-formatting source code. It needs to b
                         (mksh "mksh")
                         (t "posix"))))
         (list "-i" "4"))))
+    (add-hook 'graphql-mode-hook (lambda () (setq-local format-all-formatters '(("C" clang-format)))))
     (add-hook 'graphql-mode-hook (lambda () (setq-local format-all-formatters '(("GraphQL" prettier)))))
     (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
     (add-hook 'js-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier)))))
     (add-hook 'json-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
     (add-hook 'markdown-mode-hook (lambda () (setq-local format-all-formatters '(("Markdown" prettier)))))
     (add-hook 'sh-mode-hook (lambda () (setq-local format-all-formatters '(("Nix" nixfmt)))))
+    (add-hook 'graphql-mode-hook (lambda () (setq-local format-all-formatters '(("Objective-C" clang-format)))))
     (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
     (add-hook 'swift-mode-hook (lambda () (setq-local format-all-formatters '(("Swift" swiftformat-with-config)))))
     (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
@@ -503,64 +505,65 @@ itself, which supports native mode editing with C-c ', and org-babel,
 which supports execution of source blocks with C-c C-c.
 
 #+begin_src emacs-lisp
-    (use-package org
-      :straight t
-      :after (ob-http ob-mermaid)
-      :hook (
-             ;; Refresh any images after running org-babel, in case the
-             ;; command generated one.
-             (org-babel-after-execute . org-redisplay-inline-images)
-             (org-mode . org-indent-mode)
-             (org-mode . flyspell-mode))
-      ;; org has a custom fill-paragraph, which performs extra magic for
-      ;; tables etc.
-      :bind (:map org-mode-map ("M-e" . org-fill-paragraph))
-      :config
-      (setq org-directory "~")
-      (setq org-default-notes-file (concat org-directory "/notes.org"))
-      (setq
-       ;; Add syntax highlighting in src blocks
-       org-src-fontify-natively t
-       ;; Start org files with all trees collapsed
-       org-startup-truncated nil)
+  (use-package org
+    :straight t
+    :after (ob-http ob-mermaid)
+    :hook (
+           ;; Refresh any images after running org-babel, in case the
+           ;; command generated one.
+           (org-babel-after-execute . org-redisplay-inline-images)
+           (org-mode . org-indent-mode)
+           (org-mode . flyspell-mode))
+    ;; org has a custom fill-paragraph, which performs extra magic for
+    ;; tables etc.
+    :bind (:map org-mode-map ("M-e" . org-fill-paragraph))
+    :config
+    (setq org-directory "~")
+    (setq org-default-notes-file (concat org-directory "/notes.org"))
+    (setq
+     ;; Add syntax highlighting in src blocks
+     org-src-fontify-natively t
+     ;; Start org files with all trees collapsed
+     org-startup-truncated nil)
 
-      ;; org-babel allows execution of src blocks containing the following
-      ;; languages.
-      (org-babel-do-load-languages
-       'org-babel-load-languages
-       '(
-         (dot . t)
-         (gnuplot . t)
-         (http . t)
-         (python . t)
-         (shell . t)
-         (mermaid . t)
-         ))
+    ;; org-babel allows execution of src blocks containing the following
+    ;; languages.
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '(
+       (dot . t)
+       (gnuplot . t)
+       (http . t)
+       (python . t)
+       (shell . t)
+       (mermaid . t)
+       ))
 
-      ;; Skip confirmation for src block execution for the following
-      ;; languages.
-      (defun my-org-confirm-babel-evaluate (lang body)
-        (and (not (string= lang "http"))
-             (not (string= lang "dot"))
-             (not (string= lang "gnuplot"))
-             (not (string= lang "mermaid"))))
-      (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+    ;; Skip confirmation for src block execution for the following
+    ;; languages.
+    (defun my-org-confirm-babel-evaluate (lang body)
+      (and (not (string= lang "http"))
+           (not (string= lang "dot"))
+           (not (string= lang "gnuplot"))
+           (not (string= lang "mermaid"))))
+    (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
 
-      ;; Configure executors for the given languages
-      (setq org-src-lang-modes '(("http" . "ob-http")
-                                 ("ocaml" . tuareg)
-                                 ("elisp" . emacs-lisp)
-                                 ("ditaa" . artist)
-                                 ("asymptote" . asy)
-                                 ("dot" . graphviz-dot)
-                                 ("sqlite" . sql)
-                                 ("calc" . fundamental)
-                                 ("C" . c)
-                                 ("cpp" . c++)
-                                 ("C++" . c++)
-                                 ("screen" . shell-script)
-                                 ("shell" . sh)
-                                 ("bash" . sh))))
+    ;; Configure executors for the given languages
+    (setq org-src-lang-modes '(("C" . c)
+                               ("C++" . c++)
+                               ("asymptote" . asy)
+                               ("bash" . sh)
+                               ("calc" . fundamental)
+                               ("cpp" . c++)
+                               ("ditaa" . artist)
+                               ("dot" . graphviz-dot)
+                               ("elisp" . emacs-lisp)
+                               ("http" . "ob-http")
+                               ("mermaid" . mermaid)
+                               ("ocaml" . tuareg)
+                               ("screen" . shell-script)
+                               ("shell" . sh)
+                               ("sqlite" . sql))))
  #+end_src
 
 Org-tempo provides completion templates
