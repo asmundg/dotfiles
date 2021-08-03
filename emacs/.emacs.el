@@ -463,6 +463,9 @@ See URL `https://github.com/palantir/tslint'."
 (use-package groovy-mode
   :straight t)
 
+(use-package kotlin-mode
+  :straight t)
+
 (use-package indium
   :straight t)
 
@@ -470,6 +473,9 @@ See URL `https://github.com/palantir/tslint'."
   :straight t
   :config
   (setq js-indent-level 2))
+
+(use-package mermaid-mode
+  :straight t)
 
 (use-package mustache-mode
   :straight t)

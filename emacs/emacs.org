@@ -734,6 +734,11 @@ nix-env -f '<nixpkgs>' -iA nodePackages.node2nix
   (use-package groovy-mode
     :straight t)
 #+end_src
+** Kotlin
+#+begin_src emacs-lisp
+  (use-package kotlin-mode
+    :straight t)
+#+end_src
 ** Javascript
 JS REPL and debugger. Note that for node, this either needs an "app"
 specified in .indium.json, or it needs to connect to an existing
@@ -753,6 +758,14 @@ yarn global add indium
     :straight t
     :config
     (setq js-indent-level 2))
+#+end_src
+** Mermaid
+#+begin_src emacs-lisp
+  (use-package mermaid-mode
+    :straight t)
+#+end_src
+#+begin_src shell :tangle bootstrap.sh
+brew install mermaid-cli
 #+end_src
 ** Mustache
 #+begin_src emacs-lisp
