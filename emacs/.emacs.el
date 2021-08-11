@@ -456,6 +456,9 @@ See URL `https://github.com/palantir/tslint'."
 (use-package graphviz-dot-mode
   :straight t)
 
+(use-package gnuplot
+  :straight t)
+
 (use-package graphql-mode
   :straight t)
 

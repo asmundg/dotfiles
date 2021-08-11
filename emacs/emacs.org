@@ -719,6 +719,18 @@ nix-env -i direnv
   (use-package graphviz-dot-mode
     :straight t)
 #+end_src
+** Gnuplot
+This is needed for org-babel-gnuplot to work.
+
+#+begin_src emacs-lisp
+  (use-package gnuplot
+    :straight t)
+#+end_src
+
+#+begin_src shell :tangle bootstrap.sh
+nix-env -i gnuplot
+#+end_src
+
 ** GraphQL
 #+begin_src emacs-lisp
   (use-package graphql-mode
