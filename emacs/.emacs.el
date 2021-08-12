@@ -88,6 +88,10 @@ With argument ARG, do this that many times."
   :bind (("C-M-=" . default-text-scale-increase)
          ("C-M--" . default-text-scale-decrease)))
 
+(let ((path-from-shell (shell-command-to-string "/usr/local/bin/fish -i -c \"echo -n \\$PATH[1]; for val in \\$PATH[2..-1];echo -n \\\":\\$val\\\";end\"")))
+  (setenv "PATH" path-from-shell)
+  (setq exec-path (split-string path-from-shell ":")))
+
 (use-package exec-path-from-shell
   :straight t
   :config
