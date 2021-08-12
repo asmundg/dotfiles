@@ -68,7 +68,8 @@
 **** MacOS
 
  #+begin_src shell :tangle bootstrap-mac.sh
- brew install font-fira-code
+   brew tap homebrew/cask-fonts
+   brew install font-fira-code
  #+end_src
 
 *** Config
@@ -206,8 +207,13 @@ Grab configured PATH from environment
     :config
     (exec-path-from-shell-initialize))
 #+end_src
-#+begin_src shell :tangle bootstrap-mac.sh
-nix-env -i ispell
+#+begin_src shell :tangle bootstrap.sh
+  # Fish and friends
+  brew install fish
+  curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
+  fisher install jorgebucaran/nvm.fish
+  
+  nix-env -i ispell
 #+end_src
 * Counsel
 Search and and occur tool. Counsel/swiper/ivy is a framework for
@@ -697,7 +703,7 @@ processes, etc.
     (direnv-mode))
 #+end_src
 
-#+begin_src shell :tangle bootstrap-mac.sh
+#+begin_src shell :tangle bootstrap.sh
 nix-env -i direnv
 #+end_src
 * Languages
@@ -737,7 +743,7 @@ nix-env -i gnuplot
     :straight t)
 #+end_src
 
-#+begin_src shell :tangle bootstrap-mac.sh
+#+begin_src shell :tangle bootstrap.sh
 nix-env -f '<nixpkgs>' -iA nodePackages.node2nix
 #+end_src
 ** Groovy
