@@ -209,17 +209,12 @@ load the path.
   (setq exec-path (split-string path-from-shell ":")))
 #+end_src
 
-#+begin_src emacs-lisp
-  (use-package exec-path-from-shell
-    :straight t
-    :config
-    (exec-path-from-shell-initialize))
-#+end_src
 #+begin_src shell :tangle bootstrap.sh
   # Fish and friends
   brew install fish
   curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
-  fisher install jorgebucaran/nvm.fish
+  fisher install jorgebucaran/nvm.fish@8922519
+  fisher install lilyball/nix-env.fish@00c6cc7
   
   nix-env -i ispell
 #+end_src

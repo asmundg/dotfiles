@@ -92,11 +92,6 @@ With argument ARG, do this that many times."
   (setenv "PATH" path-from-shell)
   (setq exec-path (split-string path-from-shell ":")))
 
-(use-package exec-path-from-shell
-  :straight t
-  :config
-  (exec-path-from-shell-initialize))
-
 (use-package counsel
   :straight t
   :after (counsel-projectile)
