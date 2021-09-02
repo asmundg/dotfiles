@@ -89,7 +89,7 @@ With argument ARG, do this that many times."
          ("C-M--" . default-text-scale-decrease)))
 
 (setenv "TERM" "screen-256color")
-(let ((path-from-shell (shell-command-to-string "/usr/local/bin/fish -i -c \"echo -n \\$PATH[1]; for val in \\$PATH[2..-1];echo -n \\\":\\$val\\\";end\"")))
+(let ((path-from-shell (shell-command-to-string "$HOME/.nix-profile/bin/fish -l -c \"echo -n \\$PATH[1]; for val in \\$PATH[2..-1];echo -n \\\":\\$val\\\";end\"")))
   (setenv "PATH" path-from-shell)
   (setq exec-path (split-string path-from-shell ":")))
 
