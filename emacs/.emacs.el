@@ -325,13 +325,23 @@ See URL `https://github.com/palantir/tslint'."
   ;; tables etc.
   :bind (:map org-mode-map ("M-e" . org-fill-paragraph))
   :config
-  (setq org-directory "~")
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
+  (add-to-list 'org-agenda-files (concat org-directory "/agenda.org"))
   (setq
+   org-directory "~/Sync"
+
+   org-default-notes-file (concat org-directory "/notes.org")
+
    ;; Add syntax highlighting in src blocks
    org-src-fontify-natively t
    ;; Start org files with all trees collapsed
-   org-startup-truncated nil)
+   org-startup-truncated nil
+
+   org-agenda-breadcrumbs-separator "/"
+
+   org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s")
+                              (todo . "%i %-12:c %b")
+                              (tags . " %i %-12:c")
+                              (search . " %i %-12:c")))
 
   ;; org-babel allows execution of src blocks containing the following
   ;; languages.
