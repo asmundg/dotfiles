@@ -325,7 +325,6 @@ See URL `https://github.com/palantir/tslint'."
   ;; tables etc.
   :bind (:map org-mode-map ("M-e" . org-fill-paragraph))
   :config
-  (add-to-list 'org-agenda-files (concat org-directory "/agenda.org"))
   (setq
    org-directory "~/Sync"
 
@@ -342,6 +341,7 @@ See URL `https://github.com/palantir/tslint'."
                               (todo . "%i %-12:c %b")
                               (tags . " %i %-12:c")
                               (search . " %i %-12:c")))
+  (add-to-list 'org-agenda-files (concat org-directory "/agenda.org"))
 
   ;; org-babel allows execution of src blocks containing the following
   ;; languages.

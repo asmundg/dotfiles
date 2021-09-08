@@ -527,7 +527,6 @@ which supports execution of source blocks with C-c C-c.
     ;; tables etc.
     :bind (:map org-mode-map ("M-e" . org-fill-paragraph))
     :config
-    (add-to-list 'org-agenda-files (concat org-directory "/agenda.org"))
     (setq
      org-directory "~/Sync"
 
@@ -544,6 +543,7 @@ which supports execution of source blocks with C-c C-c.
                                 (todo . "%i %-12:c %b")
                                 (tags . " %i %-12:c")
                                 (search . " %i %-12:c")))
+    (add-to-list 'org-agenda-files (concat org-directory "/agenda.org"))
 
     ;; org-babel allows execution of src blocks containing the following
     ;; languages.
