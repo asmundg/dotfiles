@@ -770,6 +770,12 @@ nix-env -f '<nixpkgs>' -iA nodePackages.node2nix
   (use-package kotlin-mode
     :straight t)
 #+end_src
+** Java
+#+begin_src emacs-lisp
+(defun java-indent-setup ()
+  (c-set-offset 'arglist-intro '+))
+(add-hook 'java-mode-hook 'java-indent-setup)
+#+end_src
 ** Javascript
 JS REPL and debugger. Note that for node, this either needs an "app"
 specified in .indium.json, or it needs to connect to an existing

@@ -478,6 +478,10 @@ See URL `https://github.com/palantir/tslint'."
 (use-package kotlin-mode
   :straight t)
 
+(defun java-indent-setup ()
+  (c-set-offset 'arglist-intro '+))
+(add-hook 'java-mode-hook 'java-indent-setup)
+
 (use-package indium
   :straight t)
 
