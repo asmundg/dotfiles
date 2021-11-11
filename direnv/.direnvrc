@@ -1,0 +1,67 @@
+# -*- mode: sh; -*-
+
+find_up_() {
+    (
+        while true; do
+            for v in "${@}"; do
+                if [[ -f "${v}" ]]; then
+                    echo "${PWD}/${v}"
+                    return 0
+                fi
+            done
+
+            if [[ "${PWD}" == / ]] || [[ "${PWD}" == // ]]; then
+                return 1
+            fi
+
+            cd ..
+        done
+    )
+}
+
+read_version_file() {
+    local file
+    file="$(find_up_ "${@}")"
+
+    [[ -z "${file}" ]] && return
+
+    watch_file "${file}"
+    ruby -e "puts ARGF.readline" "${file}" 2>/dev/null
+}
+
+use_nvm() {
+    local version
+    version="${1}"
+    
+    [[ "${version}" == --auto ]] && version="$(read_version_file .node-version .nvmrc)"
+    [[ -z "${version}" ]] && return
+
+    NVM_PATH=~/.local/share/nvm
+
+    if [[ -e ~/.nvm/nvm.sh ]]; then
+        source ~/.nvm/nvm.sh
+        nvm use "${version}"
+    elif [[ -f ${NVM_PATH}/.index ]]; then
+        # This works with jorgebucaran/fish-nvm, a fish-specific alternative to
+        # nvm. The version of Node requested must be installed before use.
+        version="$(
+            ruby -e $'
+        version=ARGV.shift
+        version=version.strip.gsub(/^v/, "")
+        match=ARGF.readlines.find { |l| l =~ /#{Regexp.escape(version)}/ }
+        puts match.split(/\s/).first if match
+      ' "${version}" ${NVM_PATH}/.index
+        )"
+
+        [[ -z "${version}" ]] && return
+
+        if [[ -d ${NVM_PATH}/"${version}"/bin ]]; then
+            PATH_add "$(
+                cd ${NVM_PATH} || exit
+                pwd -P
+            )/${version}"/bin
+            export NVM_BIN
+            NVM_BIN=${NVM_PATH}/"${version}"/bin
+        fi
+    fi
+}
