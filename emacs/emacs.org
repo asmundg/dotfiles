@@ -775,7 +775,7 @@ use_nvm() {
             ruby -e $'
         version=ARGV.shift
         version=version.strip.gsub(/^v/, "")
-        match=ARGF.readlines.find { |l| l =~ /#{Regexp.escape(version)}/ }
+        match=ARGF.readlines.find { |l| l =~ /^(v?#{Regexp.escape(version)})|(v([0-9]+\.){2}[0-9]+ #{Regexp.escape(version)})/ }
         puts match.split(/\s/).first if match
       ' "${version}" ${NVM_PATH}/.index
         )"
