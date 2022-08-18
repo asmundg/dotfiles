@@ -1,5 +1,5 @@
 # Fish and friends
-brew install fish
+nix-env -i fish
 curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
 fisher install jorgebucaran/nvm.fish@8922519
 fisher install lilyball/nix-env.fish@00c6cc7

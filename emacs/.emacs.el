@@ -88,6 +88,8 @@ With argument ARG, do this that many times."
   :bind (("C-M-=" . default-text-scale-increase)
          ("C-M--" . default-text-scale-decrease)))
 
+(setq show-trailing-whitespace t)
+
 (setenv "TERM" "screen-256color")
 (let ((path-from-shell (shell-command-to-string "$HOME/.nix-profile/bin/fish -l -c \"echo -n \\$PATH[1]; for val in \\$PATH[2..-1];echo -n \\\":\\$val\\\";end\"")))
   (setenv "PATH" path-from-shell)
@@ -454,6 +456,13 @@ See URL `https://github.com/palantir/tslint'."
   :straight t
   :config
   (direnv-mode))
+
+(use-package prescient
+  :straight t)
+
+(use-package ivy-prescient
+  :straight t
+  :config (ivy-prescient-mode))
 
 (use-package csharp-mode
   :straight t

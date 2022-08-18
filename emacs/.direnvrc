@@ -1,0 +1,57 @@
+# -*- mode: sh; -*-
+
+find_up_() {
+    (
+        while true; do
+            for v in "${@}"; do
+                if [[ -f "${v}" ]]; then
+                    echo "${PWD}/${v}"
+                    return 0
+                fi
+            done
+
+            if [[ "${PWD}" == / ]] || [[ "${PWD}" == // ]]; then
+                return 1
+            fi
+
+            cd ..
+        done
+    )
+}
+
+read_version_file() {
+    local file
+    file="$(find_up_ "${@}")"
+
+    [[ -z "${file}" ]] && return
+
+    watch_file "${file}"
+    cat "${file}"
+}
+
+use_nvm() {
+    local version
+        version="${1}"
+    
+    [[ "${version}" == --auto ]] && version="$(read_version_file .node-version .nvmrc)"
+    [[ -z "${version}" ]] && return
+
+    NVM_PATH=~/.local/share/nvm
+
+    if [[ -e ~/.nvm/nvm.sh ]]; then
+        source ~/.nvm/nvm.sh
+        nvm use "${version}"
+    elif [[ -f ${NVM_PATH}/.index ]]; then
+        # This works with jorgebucaran/fish-nvm, a fish-specific alternative to
+        # nvm. The version of Node requested must be installed before use.
+        NVM_BIN=$(
+            grep $version ${NVM_PATH}/.index | awk '{print $1}' | while read candidate; do
+                if [[ -d ${NVM_PATH}/"${candidate}"/bin ]]; then
+                    echo "${NVM_PATH}/${candidate}/bin"
+                    return
+                fi
+            done)
+        PATH_add $NVM_BIN
+        export NVM_BIN
+    fi
+}
