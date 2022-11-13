@@ -64,6 +64,8 @@
 
 (winner-mode 1)
 
+(global-so-long-mode)
+
 (global-auto-revert-mode 1)
 (setq auto-revert-verbose nil)
 
@@ -75,7 +77,7 @@ With argument ARG, do this that many times."
   (interactive "p")
   (delete-region (point) (progn (backward-word arg) (point))))
 
-  (global-set-key (kbd "C-w") 'backward-delete-word)
+(global-set-key (kbd "C-w") 'backward-delete-word)
 
 ;; No quick exit emacs
 (global-unset-key "\C-x\C-c")
@@ -91,9 +93,17 @@ With argument ARG, do this that many times."
 (setq show-trailing-whitespace t)
 
 (setenv "TERM" "screen-256color")
-(let ((path-from-shell (shell-command-to-string "$HOME/.nix-profile/bin/fish -l -c \"echo -n \\$PATH[1]; for val in \\$PATH[2..-1];echo -n \\\":\\$val\\\";end\"")))
+(let ((path-from-shell (shell-command-to-string "fish -l -c \"echo -n \\$PATH[1]; for val in \\$PATH[2..-1];echo -n \\\":\\$val\\\";end\"")))
   (setenv "PATH" path-from-shell)
   (setq exec-path (split-string path-from-shell ":")))
+
+(use-package copilot
+  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :bind (("C-<tab>" . copilot-accept-completion)
+         ("C-S-<tab>" . copilot-accept-completion-by-line))
+  :init
+  (global-copilot-mode)
+  (copilot-diagnose))
 
 (use-package counsel
   :straight t
@@ -152,8 +162,8 @@ With argument ARG, do this that many times."
     :command ("proselint" source-inplace)
     :error-patterns
     ((warning line-start (file-name) ":" line ":" column ": "
-             (id (one-or-more (not (any " "))))
-             (message) line-end))
+              (id (one-or-more (not (any " "))))
+              (message) line-end))
     :modes (text-mode markdown-mode gfm-mode org-mode))
 
   (flycheck-define-checker typescript-tslint-original-source
@@ -232,14 +242,14 @@ See URL `https://github.com/palantir/tslint'."
                       (bash "bash")
                       (mksh "mksh")
                       (t "posix"))))
-      (list "-i" "4"))))
+      (list "-i" "4" "-bn"))))
+
   (add-hook 'c-mode-common-hook (lambda () (setq-local format-all-formatters '(("C" clang-format) ("Objective-C" clang-format)))))
   (add-hook 'graphql-mode-hook (lambda () (setq-local format-all-formatters '(("GraphQL" prettier)))))
   (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
   (add-hook 'js-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier)))))
   (add-hook 'json-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
   (add-hook 'markdown-mode-hook (lambda () (setq-local format-all-formatters '(("Markdown" prettier)))))
-  (add-hook 'sh-mode-hook (lambda () (setq-local format-all-formatters '(("Nix" nixfmt)))))
   (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
   (add-hook 'swift-mode-hook (lambda () (setq-local format-all-formatters '(("Swift" swiftformat-with-config)))))
   (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
@@ -339,7 +349,7 @@ See URL `https://github.com/palantir/tslint'."
 
    org-agenda-breadcrumbs-separator "/"
 
-   org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s")
+   org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s %b")
                               (todo . "%i %-12:c %b")
                               (tags . " %i %-12:c")
                               (search . " %i %-12:c")))
@@ -395,7 +405,7 @@ See URL `https://github.com/palantir/tslint'."
   (org-download-heading-lvl nil)
   (org-download-timestamp "%Y%m%d-%H%M%S_")
   (org-image-actual-width 300)
-  (org-download-screenshot-method "/usr/local/bin/pngpaste %s")
+  (org-download-screenshot-method "/opt/homebrew/bin/pngpaste %s")
   :bind
   ("C-M-y" . org-download-screenshot))
 
@@ -491,8 +501,8 @@ See URL `https://github.com/palantir/tslint'."
   (c-set-offset 'arglist-intro '+))
 (add-hook 'java-mode-hook 'java-indent-setup)
 
-(use-package indium
-  :straight t)
+;;(use-package indium
+;;  :straight t)
 
 (use-package json-mode
   :straight t
