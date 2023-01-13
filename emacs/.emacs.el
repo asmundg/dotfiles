@@ -183,7 +183,8 @@ See URL `https://github.com/palantir/tslint'."
     :modes (typescript-mode))
 
   (setq flycheck-display-errors-delay 0.1
-        flycheck-pos-tip-timeout 600)
+        flycheck-pos-tip-timeout 600
+        flycheck-eslint-args '("--resolve-plugins-relative-to" "/Volumes/src/1js/main/midgard/packages/eslint-config"))
 
   (add-to-list 'flycheck-checkers 'proselint)
   (add-to-list 'flycheck-checkers 'typescript-tslint-original-source))
@@ -545,7 +546,7 @@ See URL `https://github.com/palantir/tslint'."
     (setq-local flycheck-typescript-tslint-original-source-executable tslint)))
 
 (defun ts-lsp-flycheck ()
-  (flycheck-add-next-checker 'lsp '(warning . typescript-tslint-original-source)))
+  (flycheck-add-next-checker 'lsp '(warning . javascript-eslint)))
 
 (use-package typescript-mode
   :straight t
