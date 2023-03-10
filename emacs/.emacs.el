@@ -262,6 +262,10 @@ See URL `https://github.com/palantir/tslint'."
   (when 'format-all-formatters
     (format-all-buffer)))
 
+;; org-mode markdown exporter
+(use-package ox-gfm
+  :straight t)
+
 (use-package editorconfig
   :straight t
   :delight
@@ -336,7 +340,9 @@ See URL `https://github.com/palantir/tslint'."
          (org-mode . flyspell-mode))
   ;; org has a custom fill-paragraph, which performs extra magic for
   ;; tables etc.
-  :bind (:map org-mode-map ("M-e" . org-fill-paragraph))
+  :bind (:map org-mode-map
+              ("M-e" . org-fill-paragraph)
+              ("C-c ,". org-time-stamp-inactive))
   :config
   (setq
    org-directory "~/Sync"
@@ -377,6 +383,31 @@ See URL `https://github.com/palantir/tslint'."
          (not (string= lang "gnuplot"))
          (not (string= lang "mermaid"))))
   (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+
+
+  (defun ndk/heading-title ()
+    "Get the heading title."
+    (save-excursion
+      (if (not (org-at-heading-p))
+          (org-previous-visible-heading 1))
+      (org-element-property :title (org-element-at-point))))
+
+  (defun ndk/org-breadcrumbs ()
+    "Get the chain of headings from the top level down
+    to the current heading."
+    (let ((breadcrumbs (org-format-outline-path
+                        (org-get-outline-path)
+                        (1- (frame-width))
+                        nil "->"))
+          (title (ndk/heading-title)))
+      (if (string-empty-p breadcrumbs)
+          title
+        (format "%s->%s" breadcrumbs title))))
+
+  (defun ndk/set-header-line-format()
+    (setq header-line-format '(:eval (ndk/org-breadcrumbs))))
+
+  (add-hook 'org-mode-hook #'ndk/set-header-line-format)
 
   ;; Configure executors for the given languages
   (setq org-src-lang-modes '(("C" . c)
