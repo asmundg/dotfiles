@@ -232,289 +232,11 @@ load the path.
   
   nix-env -i ispell
 #+end_src
-* Counsel
-Search and and occur tool. Counsel/swiper/ivy is a framework for
-incrementally searching everything.
-
-#+begin_src emacs-lisp
-  (use-package counsel
-    :straight t
-    :after (counsel-projectile)
-    :delight ivy-mode
-    :bind (("C-s" . swiper)
-           ("C-r" . swiper)
-           ("C-c s" . counsel-rg)
-           ("C-c f" . counsel-projectile-find-file)
-           ("C-x C-f" . counsel-find-file)
-           ("C-x C-l" . counsel-esh-history)
-           ("M-x" . counsel-M-x)
-           ("C-c C-r" . ivy-resume)
-           ("M-y" . counsel-yank-pop)
-           :map ivy-minibuffer-map
-           ("M-y" . ivy-next-line))
-    :config
-    (ivy-mode 1)
-    (setq ivy-use-virtual-buffers 1)
-    (setq ivy-count-format "(%d/%d)")
-    (setq ivy-wrap 1)
-    (setq ivy-use-selectable-prompt t)
-    (setq ivy-re-builders-alist
-          '((swiper . ivy--regex-ignore-order)
-            (t . ivy--regex-ignore-order)))
-    (setq ivy-initial-inputs-alist nil)
-    (setq ivy-height 20)
-
-    (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word))
-#+end_src
-
-#+begin_src emacs-lisp
-  (use-package counsel-projectile
-    :init
-    (projectile-global-mode)
-    :config
-    (setq projectile-enable-caching t)
-    :straight t)
-#+end_src
-
-Ivy can use wgrep for editing occur buffers:
-
-1. C-c s (counsel-rg)
-2. C-c C-o (ivy-occur)
-3. C-x C-q (ivy-wgrep-change-to-wgrep-mode)
-4. Edit via macro/replace
-5. C-c C-c (wgrep-finish-edit)
-
-#+begin_src emacs-lisp
-  (use-package wgrep
-    :straight t)
-#+end_src
-
-* Company
-Completion framework.
-
-#+begin_src emacs-lisp
-  (use-package company
-    :straight t
-    :delight
-    :config
-    (global-company-mode 1))
-#+end_src
-* Ediff
-
-Avoid popping up new frames when ediffing, and just use a fancy window
-layout.
-
-#+begin_src emacs-lisp
-(setq ediff-window-setup-function 'ediff-setup-windows-plain)
-#+end_src
-
-* Flycheck
-#+begin_src emacs-lisp
-  (use-package flycheck
-    :straight t
-    :config
-    (global-flycheck-mode 1)
-
-    (flycheck-define-checker proselint
-      "A linter for prose."
-      :command ("proselint" source-inplace)
-      :error-patterns
-      ((warning line-start (file-name) ":" line ":" column ": "
-               (id (one-or-more (not (any " "))))
-               (message) line-end))
-      :modes (text-mode markdown-mode gfm-mode org-mode))
-
-    (flycheck-define-checker typescript-tslint-original-source
-      "TypeScript style checker using TSLint.
-
-  Note that this syntax checker is not used if
-  `flycheck-typescript-tslint-config' is nil or refers to a
-  non-existing file.
-
-  See URL `https://github.com/palantir/tslint'."
-      :command ("tslint" "--format" "json"
-                (config-file "--config" flycheck-typescript-tslint-config)
-                (option "--rules-dir" flycheck-typescript-tslint-rulesdir)
-                (eval flycheck-tslint-args)
-                source-original)
-      :error-parser flycheck-parse-tslint
-      :modes (typescript-mode))
-
-    (setq flycheck-display-errors-delay 0.1
-          flycheck-pos-tip-timeout 600)
-
-    (add-to-list 'flycheck-checkers 'proselint)
-    (add-to-list 'flycheck-checkers 'typescript-tslint-original-source))
-
-  (use-package flycheck-pos-tip
-    :straight t
-    :init
-    (with-eval-after-load 'flycheck
-      (flycheck-pos-tip-mode)))
-
-  (use-package flycheck-swiftlint
-    :straight t
-    :config
-    (with-eval-after-load 'flycheck
-      (flycheck-swiftlint-setup)))
-#+end_src
-
-* Formatting
-Format-all is a generic framework for auto-formatting source code. It needs to be explicitly configured per mode.
-
-#+begin_src emacs-lisp
-  (use-package format-all
-    :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code"
-                          :fork (:host github :repo "asmundg/emacs-format-all-the-code" :branch "asmundg/expose-formatter-definition"))
-    :hook ((c-mode-common
-            elisp-mode
-            emacs-lisp-mode
-            graphql-mode
-            js-mode
-            json-mode
-            nix-mode
-            markdown-mode
-            nix-mode
-            objc-mode
-            python-mode
-            sh-mode
-            swift-mode
-            typescript-mode
-            yaml-mode
-            web-mode) . format-all-mode)
-    :config
-    (define-format-all-formatter swiftformat-with-config
-      (:executable "swiftformat")
-      (:install (macos "brew install swiftformat"))
-      (:languages "Swift")
-      (:format (format-all--buffer-easy executable "--quiet" "--config" (concat (locate-dominating-file default-directory ".swiftformat") ".swiftformat"))))
-    (define-format-all-formatter shfmt-with-options
-      (:executable "shfmt")
-      (:install
-       (macos "brew install shfmt")
-       (windows "scoop install shfmt"))
-      (:languages "Shell")
-      (:format
-       (format-all--buffer-easy
-        executable
-        (if (buffer-file-name)
-            (list "-filename" (buffer-file-name))
-          (list "-ln" (cl-case (and (eql major-mode 'sh-mode)
-                                    (boundp 'sh-shell)
-                                    (symbol-value 'sh-shell))
-                        (bash "bash")
-                        (mksh "mksh")
-                        (t "posix"))))
-        (list "-i" "4"))))
-    (add-hook 'c-mode-common-hook (lambda () (setq-local format-all-formatters '(("C" clang-format) ("Objective-C" clang-format)))))
-    (add-hook 'graphql-mode-hook (lambda () (setq-local format-all-formatters '(("GraphQL" prettier)))))
-    (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
-    (add-hook 'js-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier)))))
-    (add-hook 'json-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
-    (add-hook 'markdown-mode-hook (lambda () (setq-local format-all-formatters '(("Markdown" prettier)))))
-    (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
-    (add-hook 'swift-mode-hook (lambda () (setq-local format-all-formatters '(("Swift" swiftformat-with-config)))))
-    (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
-    (add-hook 'sh-mode-hook (lambda () (setq-local format-all-formatters '(("Shell" shfmt-with-options)))))
-    (add-hook 'yaml-mode-hook (lambda () (setq-local format-all-formatters '(("YAML" prettier))))))
-#+end_src
-
-Auto format org source buffers when exiting them. Since these buffers
-aren't backed by files, the normal format-all save hook doesn't work.
-
-#+begin_src emacs-lisp
-  (define-advice org-edit-src-exit (:before (&rest _args) format-buffer)
-    "Format source blocks before exit"
-    (when 'format-all-formatters
-      (format-all-buffer)))
-#+end_src
-
-#+begin_src emacs-lisp
-  (use-package editorconfig
-    :straight t
-    :delight
-    :config
-    (editorconfig-mode 1)
-    (add-to-list 'editorconfig-indentation-alist '(swift-mode swift-mode:basic-offset)))
-#+end_src
-
-* Helpful
-More contextual information in help buffers
-
-#+begin_src emacs-lisp
-  (use-package helpful
-    :straight t
-    :bind (("C-h f" . helpful-callable)
-           ("C-h v" . helpful-variable)
-           ("C-h k" . helpful-key)
-           ("C-c C-d" . helpful-at-point)))
-#+end_src
-* LSP
-#+begin_src emacs-lisp
-  (use-package lsp-mode
-    :straight t
-    :after (flycheck which-key)
-    :hook ((js-mode . lsp)
-           (typescript-mode . lsp)
-           (haskell-mode . lsp)
-           (lsp-mode . lsp-enable-which-key-integration)
-           (lsp-mode . lsp-headerline-breadcrumb-mode))
-    :init
-    (setq lsp-keymap-prefix "s-l")
-    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-    :config
-    (lsp-register-client
-     (make-lsp-client :new-connection (lsp-tcp-connection (lambda (port) `("graphql-lsp" "server" "-m" "socket" "-p" ,(number-to-string port))))
-                      :major-modes '(graphql-mode)
-                      :initialization-options (lambda () `())
-                      :server-id 'graphql))
-    (add-to-list 'lsp-language-id-configuration '(graphql-mode . "graphql")))
-#+end_src
-
-#+begin_src emacs-lisp
-  (use-package lsp-ui
-    :straight t
-    :after lsp-mode
-    :hook (lsp-mode . lsp-ui-mode)
-    :config
-    (setq lsp-ui-sideline-diagnostic-max-lines 10)
-    (setq lsp-ui-doc-position 'bottom)
-    :commands lsp-ui-mode)
-#+end_src
-
-#+begin_src emacs-lisp
-  (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-#+end_src
-* Magit
-#+begin_src emacs-lisp
-  (use-package magit
-    :straight t
-    :hook (git-commit-mode . (lambda () (setq fill-column 72)))
-    :bind (("C-x v s" . magit-status)
-           ("C-x v b" . magit-blame-addition))
-    :config
-    (magit-add-section-hook 'magit-status-sections-hook 'magit-insert-local-branches 'magit-insert-stashes)
-    (setq
-     magit-git-executable (if (eq system-type 'darwin) "/usr/local/bin/git" "git")
-     magit-last-seen-setup-instructions "1.4.0"
-     magit-push-always-verify nil
-     ;; Always on linux, never on Windows, due to slooow
-     magit-diff-refine-hunk (if (eq system-type 'windows-nt) nil 'all)))
-#+end_src
-* Delight
-Delight
-(https://git.savannah.gnu.org/cgit/delight.git/plain/delight.el)
-allows removal of mode names from the mode line. Use with use-package
-by adding the :delight keyword.
-
-#+begin_src emacs-lisp
-  (use-package delight
-    :straight t
-    ;; Hide auto-revert-mode
-    :config (delight 'auto-revert-mode))
-#+end_src
-
 * Org
+Initialize org early, to get the straight version loaded before
+anything accidentally pulls in the native version.
+
+** Main org setup
 Org is a vast project management, note orchestration and spreadhsheet
 application. I only use a small fraction of it. See for example
 http://cachestocaches.com/2020/3/my-organized-life/ on how some people
@@ -604,7 +326,9 @@ Org-tempo provides completion templates
 #+begin_src emacs-lisp
   (require 'org-tempo)
 #+end_src
- 
+
+** org-download
+
 Org-download supports grabbing images from the OS clipboard and
 inserting them into org files.
 
@@ -646,6 +370,337 @@ graphviz for graph diagrams, mermaid makes nice sequence diagrams.
 #+begin_src emacs-lisp
   (use-package ob-mermaid
     :straight t)
+#+end_src
+
+** org-mode markdown exporter
+Adds support for exporting org to markdown.
+
+#+begin_src emacs-lisp
+  (use-package ox-gfm
+    :straight t)
+#+end_src
+** org-roam
+Knowledge graph for org-mode, inspired by Roam
+(https://github.com/org-roam/org-roam). There's a great introduction
+at
+https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/.
+
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :straight t
+    :after (org)
+    :hook (after-init . org-roam-mode)
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n g" . org-roam-graph)
+           ("C-c n c" . org-roam-capture))
+    :custom
+    (org-roam-directory (file-truename "~/Sync/roam"))
+    (org-roam-capture-templates
+     '(("d" "default" plain
+        "%?"
+        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
+        :unnarrowed t)))
+    :config
+    (make-directory "~/Sync/roam" t)
+    (org-roam-db-autosync-mode))
+#+end_src
+
+* Counsel
+Search and and occur tool. Counsel/swiper/ivy is a framework for
+incrementally searching everything.
+
+#+begin_src emacs-lisp
+  (use-package counsel
+    :straight t
+    :after (counsel-projectile)
+    :delight ivy-mode
+    :bind (("C-s" . swiper)
+           ("C-r" . swiper)
+           ("C-c s" . counsel-rg)
+           ("C-c f" . counsel-projectile-find-file)
+           ("C-x C-f" . counsel-find-file)
+           ("C-x C-l" . counsel-esh-history)
+           ("M-x" . counsel-M-x)
+           ("C-c C-r" . ivy-resume)
+           ("M-y" . counsel-yank-pop)
+           :map ivy-minibuffer-map
+           ("M-y" . ivy-next-line))
+    :config
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers 1)
+    (setq ivy-count-format "(%d/%d)")
+    (setq ivy-wrap 1)
+    (setq ivy-use-selectable-prompt t)
+    (setq ivy-re-builders-alist
+          '((swiper . ivy--regex-ignore-order)
+            (t . ivy--regex-ignore-order)))
+    (setq ivy-initial-inputs-alist nil)
+    (setq ivy-height 20)
+
+    (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-backward-kill-word))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package counsel-projectile
+    :init
+    (projectile-global-mode)
+    :config
+    (setq projectile-enable-caching t)
+    :straight t)
+#+end_src
+
+Ivy can use wgrep for editing occur buffers:
+
+1. C-c s (counsel-rg)
+2. C-c C-o (ivy-occur)
+3. C-x C-q (ivy-wgrep-change-to-wgrep-mode)
+4. Edit via macro/replace
+5. C-c C-c (wgrep-finish-edit)
+
+#+begin_src emacs-lisp
+  (use-package wgrep
+    :straight t)
+#+end_src
+
+* Company
+Completion framework.
+
+#+begin_src emacs-lisp
+  (use-package company
+    :straight t
+    :delight
+    :config
+    (global-company-mode 1))
+#+end_src
+* Ediff
+
+Avoid popping up new frames when ediffing, and just use a fancy window
+layout.
+
+#+begin_src emacs-lisp
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+#+end_src
+
+* Flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :straight t
+    :config
+    (global-flycheck-mode 1)
+
+    (flycheck-define-checker proselint
+      "A linter for prose."
+      :command ("proselint" source-inplace)
+      :error-patterns
+      ((warning line-start (file-name) ":" line ":" column ": "
+                (id (one-or-more (not (any " "))))
+                (message) line-end))
+      :modes (text-mode markdown-mode gfm-mode org-mode))
+
+    (setq flycheck-display-errors-delay 0.1
+          flycheck-pos-tip-timeout 600)
+
+    (add-to-list 'flycheck-checkers 'proselint)
+
+    ;; Supports scenario-specific chaining. Specifically, we use this to
+    ;; set up eslint to run after LSP when we're in typescript-mode.
+    (advice-add 'flycheck-checker-get :around
+                (lambda (fn checker property)
+                  (or (alist-get property (alist-get checker flycheck-checker-local-override))
+                      (funcall fn checker property))))
+
+    ;; Monkeypatch flycheck to support overriding CLI args when checking
+    ;; that eslint can be enabled. For some reason, the default
+    ;; implementation ignores flycheck-eslint-args when checking that
+    ;; eslint can run, meaning it won't find plugins in monorepos with
+    ;; shared config packages (since the config package contains plugin
+    ;; dependencies and not the packages consuming the config).
+    (advice-add
+     'flycheck-eslint-config-exists-p
+     :override
+     (lambda ()
+       (eql 0
+            (apply #'flycheck-call-checker-process
+                   (append (list 'javascript-eslint nil nil nil)
+                           flycheck-eslint-args
+                           (list "--print-config" (or buffer-file-name "index.js")))))))
+    )
+
+  (use-package flycheck-pos-tip
+    :straight t
+    :init
+    (with-eval-after-load 'flycheck
+      (flycheck-pos-tip-mode)))
+
+  (use-package flycheck-swiftlint
+    :straight t
+    :config
+    (with-eval-after-load 'flycheck
+      (flycheck-swiftlint-setup)))
+#+end_src
+
+* Formatting
+Format-all is a generic framework for auto-formatting source code. It needs to be explicitly configured per mode.
+
+#+begin_src emacs-lisp
+  (use-package format-all
+    :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code"
+                          :fork (:host github :repo "asmundg/emacs-format-all-the-code" :branch "asmundg/expose-formatter-definition"))
+    :hook ((c-mode-common
+            elisp-mode
+            emacs-lisp-mode
+            graphql-mode
+            js-mode
+            json-mode
+            nix-mode
+            markdown-mode
+            nix-mode
+            objc-mode
+            python-mode
+            sh-mode
+            swift-mode
+            typescript-mode
+            yaml-mode
+            web-mode) . format-all-mode)
+    :config
+    (define-format-all-formatter swiftformat-with-config
+      (:executable "swiftformat")
+      (:install (macos "brew install swiftformat"))
+      (:languages "Swift")
+      (:format (format-all--buffer-easy executable "--quiet" "--config" (concat (locate-dominating-file default-directory ".swiftformat") ".swiftformat"))))
+    (define-format-all-formatter shfmt-with-options
+      (:executable "shfmt")
+      (:install
+       (macos "brew install shfmt")
+       (windows "scoop install shfmt"))
+      (:languages "Shell")
+      (:format
+       (format-all--buffer-easy
+        executable
+        (if (buffer-file-name)
+            (list "-filename" (buffer-file-name))
+          (list "-ln" (cl-case (and (eql major-mode 'sh-mode)
+                                    (boundp 'sh-shell)
+                                    (symbol-value 'sh-shell))
+                        (bash "bash")
+                        (mksh "mksh")
+                        (t "posix"))))
+        (list "-i" "4" "-bn"))))
+    (add-hook 'c-mode-common-hook (lambda () (setq-local format-all-formatters '(("C" clang-format) ("Objective-C" clang-format)))))
+    (add-hook 'graphql-mode-hook (lambda () (setq-local format-all-formatters '(("GraphQL" prettier)))))
+    (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
+    (add-hook 'js-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier)))))
+    (add-hook 'json-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
+    (add-hook 'markdown-mode-hook (lambda () (setq-local format-all-formatters '(("Markdown" prettier)))))
+    (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
+    (add-hook 'swift-mode-hook (lambda () (setq-local format-all-formatters '(("Swift" swiftformat-with-config)))))
+    (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
+    (add-hook 'sh-mode-hook (lambda () (setq-local format-all-formatters '(("Shell" shfmt-with-options)))))
+    (add-hook 'yaml-mode-hook (lambda () (setq-local format-all-formatters '(("YAML" prettier))))))
+#+end_src
+
+Auto format org source buffers when exiting them. Since these buffers
+aren't backed by files, the normal format-all save hook doesn't work.
+
+#+begin_src emacs-lisp
+  (define-advice org-edit-src-exit (:before (&rest _args) format-buffer)
+    "Format source blocks before exit"
+    (when 'format-all-formatters
+      (format-all-buffer)))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package editorconfig
+    :straight t
+    :delight
+    :config
+    (editorconfig-mode 1)
+    (add-to-list 'editorconfig-indentation-alist '(swift-mode swift-mode:basic-offset)))
+#+end_src
+
+* Helpful
+More contextual information in help buffers
+
+#+begin_src emacs-lisp
+  (use-package helpful
+    :straight t
+    :bind (("C-h f" . helpful-callable)
+           ("C-h v" . helpful-variable)
+           ("C-h k" . helpful-key)
+           ("C-c C-d" . helpful-at-point)))
+#+end_src
+* Ledger
+Text-based accounting system (https://github.com/ledger/ledger-mode).
+
+#+begin_src emacs-lisp
+  (use-package ledger-mode
+    :straight t)
+#+end_src
+* LSP
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :straight t
+    :after (flycheck which-key)
+    :hook ((js-mode . lsp)
+           (typescript-mode . lsp)
+           (haskell-mode . lsp)
+           (lsp-mode . lsp-enable-which-key-integration)
+           (lsp-mode . lsp-headerline-breadcrumb-mode))
+    :init
+    (setq lsp-keymap-prefix "s-l")
+    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+    :config
+    (lsp-register-client
+     (make-lsp-client :new-connection (lsp-tcp-connection (lambda (port) `("graphql-lsp" "server" "-m" "socket" "-p" ,(number-to-string port))))
+                      :major-modes '(graphql-mode)
+                      :initialization-options (lambda () `())
+                      :server-id 'graphql))
+    (add-to-list 'lsp-language-id-configuration '(graphql-mode . "graphql")))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package lsp-ui
+    :straight t
+    :after lsp-mode
+    :hook (lsp-mode . lsp-ui-mode)
+    :config
+    (setq lsp-ui-sideline-diagnostic-max-lines 10)
+    (setq lsp-ui-doc-position 'bottom)
+    :commands lsp-ui-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+#+end_src
+* Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :straight t
+    :hook (git-commit-mode . (lambda () (setq fill-column 72)))
+    :bind (("C-x v s" . magit-status)
+           ("C-x v b" . magit-blame-addition))
+    :config
+    (magit-add-section-hook 'magit-status-sections-hook 'magit-insert-local-branches 'magit-insert-stashes)
+    (setq
+     magit-git-executable (if (eq system-type 'darwin) "/usr/local/bin/git" "git")
+     magit-last-seen-setup-instructions "1.4.0"
+     magit-push-always-verify nil
+     ;; Always on linux, never on Windows, due to slooow
+     magit-diff-refine-hunk (if (eq system-type 'windows-nt) nil 'all)))
+#+end_src
+* Delight
+Delight
+(https://git.savannah.gnu.org/cgit/delight.git/plain/delight.el)
+allows removal of mode names from the mode line. Use with use-package
+by adding the :delight keyword.
+
+#+begin_src emacs-lisp
+  (use-package delight
+    :straight t
+    ;; Hide auto-revert-mode
+    :config (delight 'auto-revert-mode))
 #+end_src
 
 * Rainbow
@@ -771,13 +826,16 @@ currently match v15.14 and so on.
   use_nvm() {
       local version
       version="${1}"
-    
+
       [[ "${version}" == --auto ]] && version="$(read_version_file .node-version .nvmrc)"
       [[ -z "${version}" ]] && return
 
       NVM_PATH=~/.local/share/nvm
 
-      if [[ -f ${NVM_PATH}/.index ]]; then
+      if [[ -e ~/.nvm/nvm.sh ]]; then
+          source ~/.nvm/nvm.sh
+          nvm use "${version}"
+      elif [[ -f ${NVM_PATH}/.index ]]; then
           # This works with jorgebucaran/fish-nvm, a fish-specific alternative to
           # nvm. The version of Node requested must be installed before use.
           NVM_BIN=$(
@@ -789,9 +847,6 @@ currently match v15.14 and so on.
               done)
           PATH_add $NVM_BIN
           export NVM_BIN
-      elif [[ -e ~/.nvm/nvm.sh ]]; then
-          source ~/.nvm/nvm.sh
-          nvm use "${version}"
       fi
   }
 #+end_src
@@ -882,8 +937,8 @@ specified in .indium.json, or it needs to connect to an existing
 process. E.g. you might want to start node manually with --inspect.
 
 #+begin_src emacs-lisp
-  (use-package indium
-    :straight t)
+  ;(use-package indium
+  ;  :straight t)
 #+end_src
 
 #+begin_src shell :tangle bootstrap.sh
@@ -951,12 +1006,22 @@ those instead of the system versions.
     (when-let ((eslint (find-executable-from-node-modules "eslint")))
       (setq-local flycheck-javascript-eslint-executable eslint)))
 
-  (defun use-tslint-from-node-modules ()
-    (when-let ((tslint (find-executable-from-node-modules "tslint")))
-      (setq-local flycheck-typescript-tslint-original-source-executable tslint)))
+  ;; Monorepo hack. This is not nice, but eslint needs to be told on the
+  ;; command line when plugins are provided by an external
+  ;; package. Which tends to be the case on monorepos with a shared
+  ;; linter config.
+  (defun sverrejoh-configure-eslint ()
+    (when-let* ((root (projectile-project-root))
+                (eslint-resolve-from (concat root "packages/eslint-config")))
+      (setq-local flycheck-eslint-args `("--resolve-plugins-relative-to" ,eslint-resolve-from))))
 
-  (defun ts-lsp-flycheck ()
-    (flycheck-add-next-checker 'lsp '(warning . typescript-tslint-original-source)))
+  ;; Chain eslint checker to LSP checker _when we're in
+  ;; typescript-mode_. This assumes that we're monkeypatching flycheck
+  ;; to read this variable back at the appropriate time.
+  (defvar-local flycheck-checker-local-override nil)
+  (defun set-flycheck-checker-to-lsp-typescript ()
+    (when (derived-mode-p 'typescript-mode)
+      (setq flycheck-checker-local-override '((lsp . ((next-checkers . (javascript-eslint))))))))
 #+end_src
 
 Order matters here, we need to make sure that we set the correct paths
@@ -966,10 +1031,10 @@ before enabling flycheck. Otherwise, the checkers may get disabled.
   (use-package typescript-mode
     :straight t
     :after flycheck
-    :hook ((typescript-mode . ts-lsp-flycheck)
-           (typescript-mode . use-tslint-from-node-modules)
+    :hook ((typescript-mode . sverrejoh-configure-eslint)
            (typescript-mode . use-eslint-from-node-modules)
-           (typescript-mode . flyspell-prog-mode))
+           (typescript-mode . flyspell-prog-mode)
+           (lsp-managed-mode . set-flycheck-checker-to-lsp-typescript))
     :mode "\\.tsx\\'")
 #+end_src
 ** YAML

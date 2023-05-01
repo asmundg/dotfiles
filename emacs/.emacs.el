@@ -64,8 +64,6 @@
 
 (winner-mode 1)
 
-(global-so-long-mode)
-
 (global-auto-revert-mode 1)
 (setq auto-revert-verbose nil)
 
@@ -77,7 +75,7 @@ With argument ARG, do this that many times."
   (interactive "p")
   (delete-region (point) (progn (backward-word arg) (point))))
 
-(global-set-key (kbd "C-w") 'backward-delete-word)
+  (global-set-key (kbd "C-w") 'backward-delete-word)
 
 ;; No quick exit emacs
 (global-unset-key "\C-x\C-c")
@@ -92,18 +90,126 @@ With argument ARG, do this that many times."
 
 (setq show-trailing-whitespace t)
 
+(global-so-long-mode)
+
 (setenv "TERM" "screen-256color")
 (let ((path-from-shell (shell-command-to-string "fish -l -c \"echo -n \\$PATH[1]; for val in \\$PATH[2..-1];echo -n \\\":\\$val\\\";end\"")))
   (setenv "PATH" path-from-shell)
   (setq exec-path (split-string path-from-shell ":")))
 
-(use-package copilot
-  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :bind (("C-<tab>" . copilot-accept-completion)
-         ("C-S-<tab>" . copilot-accept-completion-by-line))
-  :init
-  (global-copilot-mode)
-  (copilot-diagnose))
+(use-package org
+  :straight t
+  :after (ob-http ob-mermaid)
+  :hook (
+         ;; Refresh any images after running org-babel, in case the
+         ;; command generated one.
+         (org-babel-after-execute . org-redisplay-inline-images)
+         (org-mode . org-indent-mode)
+         (org-mode . flyspell-mode))
+  ;; org has a custom fill-paragraph, which performs extra magic for
+  ;; tables etc.
+  :bind (:map org-mode-map ("M-e" . org-fill-paragraph))
+  :config
+  (setq
+   org-directory "~/Sync"
+
+   org-default-notes-file (concat org-directory "/notes.org")
+
+   ;; Add syntax highlighting in src blocks
+   org-src-fontify-natively t
+   ;; Start org files with all trees collapsed
+   org-startup-truncated nil
+
+   org-agenda-breadcrumbs-separator "/"
+
+   org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s %b")
+                              (todo . "%i %-12:c %b")
+                              (tags . " %i %-12:c")
+                              (search . " %i %-12:c")))
+  (add-to-list 'org-agenda-files (concat org-directory "/agenda.org"))
+
+  ;; org-babel allows execution of src blocks containing the following
+  ;; languages.
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '(
+     (dot . t)
+     (gnuplot . t)
+     (http . t)
+     (python . t)
+     (shell . t)
+     (mermaid . t)
+     ))
+
+  ;; Skip confirmation for src block execution for the following
+  ;; languages.
+  (defun my-org-confirm-babel-evaluate (lang body)
+    (and (not (string= lang "http"))
+         (not (string= lang "dot"))
+         (not (string= lang "gnuplot"))
+         (not (string= lang "mermaid"))))
+  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+
+  ;; Configure executors for the given languages
+  (setq org-src-lang-modes '(("C" . c)
+                             ("C++" . c++)
+                             ("asymptote" . asy)
+                             ("bash" . sh)
+                             ("calc" . fundamental)
+                             ("cpp" . c++)
+                             ("ditaa" . artist)
+                             ("dot" . graphviz-dot)
+                             ("elisp" . emacs-lisp)
+                             ("http" . "ob-http")
+                             ("mermaid" . mermaid)
+                             ("ocaml" . tuareg)
+                             ("screen" . shell-script)
+                             ("shell" . sh)
+                             ("sqlite" . sql))))
+
+(require 'org-tempo)
+
+(use-package org-download
+  :straight t
+  :after (org)
+  :custom
+  (org-download-method 'directory)
+  (org-download-image-dir "images")
+  (org-download-heading-lvl nil)
+  (org-download-timestamp "%Y%m%d-%H%M%S_")
+  (org-image-actual-width 300)
+  (org-download-screenshot-method "pngpaste %s")
+  :bind
+  ("C-M-y" . org-download-screenshot))
+
+(use-package ob-http
+  :straight t)
+
+(use-package ob-mermaid
+  :straight t)
+
+(use-package ox-gfm
+  :straight t)
+
+(use-package org-roam
+  :straight t
+  :after (org)
+  :hook (after-init . org-roam-mode)
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n c" . org-roam-capture))
+  :custom
+  (org-roam-directory (file-truename "~/Sync/roam"))
+  (org-roam-capture-templates
+   '(("d" "default" plain
+      "%?"
+      :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
+      :unnarrowed t)))
+  :config
+  (make-directory "~/Sync/roam" t)
+  (org-roam-db-autosync-mode))
 
 (use-package counsel
   :straight t
@@ -166,28 +272,34 @@ With argument ARG, do this that many times."
               (message) line-end))
     :modes (text-mode markdown-mode gfm-mode org-mode))
 
-  (flycheck-define-checker typescript-tslint-original-source
-    "TypeScript style checker using TSLint.
-
-Note that this syntax checker is not used if
-`flycheck-typescript-tslint-config' is nil or refers to a
-non-existing file.
-
-See URL `https://github.com/palantir/tslint'."
-    :command ("tslint" "--format" "json"
-              (config-file "--config" flycheck-typescript-tslint-config)
-              (option "--rules-dir" flycheck-typescript-tslint-rulesdir)
-              (eval flycheck-tslint-args)
-              source-original)
-    :error-parser flycheck-parse-tslint
-    :modes (typescript-mode))
-
   (setq flycheck-display-errors-delay 0.1
-        flycheck-pos-tip-timeout 600
-        flycheck-eslint-args '("--resolve-plugins-relative-to" "/Volumes/src/1js/main/midgard/packages/eslint-config"))
+        flycheck-pos-tip-timeout 600)
 
   (add-to-list 'flycheck-checkers 'proselint)
-  (add-to-list 'flycheck-checkers 'typescript-tslint-original-source))
+
+  ;; Supports scenario-specific chaining. Specifically, we use this to
+  ;; set up eslint to run after LSP when we're in typescript-mode.
+  (advice-add 'flycheck-checker-get :around
+              (lambda (fn checker property)
+                (or (alist-get property (alist-get checker flycheck-checker-local-override))
+                    (funcall fn checker property))))
+
+  ;; Monkeypatch flycheck to support overriding CLI args when checking
+  ;; that eslint can be enabled. For some reason, the default
+  ;; implementation ignores flycheck-eslint-args when checking that
+  ;; eslint can run, meaning it won't find plugins in monorepos with
+  ;; shared config packages (since the config package contains plugin
+  ;; dependencies and not the packages consuming the config).
+  (advice-add
+   'flycheck-eslint-config-exists-p
+   :override
+   (lambda ()
+     (eql 0
+          (apply #'flycheck-call-checker-process
+                 (append (list 'javascript-eslint nil nil nil)
+                         flycheck-eslint-args
+                         (list "--print-config" (or buffer-file-name "index.js")))))))
+  )
 
 (use-package flycheck-pos-tip
   :straight t
@@ -244,7 +356,6 @@ See URL `https://github.com/palantir/tslint'."
                       (mksh "mksh")
                       (t "posix"))))
       (list "-i" "4" "-bn"))))
-
   (add-hook 'c-mode-common-hook (lambda () (setq-local format-all-formatters '(("C" clang-format) ("Objective-C" clang-format)))))
   (add-hook 'graphql-mode-hook (lambda () (setq-local format-all-formatters '(("GraphQL" prettier)))))
   (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
@@ -262,10 +373,6 @@ See URL `https://github.com/palantir/tslint'."
   (when 'format-all-formatters
     (format-all-buffer)))
 
-;; org-mode markdown exporter
-(use-package ox-gfm
-  :straight t)
-
 (use-package editorconfig
   :straight t
   :delight
@@ -279,6 +386,9 @@ See URL `https://github.com/palantir/tslint'."
          ("C-h v" . helpful-variable)
          ("C-h k" . helpful-key)
          ("C-c C-d" . helpful-at-point)))
+
+(use-package ledger-mode
+  :straight t)
 
 (use-package lsp-mode
   :straight t
@@ -328,124 +438,6 @@ See URL `https://github.com/palantir/tslint'."
   :straight t
   ;; Hide auto-revert-mode
   :config (delight 'auto-revert-mode))
-
-(use-package org
-  :straight t
-  :after (ob-http ob-mermaid)
-  :hook (
-         ;; Refresh any images after running org-babel, in case the
-         ;; command generated one.
-         (org-babel-after-execute . org-redisplay-inline-images)
-         (org-mode . org-indent-mode)
-         (org-mode . flyspell-mode))
-  ;; org has a custom fill-paragraph, which performs extra magic for
-  ;; tables etc.
-  :bind (:map org-mode-map
-              ("M-e" . org-fill-paragraph)
-              ("C-c ,". org-time-stamp-inactive))
-  :config
-  (setq
-   org-directory "~/Sync"
-
-   org-default-notes-file (concat org-directory "/notes.org")
-
-   ;; Add syntax highlighting in src blocks
-   org-src-fontify-natively t
-   ;; Start org files with all trees collapsed
-   org-startup-truncated nil
-
-   org-agenda-breadcrumbs-separator "/"
-
-   org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s %b")
-                              (todo . "%i %-12:c %b")
-                              (tags . " %i %-12:c")
-                              (search . " %i %-12:c")))
-  (add-to-list 'org-agenda-files (concat org-directory "/agenda.org"))
-
-  ;; org-babel allows execution of src blocks containing the following
-  ;; languages.
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '(
-     (dot . t)
-     (gnuplot . t)
-     (http . t)
-     (python . t)
-     (shell . t)
-     (mermaid . t)
-     ))
-
-  ;; Skip confirmation for src block execution for the following
-  ;; languages.
-  (defun my-org-confirm-babel-evaluate (lang body)
-    (and (not (string= lang "http"))
-         (not (string= lang "dot"))
-         (not (string= lang "gnuplot"))
-         (not (string= lang "mermaid"))))
-  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
-
-
-  (defun ndk/heading-title ()
-    "Get the heading title."
-    (save-excursion
-      (if (not (org-at-heading-p))
-          (org-previous-visible-heading 1))
-      (org-element-property :title (org-element-at-point))))
-
-  (defun ndk/org-breadcrumbs ()
-    "Get the chain of headings from the top level down
-    to the current heading."
-    (let ((breadcrumbs (org-format-outline-path
-                        (org-get-outline-path)
-                        (1- (frame-width))
-                        nil "->"))
-          (title (ndk/heading-title)))
-      (if (string-empty-p breadcrumbs)
-          title
-        (format "%s->%s" breadcrumbs title))))
-
-  (defun ndk/set-header-line-format()
-    (setq header-line-format '(:eval (ndk/org-breadcrumbs))))
-
-  (add-hook 'org-mode-hook #'ndk/set-header-line-format)
-
-  ;; Configure executors for the given languages
-  (setq org-src-lang-modes '(("C" . c)
-                             ("C++" . c++)
-                             ("asymptote" . asy)
-                             ("bash" . sh)
-                             ("calc" . fundamental)
-                             ("cpp" . c++)
-                             ("ditaa" . artist)
-                             ("dot" . graphviz-dot)
-                             ("elisp" . emacs-lisp)
-                             ("http" . "ob-http")
-                             ("mermaid" . mermaid)
-                             ("ocaml" . tuareg)
-                             ("screen" . shell-script)
-                             ("shell" . sh)
-                             ("sqlite" . sql))))
-
-(require 'org-tempo)
-
-(use-package org-download
-  :straight t
-  :after (org)
-  :custom
-  (org-download-method 'directory)
-  (org-download-image-dir "images")
-  (org-download-heading-lvl nil)
-  (org-download-timestamp "%Y%m%d-%H%M%S_")
-  (org-image-actual-width 300)
-  (org-download-screenshot-method "/opt/homebrew/bin/pngpaste %s")
-  :bind
-  ("C-M-y" . org-download-screenshot))
-
-(use-package ob-http
-  :straight t)
-
-(use-package ob-mermaid
-  :straight t)
 
 (use-package rainbow-delimiters
   :straight t
@@ -506,6 +498,14 @@ See URL `https://github.com/palantir/tslint'."
   :straight t
   :config (ivy-prescient-mode))
 
+(use-package copilot
+  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :bind (("C-<tab>" . copilot-accept-completion)
+         ("C-S-<tab>" . copilot-accept-completion-by-line))
+  :init
+  (global-copilot-mode)
+  (copilot-diagnose))
+
 (use-package csharp-mode
   :straight t
   :config
@@ -533,8 +533,8 @@ See URL `https://github.com/palantir/tslint'."
   (c-set-offset 'arglist-intro '+))
 (add-hook 'java-mode-hook 'java-indent-setup)
 
-;;(use-package indium
-;;  :straight t)
+;(use-package indium
+;  :straight t)
 
 (use-package json-mode
   :straight t
@@ -572,20 +572,30 @@ See URL `https://github.com/palantir/tslint'."
   (when-let ((eslint (find-executable-from-node-modules "eslint")))
     (setq-local flycheck-javascript-eslint-executable eslint)))
 
-(defun use-tslint-from-node-modules ()
-  (when-let ((tslint (find-executable-from-node-modules "tslint")))
-    (setq-local flycheck-typescript-tslint-original-source-executable tslint)))
+;; Monorepo hack. This is not nice, but eslint needs to be told on the
+;; command line when plugins are provided by an external
+;; package. Which tends to be the case on monorepos with a shared
+;; linter config.
+(defun sverrejoh-configure-eslint ()
+  (when-let* ((root (projectile-project-root))
+              (eslint-resolve-from (concat root "packages/eslint-config")))
+    (setq-local flycheck-eslint-args `("--resolve-plugins-relative-to" ,eslint-resolve-from))))
 
-(defun ts-lsp-flycheck ()
-  (flycheck-add-next-checker 'lsp '(warning . javascript-eslint)))
+;; Chain eslint checker to LSP checker _when we're in
+;; typescript-mode_. This assumes that we're monkeypatching flycheck
+;; to read this variable back at the appropriate time.
+(defvar-local flycheck-checker-local-override nil)
+(defun set-flycheck-checker-to-lsp-typescript ()
+  (when (derived-mode-p 'typescript-mode)
+    (setq flycheck-checker-local-override '((lsp . ((next-checkers . (javascript-eslint))))))))
 
 (use-package typescript-mode
   :straight t
   :after flycheck
-  :hook ((typescript-mode . ts-lsp-flycheck)
-         (typescript-mode . use-tslint-from-node-modules)
+  :hook ((typescript-mode . sverrejoh-configure-eslint)
          (typescript-mode . use-eslint-from-node-modules)
-         (typescript-mode . flyspell-prog-mode))
+         (typescript-mode . flyspell-prog-mode)
+         (lsp-managed-mode . set-flycheck-checker-to-lsp-typescript))
   :mode "\\.tsx\\'")
 
 (use-package yaml-mode
