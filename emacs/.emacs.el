@@ -97,6 +97,8 @@ With argument ARG, do this that many times."
   (setenv "PATH" path-from-shell)
   (setq exec-path (split-string path-from-shell ":")))
 
+(setenv "NPM_AUTH_TOKEN" "")
+
 (use-package org
   :straight t
   :after (ob-http ob-mermaid)
@@ -108,7 +110,8 @@ With argument ARG, do this that many times."
          (org-mode . flyspell-mode))
   ;; org has a custom fill-paragraph, which performs extra magic for
   ;; tables etc.
-  :bind (:map org-mode-map ("M-e" . org-fill-paragraph))
+  :bind (:map org-mode-map ("M-e" . org-fill-paragraph)
+              ("C-c C-." . org-time-stamp-inactive))
   :config
   (setq
    org-directory "~/Sync"
@@ -125,8 +128,27 @@ With argument ARG, do this that many times."
    org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s %b")
                               (todo . "%i %-12:c %b")
                               (tags . " %i %-12:c")
-                              (search . " %i %-12:c")))
+                              (search . " %i %-12:c"))
+
+   org-todo-keywords
+   '((sequence "TODO" "IN-PROGRESS" "|" "DONE"))
+
+   org-agenda-custom-commands
+   '(("c" "Simple agenda view"
+
+      (
+       (tags "PRIORITY=\"A\""
+             ((org-agenda-skip-function '(or (org-agenda-skip-entry-if 'todo 'done)
+                                             (org-agenda-skip-entry-if 'todo '("TODO"))))
+              (org-agenda-overriding-header "High-priority unfinished tasks:")))
+       (agenda "")
+       (alltodo ""
+                ((org-agenda-skip-function '(or (air-org-skip-subtree-if-priority ?A)
+                                                (org-agenda-skip-if nil '(scheduled deadline))))))))))
+
   (add-to-list 'org-agenda-files (concat org-directory "/agenda.org"))
+  (add-to-list 'org-agenda-files (concat org-directory "/roam/"))
+  (add-to-list 'org-modules 'org-agenda t)
 
   ;; org-babel allows execution of src blocks containing the following
   ;; languages.
@@ -140,6 +162,17 @@ With argument ARG, do this that many times."
      (shell . t)
      (mermaid . t)
      ))
+
+  (defun air-org-skip-subtree-if-priority (priority)
+    "Skip an agenda subtree if it has a priority of PRIORITY.
+
+        PRIORITY may be one of the characters ?A, ?B, or ?C."
+    (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+          (pri-value (* 1000 (- org-lowest-priority priority)))
+          (pri-current (org-get-priority (thing-at-point 'line t))))
+      (if (= pri-value pri-current)
+          subtree-end
+        nil)))
 
   ;; Skip confirmation for src block execution for the following
   ;; languages.
@@ -192,24 +225,35 @@ With argument ARG, do this that many times."
   :straight t)
 
 (use-package org-roam
-  :straight t
+    :straight t
+    :after (org)
+    :hook (after-init . org-roam-mode)
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n g" . org-roam-graph)
+           ("C-c n c" . org-roam-capture))
+    :custom
+    (org-roam-directory (file-truename "~/Sync/roam"))
+    (org-roam-capture-templates
+     '(("d" "default" plain
+        "%?"
+        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org"
+                           ":PROPERTIES:
+:CATEGORY: roam
+:END:
+#+title: ${title}\n#+date: %U\n")
+        :unnarrowed t)))
+    :config
+    (make-directory "~/Sync/roam" t)
+    (org-roam-db-autosync-mode))
+
+(use-package org-habit-plus
   :after (org)
-  :hook (after-init . org-roam-mode)
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n g" . org-roam-graph)
-         ("C-c n c" . org-roam-capture))
-  :custom
-  (org-roam-directory (file-truename "~/Sync/roam"))
-  (org-roam-capture-templates
-   '(("d" "default" plain
-      "%?"
-      :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
-      :unnarrowed t)))
+  :straight (org-habit-plus :type git :host github :repo "myshevchuk/org-habit-plus")
   :config
-  (make-directory "~/Sync/roam" t)
-  (org-roam-db-autosync-mode))
+  (add-to-list 'org-modules 'org-habit t)
+  (add-to-list 'org-modules 'org-habit-plus t))
 
 (use-package counsel
   :straight t
