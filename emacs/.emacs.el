@@ -99,6 +99,9 @@ With argument ARG, do this that many times."
 
 (setenv "NPM_AUTH_TOKEN" "")
 
+(setq gc-cons-threshold 100000000)
+(setq read-process-output-max (* 1024 1024)) ;; 1mb
+
 (use-package org
   :straight t
   :after (ob-http ob-mermaid)
@@ -130,20 +133,20 @@ With argument ARG, do this that many times."
                               (tags . " %i %-12:c")
                               (search . " %i %-12:c"))
 
-   org-todo-keywords
-   '((sequence "TODO" "IN-PROGRESS" "|" "DONE"))
+   org-priority-lowest 9
+   org-priority-highest 1
+   org-priority-default 2
 
    org-agenda-custom-commands
    '(("c" "Simple agenda view"
 
       (
-       (tags "PRIORITY=\"A\""
-             ((org-agenda-skip-function '(or (org-agenda-skip-entry-if 'todo 'done)
-                                             (org-agenda-skip-entry-if 'todo '("TODO"))))
+       (tags "PRIORITY=1"
+             ((org-agenda-skip-function '(or (org-agenda-skip-entry-if 'todo 'done)))
               (org-agenda-overriding-header "High-priority unfinished tasks:")))
        (agenda "")
        (alltodo ""
-                ((org-agenda-skip-function '(or (air-org-skip-subtree-if-priority ?A)
+                ((org-agenda-skip-function '(or (air-org-skip-subtree-if-priority 1)
                                                 (org-agenda-skip-if nil '(scheduled deadline))))))))))
 
   (add-to-list 'org-agenda-files (concat org-directory "/agenda.org"))
@@ -196,6 +199,7 @@ With argument ARG, do this that many times."
                              ("http" . "ob-http")
                              ("mermaid" . mermaid)
                              ("ocaml" . tuareg)
+                             ("powershell" . powershell)
                              ("screen" . shell-script)
                              ("shell" . sh)
                              ("sqlite" . sql))))
@@ -414,7 +418,7 @@ With argument ARG, do this that many times."
 
 (define-advice org-edit-src-exit (:before (&rest _args) format-buffer)
   "Format source blocks before exit"
-  (when 'format-all-formatters
+  (when (bound-and-true-p format-all-formatters)
     (format-all-buffer)))
 
 (use-package editorconfig
@@ -472,7 +476,6 @@ With argument ARG, do this that many times."
   :config
   (magit-add-section-hook 'magit-status-sections-hook 'magit-insert-local-branches 'magit-insert-stashes)
   (setq
-   magit-git-executable (if (eq system-type 'darwin) "/usr/local/bin/git" "git")
    magit-last-seen-setup-instructions "1.4.0"
    magit-push-always-verify nil
    ;; Always on linux, never on Windows, due to slooow
@@ -491,6 +494,9 @@ With argument ARG, do this that many times."
   :straight t
   :hook ((python-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-identifiers-mode))
 
+(use-package sdcv-mode
+  :straight (:host github :repo "gucong/emacs-sdcv" :files ("*.el")))
+
 (use-package smartparens
   :straight t
   :delight
@@ -507,17 +513,9 @@ With argument ARG, do this that many times."
 (use-package powerline
   :straight t)
 
-(use-package moe-theme
+(use-package modus-themes
   :straight t
-  :after (powerline)
-  :config
-  (moe-dark)
-  (powerline-moe-theme))
-
-(use-package moe-flycheck-mode-line
-  :straight (moe-flycheck-mode-line :type git :host github :repo "asmundg/moe-flycheck-mode-line" :branch "asmundg/support-new-mode-syntax")
-  :after (flycheck)
-  :hook (flycheck-mode . moe-flycheck-mode-line-mode))
+  :init (load-theme 'modus-vivendi))
 
 (use-package git-gutter-fringe
   :straight t
@@ -666,3 +664,7 @@ With argument ARG, do this that many times."
   :delight
   :init
   (which-key-mode))
+
+(custom-set-variables
+ '(custom-safe-themes
+   '("d067a9ec4b417a71fbbe6c7017d5b7c8b961f4b1fc495cd9fbb14b6f01cca584" default)))

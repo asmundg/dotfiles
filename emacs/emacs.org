@@ -237,6 +237,14 @@ Ensure we have a default auth token for .npmrc
   
   nix-env -i ispell
 #+end_src
+
+Increase GC threshold and process IO batch size (recommended for LSP:
+https://emacs-lsp.github.io/lsp-mode/page/performance/#adjust-gc-cons-threshold)
+
+#+begin_src emacs-lisp
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
+#+end_src
 * Org
 Initialize org early, to get the straight version loaded before
 anything accidentally pulls in the native version.
@@ -284,20 +292,20 @@ which supports execution of source blocks with C-c C-c.
                                 (tags . " %i %-12:c")
                                 (search . " %i %-12:c"))
 
-     org-todo-keywords
-     '((sequence "TODO" "IN-PROGRESS" "|" "DONE"))
+     org-priority-lowest 9
+     org-priority-highest 1
+     org-priority-default 2
 
      org-agenda-custom-commands
      '(("c" "Simple agenda view"
 
         (
-         (tags "PRIORITY=\"A\""
-               ((org-agenda-skip-function '(or (org-agenda-skip-entry-if 'todo 'done)
-                                               (org-agenda-skip-entry-if 'todo '("TODO"))))
+         (tags "PRIORITY=1"
+               ((org-agenda-skip-function '(or (org-agenda-skip-entry-if 'todo 'done)))
                 (org-agenda-overriding-header "High-priority unfinished tasks:")))
          (agenda "")
          (alltodo ""
-                  ((org-agenda-skip-function '(or (air-org-skip-subtree-if-priority ?A)
+                  ((org-agenda-skip-function '(or (air-org-skip-subtree-if-priority 1)
                                                   (org-agenda-skip-if nil '(scheduled deadline))))))))))
 
     (add-to-list 'org-agenda-files (concat org-directory "/agenda.org"))
@@ -350,6 +358,7 @@ which supports execution of source blocks with C-c C-c.
                                ("http" . "ob-http")
                                ("mermaid" . mermaid)
                                ("ocaml" . tuareg)
+                               ("powershell" . powershell)
                                ("screen" . shell-script)
                                ("shell" . sh)
                                ("sqlite" . sql))))
@@ -661,7 +670,7 @@ aren't backed by files, the normal format-all save hook doesn't work.
 #+begin_src emacs-lisp
   (define-advice org-edit-src-exit (:before (&rest _args) format-buffer)
     "Format source blocks before exit"
-    (when 'format-all-formatters
+    (when (bound-and-true-p format-all-formatters)
       (format-all-buffer)))
 #+end_src
 
@@ -738,7 +747,6 @@ Text-based accounting system (https://github.com/ledger/ledger-mode).
     :config
     (magit-add-section-hook 'magit-status-sections-hook 'magit-insert-local-branches 'magit-insert-stashes)
     (setq
-     magit-git-executable (if (eq system-type 'darwin) "/usr/local/bin/git" "git")
      magit-last-seen-setup-instructions "1.4.0"
      magit-push-always-verify nil
      ;; Always on linux, never on Windows, due to slooow
@@ -769,6 +777,15 @@ Visual aid, adding color identifies to variables and parens
     :straight t
     :hook ((python-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-identifiers-mode))
 #+end_src
+* SDCV
+Dictionary handler. Pair this with Webster's unabridged for maximum
+effect.
+
+#+begin_src emacs-lisp
+  (use-package sdcv-mode
+    :straight (:host github :repo "gucong/emacs-sdcv" :files ("*.el"))
+    :hook (sdcv-mode . (outline-show-all)))
+#+end_src
 * Smart parens
 #+begin_src emacs-lisp
   (use-package smartparens
@@ -791,19 +808,9 @@ Visual aid, adding color identifies to variables and parens
 #+end_src
 
 #+begin_src emacs-lisp
-  (use-package moe-theme
+  (use-package modus-themes
     :straight t
-    :after (powerline)
-    :config
-    (moe-dark)
-    (powerline-moe-theme))
-#+end_src
-
-#+begin_src emacs-lisp
-  (use-package moe-flycheck-mode-line
-    :straight (moe-flycheck-mode-line :type git :host github :repo "asmundg/moe-flycheck-mode-line" :branch "asmundg/support-new-mode-syntax")
-    :after (flycheck)
-    :hook (flycheck-mode . moe-flycheck-mode-line-mode))
+    :init (load-theme 'modus-vivendi))
 #+end_src
 * Tools
 ** Git
@@ -1133,3 +1140,12 @@ Show available chord completions
     :init
     (which-key-mode))
 #+end_src
+* Custom
+Mark theme as safe
+
+#+begin_src emacs-lisp
+(custom-set-variables
+ '(custom-safe-themes
+   '("d067a9ec4b417a71fbbe6c7017d5b7c8b961f4b1fc495cd9fbb14b6f01cca584" default)))
+#+end_src
+
