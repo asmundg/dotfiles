@@ -1,4 +1,4 @@
 brew tap homebrew/cask-fonts
-brew install font-fira-code
+brew install iosevka
 
 brew install pngpaste

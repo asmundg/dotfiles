@@ -62,20 +62,20 @@
   
 ** Fonts
 
- Fira Code is pretty nice.
+Now using Iosevka (https://github.com/be5invis/Iosevka)
 
 *** Installing the font
 **** MacOS
 
  #+begin_src shell :tangle bootstrap-mac.sh
    brew tap homebrew/cask-fonts
-   brew install font-fira-code
+   brew install iosevka
  #+end_src
 
 *** Config
 
  #+begin_src emacs-lisp
- (set-face-attribute 'default nil :font "Fira Code" :height 160)
+ (set-face-attribute 'default nil :font "Iosevka" :height 160)
  #+end_src
 
 ** General editing
@@ -537,6 +537,14 @@ Completion framework.
     :config
     (global-company-mode 1))
 #+end_src
+* Dired
+#+begin_src emacs-lisp
+  (eval-after-load "dired" '(require 'dired-x))
+  ;; Use system trash instead of rm
+  (setq delete-by-moving-to-trash t
+  ;; Suggest other buffer as target when two direds are open
+        dired-dwim-target t)
+#+end_src
 * Ediff
 
 Avoid popping up new frames when ediffing, and just use a fancy window
@@ -778,13 +786,20 @@ Visual aid, adding color identifies to variables and parens
     :hook ((python-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-identifiers-mode))
 #+end_src
 * SDCV
-Dictionary handler. Pair this with Webster's unabridged for maximum
+Dictionary handler. Pair this with Webster's Unabridged for maximum
 effect.
+
+#+begin_src shell :tangle bootstrap.sh
+  brew install sdcv
+  mkdir -p ~/.stardict/dic/
+  curl https://s3.amazonaws.com/jsomers/dictionary.zip | tar -xO --strip-components=1 dictionary/stardict-dictd-web1913-2.4.2.tar.bz2 | tar -xC ~/.stardict/dic/
+#+end_src
 
 #+begin_src emacs-lisp
   (use-package sdcv-mode
     :straight (:host github :repo "gucong/emacs-sdcv" :files ("*.el"))
-    :hook (sdcv-mode . (outline-show-all)))
+    :hook (sdcv-mode . (outline-show-all))
+    :bind (("C-c i" . sdcv-search)))
 #+end_src
 * Smart parens
 #+begin_src emacs-lisp
@@ -1096,8 +1111,13 @@ before enabling flycheck. Otherwise, the checkers may get disabled.
            (typescript-mode . use-eslint-from-node-modules)
            (typescript-mode . flyspell-prog-mode)
            (lsp-managed-mode . set-flycheck-checker-to-lsp-typescript))
+    :config
+    ;; Ensure V8 has enough memory to load big projects into tsserver
+    (setq lsp-clients-typescript-max-ts-server-memory 16384
+          lsp-clients-typescript-prefer-use-project-ts-server t)
     :mode "\\.tsx\\'")
 #+end_src
+
 ** YAML
 #+begin_src emacs-lisp
   (use-package yaml-mode

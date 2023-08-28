@@ -38,7 +38,7 @@
 			       (lambda (fg) (set-face-foreground 'mode-line fg))
 			       orig-fg))))
 
-(set-face-attribute 'default nil :font "Fira Code" :height 160)
+(set-face-attribute 'default nil :font "Iosevka" :height 160)
 
 (setq-default indent-tabs-mode nil)
 
@@ -304,6 +304,12 @@ With argument ARG, do this that many times."
   :config
   (global-company-mode 1))
 
+(eval-after-load "dired" '(require 'dired-x))
+;; Use system trash instead of rm
+(setq delete-by-moving-to-trash t
+;; Suggest other buffer as target when two direds are open
+      dired-dwim-target t)
+
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 
 (use-package flycheck
@@ -495,7 +501,9 @@ With argument ARG, do this that many times."
   :hook ((python-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-identifiers-mode))
 
 (use-package sdcv-mode
-  :straight (:host github :repo "gucong/emacs-sdcv" :files ("*.el")))
+  :straight (:host github :repo "gucong/emacs-sdcv" :files ("*.el"))
+  :hook (sdcv-mode . (outline-show-all))
+  :bind (("C-c i" . sdcv-search)))
 
 (use-package smartparens
   :straight t
@@ -638,6 +646,10 @@ With argument ARG, do this that many times."
          (typescript-mode . use-eslint-from-node-modules)
          (typescript-mode . flyspell-prog-mode)
          (lsp-managed-mode . set-flycheck-checker-to-lsp-typescript))
+  :config
+  ;; Ensure V8 has enough memory to load big projects into tsserver
+  (setq lsp-clients-typescript-max-ts-server-memory 16384
+        lsp-clients-typescript-prefer-use-project-ts-server t)
   :mode "\\.tsx\\'")
 
 (use-package yaml-mode
@@ -666,5 +678,15 @@ With argument ARG, do this that many times."
   (which-key-mode))
 
 (custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    '("d067a9ec4b417a71fbbe6c7017d5b7c8b961f4b1fc495cd9fbb14b6f01cca584" default)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
