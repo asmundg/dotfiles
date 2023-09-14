@@ -245,6 +245,13 @@ https://emacs-lsp.github.io/lsp-mode/page/performance/#adjust-gc-cons-threshold)
   (setq gc-cons-threshold 100000000)
   (setq read-process-output-max (* 1024 1024)) ;; 1mb
 #+end_src
+** Customizations
+#+begin_src emacs-lisp
+;; Redirect customizations outside the main config, to avoid spurious diffs
+  (setq custom-file "~/.emacs.d/custom.el")
+  (when (file-exists-p custom-file)
+    (load custom-file))
+#+end_src
 * Org
 Initialize org early, to get the straight version loaded before
 anything accidentally pulls in the native version.
@@ -760,6 +767,7 @@ Text-based accounting system (https://github.com/ledger/ledger-mode).
      ;; Always on linux, never on Windows, due to slooow
      magit-diff-refine-hunk (if (eq system-type 'windows-nt) nil 'all)))
 #+end_src
+
 * Delight
 Delight
 (https://git.savannah.gnu.org/cgit/delight.git/plain/delight.el)

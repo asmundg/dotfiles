@@ -1,7 +1,7 @@
 (("Emacs-wgrep" . "f9687c28bbc2e84f87a479b6ce04407bb97cfb23")
  ("company-mode" . "f1877a370ca76d5cd6614c527635b2d6983188af")
  ("compat" . "9d2a293dca90e70a8bcd963682e8b7122371595b")
- ("copilot.el" . "20ce5cfb74ec17f822cecb0708b7acf31a93d010")
+ ("copilot.el" . "421703f5dd5218ec2a3aa23ddf09d5f13e5014c2")
  ("counsel-projectile" . "40d1e1d4bb70acb00fddd6f4df9778bf2c52734b")
  ("csharp-mode" . "396b5e9b32bb58c9f984a03f5075455af87f7307")
  ("csv-mode" . "e13282b678af6b9ba74e5232610c6a4406c87877")
