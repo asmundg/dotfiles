@@ -1,10 +1,8 @@
-# Fish and friends
-nix-env -i fish
-curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
-fisher install jorgebucaran/nvm.fish@8922519
-fisher install lilyball/nix-env.fish@00c6cc7
+# Zsh basics
+curl -L git.io/antigen >antigen.zsh
+cp antigen.zsh ~/
 
-nix-env -i ispell
+brew install atuin
 
 brew install sdcv
 mkdir -p ~/.stardict/dic/
