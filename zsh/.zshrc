@@ -10,5 +10,5 @@ antigen bundle zsh-users/zsh-autosuggestions
 # Syntax highlighting bundle must come last
 antigen bundle zsh-users/zsh-syntax-highlighting
 
-antigen theme robbyrussell
+antigen theme afowler
 antigen apply
