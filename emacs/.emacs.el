@@ -92,10 +92,11 @@ With argument ARG, do this that many times."
 
 (global-so-long-mode)
 
+(use-package exec-path-from-shell
+  :straight t
+  :config (exec-path-from-shell-initialize))
+
 (setenv "TERM" "screen-256color")
-(let ((path-from-shell (shell-command-to-string "fish -l -c \"echo -n \\$PATH[1]; for val in \\$PATH[2..-1];echo -n \\\":\\$val\\\";end\"")))
-  (setenv "PATH" path-from-shell)
-  (setq exec-path (split-string path-from-shell ":")))
 
 (setenv "NPM_AUTH_TOKEN" "")
 
