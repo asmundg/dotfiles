@@ -606,6 +606,12 @@ With argument ARG, do this that many times."
 (use-package nix-mode
   :straight t)
 
+(use-package lsp-sourcekit
+  :after lsp-mode
+  :hook (swift-mode . (lambda () (lsp)))
+  :config
+  (setq lsp-sourcekit-executable (string-trim (shell-command-to-string "xcrun --find sourcekit-lsp"))))
+
 (use-package swift-mode
   :straight t)
 

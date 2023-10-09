@@ -1059,10 +1059,20 @@ Reproducible package manager.
 nix-env -i nixfmt
 #+end_src
 ** Swift
+LSP support
+#+begin_src emacs-lisp
+  (use-package lsp-sourcekit
+    :after lsp-mode
+    :hook (swift-mode . (lambda () (lsp)))
+    :config
+    (setq lsp-sourcekit-executable (string-trim (shell-command-to-string "xcrun --find sourcekit-lsp"))))
+#+end_src
+
 #+begin_src emacs-lisp
   (use-package swift-mode
     :straight t)
 #+end_src
+
 ** Typescript
 Tools like linters are often useful to run from the project's own
 dependencies, since behavior can vary between versions. We set up some
