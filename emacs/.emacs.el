@@ -640,7 +640,7 @@ With argument ARG, do this that many times."
 ;; linter config.
 (defun sverrejoh-configure-eslint ()
   (when-let* ((root (projectile-project-root))
-              (eslint-resolve-from (concat root "packages/eslint-config")))
+              (eslint-resolve-from (concat root (getenv "ESLINT_CONFIG_PKG"))))
     (setq-local flycheck-eslint-args `("--resolve-plugins-relative-to" ,eslint-resolve-from))))
 
 ;; Chain eslint checker to LSP checker _when we're in
