@@ -12,3 +12,5 @@ antigen bundle zsh-users/zsh-syntax-highlighting
 
 antigen theme afowler
 antigen apply
+
+alias rm="trash"
