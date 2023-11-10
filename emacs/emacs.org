@@ -616,6 +616,10 @@ layout.
     :config
     (with-eval-after-load 'flycheck
       (flycheck-swiftlint-setup)))
+
+  (use-package flycheck-color-mode-line
+               :straight t
+               :hook (flycheck-mode . flycheck-color-mode-line-mode))
 #+end_src
 
 * Formatting

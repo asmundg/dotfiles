@@ -373,6 +373,10 @@ With argument ARG, do this that many times."
   (with-eval-after-load 'flycheck
     (flycheck-swiftlint-setup)))
 
+(use-package flycheck-color-mode-line
+             :straight t
+             :hook (flycheck-mode . flycheck-color-mode-line-mode))
+
 (use-package format-all
   :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code"
                         :fork (:host github :repo "asmundg/emacs-format-all-the-code" :branch "asmundg/expose-formatter-definition"))
