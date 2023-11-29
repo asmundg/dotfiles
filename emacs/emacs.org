@@ -727,6 +727,7 @@ Text-based accounting system (https://github.com/ledger/ledger-mode).
     :hook ((js-mode . lsp)
            (typescript-mode . lsp)
            (haskell-mode . lsp)
+           (python-mode . lsp)
            (lsp-mode . lsp-enable-which-key-integration)
            (lsp-mode . lsp-headerline-breadcrumb-mode))
     :init
@@ -1066,6 +1067,7 @@ nix-env -i nixfmt
 LSP support
 #+begin_src emacs-lisp
   (use-package lsp-sourcekit
+    :straight t
     :after lsp-mode
     :hook (swift-mode . (lambda () (lsp)))
     :config

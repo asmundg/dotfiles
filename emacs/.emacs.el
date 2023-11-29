@@ -460,6 +460,7 @@ With argument ARG, do this that many times."
   :hook ((js-mode . lsp)
          (typescript-mode . lsp)
          (haskell-mode . lsp)
+         (python-mode . lsp)
          (lsp-mode . lsp-enable-which-key-integration)
          (lsp-mode . lsp-headerline-breadcrumb-mode))
   :init
@@ -611,6 +612,7 @@ With argument ARG, do this that many times."
   :straight t)
 
 (use-package lsp-sourcekit
+  :straight t
   :after lsp-mode
   :hook (swift-mode . (lambda () (lsp)))
   :config
