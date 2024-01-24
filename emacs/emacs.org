@@ -43,7 +43,6 @@
  (scroll-bar-mode -1)
  (menu-bar-mode -1)
 
- (global-linum-mode -1)
  (line-number-mode 1)
  (column-number-mode 1)
  #+end_src
@@ -516,7 +515,9 @@ incrementally searching everything.
     :init
     (projectile-global-mode)
     :config
-    (setq projectile-enable-caching t)
+    (setq projectile-enable-caching t
+          ;; Improve perf in large repos
+          counsel-projectile-find-file-matcher 'ivy--re-filter)
     :straight t)
 #+end_src
 
@@ -849,7 +850,13 @@ buffer.
     :straight t
     :delight git-gutter-mode
     :config
-    (global-git-gutter-mode 1))
+    (global-git-gutter-mode 1)
+    (setq git-gutter:update-interval 0.02)
+
+    ;; modern fringe bitmaps (https://ianyepan.github.io/posts/emacs-git-gutter/)
+    (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 #+end_src
 ** Shell switcher
 Provides quick toggle between shells (C-')
@@ -951,17 +958,16 @@ Emacs. https://github.com/raxod502/prescient.el
     :straight t
     :config (ivy-prescient-mode))
 #+end_src
+
 ** Copilot
 Codex LLM-powered completion suggestions.
 
 #+begin_src emacs-lisp
-(use-package copilot
-  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :bind (("C-<tab>" . copilot-accept-completion)
-         ("C-S-<tab>" . copilot-accept-completion-by-line))
-  :init
-  (global-copilot-mode)
-  (copilot-diagnose))
+  (use-package copilot
+    :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+    :hook ((prog-mode . copilot-mode))
+    :bind (("C-<tab>" . copilot-accept-completion)
+           ("C-S-<tab>" . copilot-accept-completion-by-line)))
 #+end_src
 * Languages
 ** C#

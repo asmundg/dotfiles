@@ -26,7 +26,6 @@
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
 
-(global-linum-mode -1)
 (line-number-mode 1)
 (column-number-mode 1)
 
@@ -298,7 +297,9 @@ With argument ARG, do this that many times."
   :init
   (projectile-global-mode)
   :config
-  (setq projectile-enable-caching t)
+  (setq projectile-enable-caching t
+        ;; Improve perf in large repos
+        counsel-projectile-find-file-matcher 'ivy--re-filter)
   :straight t)
 
 (use-package wgrep
@@ -540,7 +541,13 @@ With argument ARG, do this that many times."
   :straight t
   :delight git-gutter-mode
   :config
-  (global-git-gutter-mode 1))
+  (global-git-gutter-mode 1)
+  (setq git-gutter:update-interval 0.02)
+
+  ;; modern fringe bitmaps (https://ianyepan.github.io/posts/emacs-git-gutter/)
+  (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 
 (use-package shell-switcher
   :straight t
@@ -561,11 +568,9 @@ With argument ARG, do this that many times."
 
 (use-package copilot
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :hook ((prog-mode . copilot-mode))
   :bind (("C-<tab>" . copilot-accept-completion)
-         ("C-S-<tab>" . copilot-accept-completion-by-line))
-  :init
-  (global-copilot-mode)
-  (copilot-diagnose))
+         ("C-S-<tab>" . copilot-accept-completion-by-line)))
 
 (use-package csharp-mode
   :straight t
