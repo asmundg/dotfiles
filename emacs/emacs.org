@@ -4,6 +4,15 @@
 #+startup: fold
 :END:
 * Bootstrap
+** MacOS dependencies
+Install emacs
+
+#+begin_src shell :tangle bootstrap.sh
+  brew reinstall gcc libgccjit
+  brew tap d12frosted/emacs-plus
+  brew install emacs-plus@29 --with-poll --with-native-comp
+#+end_src
+
 ** Straight
  Straight is a package manager producing consistent configurations via
  git and lockfile: https://github.com/raxod502/straight.el
