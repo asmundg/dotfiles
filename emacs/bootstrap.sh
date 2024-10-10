@@ -1,3 +1,7 @@
+brew reinstall gcc libgccjit
+brew tap d12frosted/emacs-plus
+brew install emacs-plus@29 --with-poll --with-native-comp
+
 # Zsh basics
 curl -L git.io/antigen >antigen.zsh
 cp antigen.zsh ~/
