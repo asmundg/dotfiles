@@ -257,6 +257,11 @@ With argument ARG, do this that many times."
     (make-directory "~/Sync/roam" t)
     (org-roam-db-autosync-mode))
 
+(use-package org-tidy
+  :straight t
+  :hook
+  (org-mode . org-tidy-mode))
+
 (use-package org-habit-plus
   :after (org)
   :straight (org-habit-plus :type git :host github :repo "myshevchuk/org-habit-plus")
@@ -567,7 +572,9 @@ With argument ARG, do this that many times."
   :config (ivy-prescient-mode))
 
 (use-package copilot
-  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :straight (copilot
+             :type git :host github :repo "zerolfx/copilot.el" :files ("dist" "*.el")
+             :fork (:host github :repo "asmundg/copilot.el" :branch "asmundg/bump-copilot"))
   :hook ((prog-mode . copilot-mode))
   :bind (("C-<tab>" . copilot-accept-completion)
          ("C-S-<tab>" . copilot-accept-completion-by-line)))

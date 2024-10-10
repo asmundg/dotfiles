@@ -470,6 +470,15 @@ https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/.
     (org-roam-db-autosync-mode))
 #+end_src
 
+** org-tidy
+Auto-collapse property drawers to make things less messy.
+
+#+begin_src emacs-lisp
+(use-package org-tidy
+  :straight t
+  :hook
+  (org-mode . org-tidy-mode))
+#+end_src
 ** org-habit-plus
 
 Org-habit, but with the ability to combine specific weekdays with a
@@ -973,7 +982,9 @@ Codex LLM-powered completion suggestions.
 
 #+begin_src emacs-lisp
   (use-package copilot
-    :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+    :straight (copilot
+               :type git :host github :repo "zerolfx/copilot.el" :files ("dist" "*.el")
+               :fork (:host github :repo "asmundg/copilot.el" :branch "asmundg/bump-copilot"))
     :hook ((prog-mode . copilot-mode))
     :bind (("C-<tab>" . copilot-accept-completion)
            ("C-S-<tab>" . copilot-accept-completion-by-line)))
