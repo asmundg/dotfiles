@@ -259,6 +259,14 @@ https://emacs-lsp.github.io/lsp-mode/page/performance/#adjust-gc-cons-threshold)
   (when (file-exists-p custom-file)
     (load custom-file))
 #+end_src
+** Marginalia
+Inline help in minibuffer
+#+begin_src emacs-lisp
+  (use-package marginalia
+    :straight t
+    :init
+    (marginalia-mode))
+#+end_src
 * Org
 Initialize org early, to get the straight version loaded before
 anything accidentally pulls in the native version.

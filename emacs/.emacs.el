@@ -107,6 +107,11 @@ With argument ARG, do this that many times."
   (when (file-exists-p custom-file)
     (load custom-file))
 
+(use-package marginalia
+  :straight t
+  :init
+  (marginalia-mode))
+
 (use-package org
   :straight t
   :after (ob-http ob-mermaid)
