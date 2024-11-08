@@ -389,8 +389,7 @@ With argument ARG, do this that many times."
              :hook (flycheck-mode . flycheck-color-mode-line-mode))
 
 (use-package format-all
-  :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code"
-                        :fork (:host github :repo "asmundg/emacs-format-all-the-code" :branch "asmundg/expose-formatter-definition"))
+  :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code")
   :hook ((c-mode-common
           elisp-mode
           emacs-lisp-mode
@@ -408,36 +407,36 @@ With argument ARG, do this that many times."
           yaml-mode
           web-mode) . format-all-mode)
   :config
-  (define-format-all-formatter swiftformat-with-config
-    (:executable "swiftformat")
-    (:install (macos "brew install swiftformat"))
-    (:languages "Swift")
-    (:format (format-all--buffer-easy executable "--quiet" "--config" (concat (locate-dominating-file default-directory ".swiftformat") ".swiftformat"))))
-  (define-format-all-formatter shfmt-with-options
-    (:executable "shfmt")
-    (:install
-     (macos "brew install shfmt")
-     (windows "scoop install shfmt"))
-    (:languages "Shell")
-    (:format
-     (format-all--buffer-easy
-      executable
-      (if (buffer-file-name)
-          (list "-filename" (buffer-file-name))
-        (list "-ln" (cl-case (and (eql major-mode 'sh-mode)
-                                  (boundp 'sh-shell)
-                                  (symbol-value 'sh-shell))
-                      (bash "bash")
-                      (mksh "mksh")
-                      (t "posix"))))
-      (list "-i" "4" "-bn"))))
+  ;; (define-format-all-formatter swiftformat-with-config
+  ;;   (:executable "swiftformat")
+  ;;   (:install (macos "brew install swiftformat"))
+  ;;   (:languages "Swift")
+  ;;   (:format (format-all--buffer-easy executable "--quiet" "--config" (concat (locate-dominating-file default-directory ".swiftformat") ".swiftformat"))))
+  ;; (define-format-all-formatter shfmt-with-options
+  ;;   (:executable "shfmt")
+  ;;   (:install
+  ;;    (macos "brew install shfmt")
+  ;;    (windows "scoop install shfmt"))
+  ;;   (:languages "Shell")
+  ;;   (:format
+  ;;    (format-all--buffer-easy
+  ;;     executable
+  ;;     (if (buffer-file-name)
+  ;;         (list "-filename" (buffer-file-name))
+  ;;       (list "-ln" (cl-case (and (eql major-mode 'sh-mode)
+  ;;                                 (boundp 'sh-shell)
+  ;;                                 (symbol-value 'sh-shell))
+  ;;                     (bash "bash")
+  ;;                     (mksh "mksh")
+  ;;                     (t "posix"))))
+  ;;     (list "-i" "4" "-bn"))))
   (add-hook 'c-mode-common-hook (lambda () (setq-local format-all-formatters '(("C" clang-format) ("Objective-C" clang-format)))))
   (add-hook 'graphql-mode-hook (lambda () (setq-local format-all-formatters '(("GraphQL" prettier)))))
   (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
   (add-hook 'js-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier)))))
   (add-hook 'json-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
   (add-hook 'markdown-mode-hook (lambda () (setq-local format-all-formatters '(("Markdown" prettier)))))
-  (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
+  (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" ruff)))))
   (add-hook 'swift-mode-hook (lambda () (setq-local format-all-formatters '(("Swift" swiftformat-with-config)))))
   (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
   (add-hook 'sh-mode-hook (lambda () (setq-local format-all-formatters '(("Shell" shfmt-with-options)))))
@@ -455,6 +454,25 @@ With argument ARG, do this that many times."
   (editorconfig-mode 1)
   (add-to-list 'editorconfig-indentation-alist '(swift-mode swift-mode:basic-offset)))
 
+(use-package apheleia
+  :straight t
+  :init
+  (apheleia-global-mode +1)
+  :config
+  (setf (alist-get 'python-mode apheleia-mode-alist)
+        '(ruff-isort ruff))
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist)
+        '(ruff-isort ruff))
+  (setf (alist-get 'swiftformat apheleia-formatters)
+        '("swiftformat"
+          ;; Look for .swiftformat in parent directories
+          "--config" (concat (locate-dominating-file default-directory ".swiftformat") ".swiftformat")
+          "--stdinpath" filepath
+          "stdin"))
+  (setf (alist-get 'swift-mode apheleia-mode-alist)
+        '(swiftformat))
+  )
+
 (use-package helpful
   :straight t
   :bind (("C-h f" . helpful-callable)
@@ -471,7 +489,6 @@ With argument ARG, do this that many times."
   :hook ((js-mode . lsp)
          (typescript-mode . lsp)
          (haskell-mode . lsp)
-         (python-mode . lsp)
          (lsp-mode . lsp-enable-which-key-integration)
          (lsp-mode . lsp-headerline-breadcrumb-mode))
   :init
@@ -496,6 +513,14 @@ With argument ARG, do this that many times."
 
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 
+(add-hook 'python-mode-hook #'eglot-ensure)
+(add-hook 'python-ts-mode-hook #'eglot-ensure)
+(use-package flycheck-eglot
+  :straight t
+  :after (flycheck eglot)
+  :config
+  (global-flycheck-eglot-mode 1))
+
 (use-package magit
   :straight t
   :hook (git-commit-mode . (lambda () (setq fill-column 72)))
@@ -516,11 +541,11 @@ With argument ARG, do this that many times."
 
 (use-package rainbow-delimiters
   :straight t
-  :hook ((python-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-delimiters-mode))
+  :hook ((python-mode python-ts-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-delimiters-mode))
 
 (use-package rainbow-identifiers
   :straight t
-  :hook ((python-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-identifiers-mode))
+  :hook ((python-mode python-ts-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-identifiers-mode))
 
 (use-package sdcv-mode
   :straight (:host github :repo "gucong/emacs-sdcv" :files ("*.el"))
@@ -583,6 +608,12 @@ With argument ARG, do this that many times."
   :hook ((prog-mode . copilot-mode))
   :bind (("C-<tab>" . copilot-accept-completion)
          ("C-S-<tab>" . copilot-accept-completion-by-line)))
+
+(use-package treesit-auto
+  :straight t
+  :config
+  ;; (global-treesit-auto-mode) Disable for now - too many perf issues
+  (setq treesit-auto-install t))
 
 (use-package csharp-mode
   :straight t
@@ -711,6 +742,30 @@ With argument ARG, do this that many times."
   :delight
   :init
   (which-key-mode))
+
+;; (use-package elisa
+;;   :straight t
+;;   :init
+;;   (setopt elisa-limit 5)
+;;   ;; reranker increases answer quality significantly
+;;   (setopt elisa-reranker-enabled nil)
+;;   ;; prompt rewriting may increase quality of answers
+;;   ;; disable it if you want direct control over prompt
+;;   (setopt elisa-prompt-rewriting-enabled t)
+;;   (require 'llm-ollama)
+;;   ;; gemma 2 works very good in my use cases
+;;   ;; it also boasts strong multilingual capabilities
+;;   (setopt elisa-chat-provider
+;;           (make-llm-ollama
+;;            :chat-model "gemma2:9b-instruct-q6_K"
+;;            :embedding-model "chatfire/bge-m3:q8_0"
+;;            ;; set context window to 8k
+;;            :default-chat-non-standard-params '(("num_ctx" . 8192))))
+;;   ;; this embedding model has stong multilingual capabilities
+;;   (setopt elisa-embeddings-provider (make-llm-ollama :embedding-model "chatfire/bge-m3:q8_0"))
+;;   :config
+;;   ;; searxng works better than duckduckgo in my tests
+;;   (setopt elisa-web-search-function 'elisa-search-searxng))
 
 (custom-set-variables
  '(custom-safe-themes

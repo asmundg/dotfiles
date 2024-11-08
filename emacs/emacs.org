@@ -650,12 +650,12 @@ layout.
 #+end_src
 
 * Formatting
+** Format-all
 Format-all is a generic framework for auto-formatting source code. It needs to be explicitly configured per mode.
 
 #+begin_src emacs-lisp
   (use-package format-all
-    :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code"
-                          :fork (:host github :repo "asmundg/emacs-format-all-the-code" :branch "asmundg/expose-formatter-definition"))
+    :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code")
     :hook ((c-mode-common
             elisp-mode
             emacs-lisp-mode
@@ -673,36 +673,36 @@ Format-all is a generic framework for auto-formatting source code. It needs to b
             yaml-mode
             web-mode) . format-all-mode)
     :config
-    (define-format-all-formatter swiftformat-with-config
-      (:executable "swiftformat")
-      (:install (macos "brew install swiftformat"))
-      (:languages "Swift")
-      (:format (format-all--buffer-easy executable "--quiet" "--config" (concat (locate-dominating-file default-directory ".swiftformat") ".swiftformat"))))
-    (define-format-all-formatter shfmt-with-options
-      (:executable "shfmt")
-      (:install
-       (macos "brew install shfmt")
-       (windows "scoop install shfmt"))
-      (:languages "Shell")
-      (:format
-       (format-all--buffer-easy
-        executable
-        (if (buffer-file-name)
-            (list "-filename" (buffer-file-name))
-          (list "-ln" (cl-case (and (eql major-mode 'sh-mode)
-                                    (boundp 'sh-shell)
-                                    (symbol-value 'sh-shell))
-                        (bash "bash")
-                        (mksh "mksh")
-                        (t "posix"))))
-        (list "-i" "4" "-bn"))))
+    ;; (define-format-all-formatter swiftformat-with-config
+    ;;   (:executable "swiftformat")
+    ;;   (:install (macos "brew install swiftformat"))
+    ;;   (:languages "Swift")
+    ;;   (:format (format-all--buffer-easy executable "--quiet" "--config" (concat (locate-dominating-file default-directory ".swiftformat") ".swiftformat"))))
+    ;; (define-format-all-formatter shfmt-with-options
+    ;;   (:executable "shfmt")
+    ;;   (:install
+    ;;    (macos "brew install shfmt")
+    ;;    (windows "scoop install shfmt"))
+    ;;   (:languages "Shell")
+    ;;   (:format
+    ;;    (format-all--buffer-easy
+    ;;     executable
+    ;;     (if (buffer-file-name)
+    ;;         (list "-filename" (buffer-file-name))
+    ;;       (list "-ln" (cl-case (and (eql major-mode 'sh-mode)
+    ;;                                 (boundp 'sh-shell)
+    ;;                                 (symbol-value 'sh-shell))
+    ;;                     (bash "bash")
+    ;;                     (mksh "mksh")
+    ;;                     (t "posix"))))
+    ;;     (list "-i" "4" "-bn"))))
     (add-hook 'c-mode-common-hook (lambda () (setq-local format-all-formatters '(("C" clang-format) ("Objective-C" clang-format)))))
     (add-hook 'graphql-mode-hook (lambda () (setq-local format-all-formatters '(("GraphQL" prettier)))))
     (add-hook 'emacs-lisp-mode-hook (lambda () (setq-local format-all-formatters '(("Emacs Lisp" emacs-lisp)))))
     (add-hook 'js-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier)))))
     (add-hook 'json-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
     (add-hook 'markdown-mode-hook (lambda () (setq-local format-all-formatters '(("Markdown" prettier)))))
-    (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" black)))))
+    (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" ruff)))))
     (add-hook 'swift-mode-hook (lambda () (setq-local format-all-formatters '(("Swift" swiftformat-with-config)))))
     (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
     (add-hook 'sh-mode-hook (lambda () (setq-local format-all-formatters '(("Shell" shfmt-with-options)))))
@@ -719,6 +719,7 @@ aren't backed by files, the normal format-all save hook doesn't work.
       (format-all-buffer)))
 #+end_src
 
+** Editorconfig
 #+begin_src emacs-lisp
   (use-package editorconfig
     :straight t
@@ -727,6 +728,31 @@ aren't backed by files, the normal format-all save hook doesn't work.
     (editorconfig-mode 1)
     (add-to-list 'editorconfig-indentation-alist '(swift-mode swift-mode:basic-offset)))
 #+end_src
+
+** Apheleia
+Generic formatting library, replacing format-all.
+
+#+begin_src emacs-lisp
+  (use-package apheleia
+    :straight t
+    :init
+    (apheleia-global-mode +1)
+    :config
+    (setf (alist-get 'python-mode apheleia-mode-alist)
+          '(ruff-isort ruff))
+    (setf (alist-get 'python-ts-mode apheleia-mode-alist)
+          '(ruff-isort ruff))
+    (setf (alist-get 'swiftformat apheleia-formatters)
+          '("swiftformat"
+            ;; Look for .swiftformat in parent directories
+            "--config" (concat (locate-dominating-file default-directory ".swiftformat") ".swiftformat")
+            "--stdinpath" filepath
+            "stdin"))
+    (setf (alist-get 'swift-mode apheleia-mode-alist)
+          '(swiftformat))
+    )
+#+end_src
+
 
 * Helpful
 More contextual information in help buffers
@@ -754,7 +780,6 @@ Text-based accounting system (https://github.com/ledger/ledger-mode).
     :hook ((js-mode . lsp)
            (typescript-mode . lsp)
            (haskell-mode . lsp)
-           (python-mode . lsp)
            (lsp-mode . lsp-enable-which-key-integration)
            (lsp-mode . lsp-headerline-breadcrumb-mode))
     :init
@@ -783,7 +808,21 @@ Text-based accounting system (https://github.com/ledger/ledger-mode).
 #+begin_src emacs-lisp
   (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 #+end_src
+* Eglot
+Alternative LSP interface
+
+#+begin_src emacs-lisp
+  (add-hook 'python-mode-hook #'eglot-ensure)
+  (add-hook 'python-ts-mode-hook #'eglot-ensure)
+  (use-package flycheck-eglot
+    :straight t
+    :after (flycheck eglot)
+    :config
+    (global-flycheck-eglot-mode 1))
+#+end_src
 * Magit
+Git frontend
+
 #+begin_src emacs-lisp
   (use-package magit
     :straight t
@@ -818,11 +857,11 @@ Visual aid, adding color identifies to variables and parens
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
     :straight t
-    :hook ((python-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-delimiters-mode))
+    :hook ((python-mode python-ts-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-delimiters-mode))
 
   (use-package rainbow-identifiers
     :straight t
-    :hook ((python-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-identifiers-mode))
+    :hook ((python-mode python-ts-mode csharp-mode typescript-mode clojure-mode javascript-mode objc-mode swift-mode) . rainbow-identifiers-mode))
 #+end_src
 * SDCV
 Dictionary handler. Pair this with Webster's Unabridged for maximum
@@ -997,6 +1036,16 @@ Codex LLM-powered completion suggestions.
     :bind (("C-<tab>" . copilot-accept-completion)
            ("C-S-<tab>" . copilot-accept-completion-by-line)))
 #+end_src
+* Tree sitter
+Programming framework
+
+#+begin_src emacs-lisp
+  (use-package treesit-auto
+    :straight t
+    :config
+    ;; (global-treesit-auto-mode) Disable for now - too many perf issues
+    (setq treesit-auto-install t))
+  #+end_src
 * Languages
 ** C#
 #+begin_src emacs-lisp
@@ -1216,6 +1265,33 @@ Show available chord completions
     :delight
     :init
     (which-key-mode))
+#+end_src
+* LLM
+** Elisa
+#+begin_src emacs-lisp
+  ;; (use-package elisa
+  ;;   :straight t
+  ;;   :init
+  ;;   (setopt elisa-limit 5)
+  ;;   ;; reranker increases answer quality significantly
+  ;;   (setopt elisa-reranker-enabled nil)
+  ;;   ;; prompt rewriting may increase quality of answers
+  ;;   ;; disable it if you want direct control over prompt
+  ;;   (setopt elisa-prompt-rewriting-enabled t)
+  ;;   (require 'llm-ollama)
+  ;;   ;; gemma 2 works very good in my use cases
+  ;;   ;; it also boasts strong multilingual capabilities
+  ;;   (setopt elisa-chat-provider
+  ;;           (make-llm-ollama
+  ;;            :chat-model "gemma2:9b-instruct-q6_K"
+  ;;            :embedding-model "chatfire/bge-m3:q8_0"
+  ;;            ;; set context window to 8k
+  ;;            :default-chat-non-standard-params '(("num_ctx" . 8192))))
+  ;;   ;; this embedding model has stong multilingual capabilities
+  ;;   (setopt elisa-embeddings-provider (make-llm-ollama :embedding-model "chatfire/bge-m3:q8_0"))
+  ;;   :config
+  ;;   ;; searxng works better than duckduckgo in my tests
+  ;;   (setopt elisa-web-search-function 'elisa-search-searxng))
 #+end_src
 * Custom
 Mark theme as safe
