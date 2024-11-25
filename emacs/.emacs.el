@@ -593,6 +593,11 @@ With argument ARG, do this that many times."
   :bind (("C-<tab>" . copilot-accept-completion)
          ("C-S-<tab>" . copilot-accept-completion-by-line)))
 
+(use-package copilot-chat
+  :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
+  :after (request markdown-mode)
+  :hook (git-commit-setup . copilot-chat-insert-commit-message))
+
 (use-package treesit-auto
   :straight t
   :config
