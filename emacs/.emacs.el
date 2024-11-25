@@ -390,22 +390,6 @@ With argument ARG, do this that many times."
 
 (use-package format-all
   :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code")
-  :hook ((c-mode-common
-          elisp-mode
-          emacs-lisp-mode
-          graphql-mode
-          js-mode
-          json-mode
-          nix-mode
-          markdown-mode
-          nix-mode
-          objc-mode
-          python-mode
-          sh-mode
-          swift-mode
-          typescript-mode
-          yaml-mode
-          web-mode) . format-all-mode)
   :config
   ;; (define-format-all-formatter swiftformat-with-config
   ;;   (:executable "swiftformat")
