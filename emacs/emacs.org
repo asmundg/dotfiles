@@ -881,7 +881,10 @@ effect.
 * Theme
 #+begin_src emacs-lisp
   (use-package powerline
-    :straight t)
+    :straight t
+    :after (modus-themes)
+    :config
+    (powerline-default-theme))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -1294,4 +1297,3 @@ Mark theme as safe
  '(custom-safe-themes
    '("d067a9ec4b417a71fbbe6c7017d5b7c8b961f4b1fc495cd9fbb14b6f01cca584" default)))
 #+end_src
-

@@ -550,7 +550,10 @@ With argument ARG, do this that many times."
   (require 'smartparens-config))
 
 (use-package powerline
-  :straight t)
+  :straight t
+  :after (modus-themes)
+  :config
+  (powerline-default-theme))
 
 (use-package modus-themes
   :straight t
