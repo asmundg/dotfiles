@@ -420,7 +420,6 @@ With argument ARG, do this that many times."
   (add-hook 'js-mode-hook (lambda () (setq-local format-all-formatters '(("JavaScript" prettier)))))
   (add-hook 'json-mode-hook (lambda () (setq-local format-all-formatters '(("JSON" prettier)))))
   (add-hook 'markdown-mode-hook (lambda () (setq-local format-all-formatters '(("Markdown" prettier)))))
-  (add-hook 'python-mode-hook (lambda () (setq-local format-all-formatters '(("Python" ruff)))))
   (add-hook 'swift-mode-hook (lambda () (setq-local format-all-formatters '(("Swift" swiftformat-with-config)))))
   (add-hook 'typescript-mode-hook (lambda () (setq-local format-all-formatters '(("TypeScript" prettier)))))
   (add-hook 'sh-mode-hook (lambda () (setq-local format-all-formatters '(("Shell" shfmt-with-options)))))
@@ -504,6 +503,13 @@ With argument ARG, do this that many times."
   :after (flycheck eglot)
   :config
   (global-flycheck-eglot-mode 1))
+
+(add-hook 'eglot-managed-mode-hook
+          (lambda ()
+            (when (eq major-mode 'python-mode)
+              (setq-local eldoc-documentation-functions
+                         (remq 'python-eldoc-function
+                               eldoc-documentation-functions)))))
 
 (use-package magit
   :straight t
@@ -598,8 +604,10 @@ With argument ARG, do this that many times."
 
 (use-package copilot-chat
   :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
-  :after (request markdown-mode)
-  :hook (git-commit-setup . copilot-chat-insert-commit-message))
+  :hook (git-commit-setup . copilot-chat-insert-commit-message)
+  :bind (("C-c a c" . copilot-chat-display)
+         ("C-c a a" . copilot-chat-add-current-buffer)
+         ("C-c a r" . copilot-chat-reset)))
 
 (use-package treesit-auto
   :straight t
