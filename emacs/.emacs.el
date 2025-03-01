@@ -34,8 +34,8 @@
         (let ((orig-fg (face-foreground 'mode-line)))
           (set-face-foreground 'mode-line "#F2804F")
           (run-with-idle-timer 0.1 nil
-			       (lambda (fg) (set-face-foreground 'mode-line fg))
-			       orig-fg))))
+       			(lambda (fg) (set-face-foreground 'mode-line fg))
+       			orig-fg))))
 
 (set-face-attribute 'default nil :font "Iosevka" :height 160)
 
@@ -607,7 +607,8 @@ With argument ARG, do this that many times."
   :bind (("C-c a c" . copilot-chat-display)
          ("C-c a a" . copilot-chat-add-current-buffer)
          ("C-c a r" . copilot-chat-reset))
-  :config (setq copilot-chat-model "claude-3.7-sonnet"))
+  :config (setq copilot-chat-model "claude-3.7-sonnet"
+                copilot-chat-frontend 'org))
 
 (use-package treesit-auto
   :straight t

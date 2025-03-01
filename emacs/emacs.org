@@ -1043,7 +1043,8 @@ Copilot chat
     :bind (("C-c a c" . copilot-chat-display)
            ("C-c a a" . copilot-chat-add-current-buffer)
            ("C-c a r" . copilot-chat-reset))
-    :config (setq copilot-chat-model "claude-3.7-sonnet"))
+    :config (setq copilot-chat-model "claude-3.7-sonnet"
+                  copilot-chat-frontend 'org))
 #+end_src
 * Tree sitter
 Programming framework
