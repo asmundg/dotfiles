@@ -1028,8 +1028,7 @@ Codex LLM-powered completion suggestions.
 #+begin_src emacs-lisp
   (use-package copilot
     :straight (copilot
-               :type git :host github :repo "zerolfx/copilot.el" :files ("dist" "*.el")
-               :fork (:host github :repo "asmundg/copilot.el" :branch "asmundg/bump-copilot"))
+               :type git :host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el"))
     :hook ((prog-mode . copilot-mode))
     :bind (("C-<tab>" . copilot-accept-completion)
            ("C-S-<tab>" . copilot-accept-completion-by-line)))
