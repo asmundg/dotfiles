@@ -606,7 +606,8 @@ With argument ARG, do this that many times."
   :hook (git-commit-setup . copilot-chat-insert-commit-message)
   :bind (("C-c a c" . copilot-chat-display)
          ("C-c a a" . copilot-chat-add-current-buffer)
-         ("C-c a r" . copilot-chat-reset)))
+         ("C-c a r" . copilot-chat-reset))
+  :config (setq copilot-chat-model "claude-3.7-sonnet"))
 
 (use-package treesit-auto
   :straight t
