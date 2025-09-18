@@ -83,7 +83,8 @@ Now using Iosevka (https://github.com/be5invis/Iosevka)
 *** Config
 
  #+begin_src emacs-lisp
- (set-face-attribute 'default nil :font "Iosevka" :height 160)
+   (when (eq system-type 'darwin)
+     (set-face-attribute 'default nil :font "Iosevka" :height 160))
  #+end_src
 
 ** General editing
@@ -833,6 +834,12 @@ Git frontend
      magit-diff-refine-hunk (if (eq system-type 'windows-nt) nil 'all)))
 #+end_src
 
+#+begin_src emacs-lisp
+  (use-package magit-delta
+    :straight t
+    :hook (magit-mode . magit-delta-mode))
+#+end_src
+
 * Delight
 Delight
 (https://git.savannah.gnu.org/cgit/delight.git/plain/delight.el)
@@ -1039,7 +1046,6 @@ Copilot chat
 #+begin_src emacs-lisp
   (use-package copilot-chat
     :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
-    :hook (git-commit-setup . copilot-chat-insert-commit-message)
     :bind (("C-c a c" . copilot-chat-display)
            ("C-c a a" . copilot-chat-add-current-buffer)
            ("C-c a r" . copilot-chat-reset))

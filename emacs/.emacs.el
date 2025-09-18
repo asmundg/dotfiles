@@ -19,6 +19,10 @@
 ;; keyword.
 (straight-use-package 'use-package)
 
+;; Avoid using built-in project, which will cause eglot to fail when
+;; it tells straight to get a second copy.
+(straight-use-package 'project)
+
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
 (setq visible-bell t)
@@ -524,6 +528,10 @@ With argument ARG, do this that many times."
    ;; Always on linux, never on Windows, due to slooow
    magit-diff-refine-hunk (if (eq system-type 'windows-nt) nil 'all)))
 
+(use-package magit-delta
+  :straight t
+  :hook (magit-mode . magit-delta-mode))
+
 (use-package delight
   :straight t
   ;; Hide auto-revert-mode
@@ -603,7 +611,6 @@ With argument ARG, do this that many times."
 
 (use-package copilot-chat
   :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
-  :hook (git-commit-setup . copilot-chat-insert-commit-message)
   :bind (("C-c a c" . copilot-chat-display)
          ("C-c a a" . copilot-chat-add-current-buffer)
          ("C-c a r" . copilot-chat-reset))
