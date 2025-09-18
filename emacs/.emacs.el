@@ -19,10 +19,6 @@
 ;; keyword.
 (straight-use-package 'use-package)
 
-;; Avoid using built-in project, which will cause eglot to fail when
-;; it tells straight to get a second copy.
-(straight-use-package 'project)
-
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
 (setq visible-bell t)
@@ -41,7 +37,8 @@
        			(lambda (fg) (set-face-foreground 'mode-line fg))
        			orig-fg))))
 
-(set-face-attribute 'default nil :font "Iosevka" :height 160)
+(when (eq system-type 'darwin)
+  (set-face-attribute 'default nil :font "Iosevka" :height 160))
 
 (setq-default indent-tabs-mode nil)
 
@@ -97,7 +94,9 @@ With argument ARG, do this that many times."
 
 (use-package exec-path-from-shell
   :straight t
-  :config (exec-path-from-shell-initialize))
+  :config
+  (setq exec-path-from-shell-variables '("PATH" "OPENAI_API_BASE" "OPENAI_API_KEY"))
+  (exec-path-from-shell-initialize))
 
 (setenv "TERM" "screen-256color")
 
@@ -751,29 +750,13 @@ With argument ARG, do this that many times."
   :init
   (which-key-mode))
 
-;; (use-package elisa
-;;   :straight t
-;;   :init
-;;   (setopt elisa-limit 5)
-;;   ;; reranker increases answer quality significantly
-;;   (setopt elisa-reranker-enabled nil)
-;;   ;; prompt rewriting may increase quality of answers
-;;   ;; disable it if you want direct control over prompt
-;;   (setopt elisa-prompt-rewriting-enabled t)
-;;   (require 'llm-ollama)
-;;   ;; gemma 2 works very good in my use cases
-;;   ;; it also boasts strong multilingual capabilities
-;;   (setopt elisa-chat-provider
-;;           (make-llm-ollama
-;;            :chat-model "gemma2:9b-instruct-q6_K"
-;;            :embedding-model "chatfire/bge-m3:q8_0"
-;;            ;; set context window to 8k
-;;            :default-chat-non-standard-params '(("num_ctx" . 8192))))
-;;   ;; this embedding model has stong multilingual capabilities
-;;   (setopt elisa-embeddings-provider (make-llm-ollama :embedding-model "chatfire/bge-m3:q8_0"))
-;;   :config
-;;   ;; searxng works better than duckduckgo in my tests
-;;   (setopt elisa-web-search-function 'elisa-search-searxng))
+(use-package aidermacs
+  :straight t
+  :bind (("C-c a" . aidermacs-transient-menu))
+  :config
+  :custom
+  (aidermacs-default-chat-mode 'architect)
+  (aidermacs-default-model "openai/claude-sonnet-4"))
 
 (custom-set-variables
  '(custom-safe-themes
