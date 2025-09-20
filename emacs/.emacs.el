@@ -300,6 +300,7 @@ With argument ARG, do this that many times."
   (setq ivy-use-selectable-prompt t)
   (setq ivy-re-builders-alist
         '((swiper . ivy--regex-ignore-order)
+          (counsel-rg . ivy--regex-plus)
           (t . ivy--regex-ignore-order)))
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-height 20)
@@ -572,17 +573,13 @@ With argument ARG, do this that many times."
   :straight t
   :init (load-theme 'modus-vivendi))
 
-(use-package git-gutter-fringe
-  :straight t
+(use-package git-gutter
+  :straight (git-gutter
+             :type git :host github :repo "emacsorphanage/git-gutter" :files ("dist" "*.el"))
   :delight git-gutter-mode
   :config
   (global-git-gutter-mode 1)
-  (setq git-gutter:update-interval 0.02)
-
-  ;; modern fringe bitmaps (https://ianyepan.github.io/posts/emacs-git-gutter/)
-  (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
+  (setq git-gutter:update-interval 0.02))
 
 (use-package shell-switcher
   :straight t
@@ -599,10 +596,7 @@ With argument ARG, do this that many times."
 
 (use-package ivy-prescient
   :straight t
-  :config (ivy-prescient-mode)
-  ;; ivy-prescient-re-builder will cause rg to attempt a _very_
-  ;; complex regex, which fails for large files
-  (setf (alist-get 'counsel-rg ivy-re-builders-alist) #'ivy--regex-plus))
+  :config (ivy-prescient-mode))
 
 (use-package copilot
   :straight (copilot
