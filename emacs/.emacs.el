@@ -599,7 +599,10 @@ With argument ARG, do this that many times."
 
 (use-package ivy-prescient
   :straight t
-  :config (ivy-prescient-mode))
+  :config (ivy-prescient-mode)
+  ;; ivy-prescient-re-builder will cause rg to attempt a _very_
+  ;; complex regex, which fails for large files
+  (setf (alist-get 'counsel-rg ivy-re-builders-alist) #'ivy--regex-plus))
 
 (use-package copilot
   :straight (copilot
@@ -607,14 +610,6 @@ With argument ARG, do this that many times."
   :hook ((prog-mode . copilot-mode))
   :bind (("C-<tab>" . copilot-accept-completion)
          ("C-S-<tab>" . copilot-accept-completion-by-line)))
-
-(use-package copilot-chat
-  :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
-  :bind (("C-c a c" . copilot-chat-display)
-         ("C-c a a" . copilot-chat-add-current-buffer)
-         ("C-c a r" . copilot-chat-reset))
-  :config (setq copilot-chat-model "claude-3.7-sonnet"
-                copilot-chat-frontend 'org))
 
 (use-package treesit-auto
   :straight t
