@@ -793,31 +793,9 @@ Text-based accounting system (https://github.com/ledger/ledger-mode).
 #+end_src
 
 #+begin_src emacs-lisp
-  (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-#+end_src
-* Eglot
-Alternative LSP interface
-
-#+begin_src emacs-lisp
-  (add-hook 'python-mode-hook #'eglot-ensure)
-  (add-hook 'python-ts-mode-hook #'eglot-ensure)
-  (use-package flycheck-eglot
+  (use-package lsp-ivy
     :straight t
-    :after (flycheck eglot)
-    :config
-    (global-flycheck-eglot-mode 1))
-#+end_src
-
-Clean up conflicting eldoc behaviors (this produces cruft in the echo
-buffer)
-
-#+begin_src emacs-lisp
-(add-hook 'eglot-managed-mode-hook
-          (lambda ()
-            (when (eq major-mode 'python-mode)
-              (setq-local eldoc-documentation-functions
-                         (remq 'python-eldoc-function
-                               eldoc-documentation-functions)))))
+    :commands lsp-ivy-workspace-symbol)
 #+end_src
 * Magit
 Git frontend
@@ -856,6 +834,14 @@ by adding the :delight keyword.
     :config (delight 'auto-revert-mode))
 #+end_src
 
+* Python
+#+begin_src emacs-lisp
+  (use-package lsp-pyright
+    :straight t
+    :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp))))
+#+end_src
 * Rainbow
 Visual aid, adding color identifies to variables and parens
 

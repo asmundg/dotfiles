@@ -498,22 +498,9 @@ With argument ARG, do this that many times."
   (setq lsp-ui-doc-position 'bottom)
   :commands lsp-ui-mode)
 
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-
-(add-hook 'python-mode-hook #'eglot-ensure)
-(add-hook 'python-ts-mode-hook #'eglot-ensure)
-(use-package flycheck-eglot
+(use-package lsp-ivy
   :straight t
-  :after (flycheck eglot)
-  :config
-  (global-flycheck-eglot-mode 1))
-
-(add-hook 'eglot-managed-mode-hook
-          (lambda ()
-            (when (eq major-mode 'python-mode)
-              (setq-local eldoc-documentation-functions
-                         (remq 'python-eldoc-function
-                               eldoc-documentation-functions)))))
+  :commands lsp-ivy-workspace-symbol)
 
 (use-package magit
   :straight t
@@ -536,6 +523,12 @@ With argument ARG, do this that many times."
   :straight t
   ;; Hide auto-revert-mode
   :config (delight 'auto-revert-mode))
+
+(use-package lsp-pyright
+  :straight t
+  :hook (python-mode . (lambda ()
+                        (require 'lsp-pyright)
+                        (lsp))))
 
 (use-package rainbow-delimiters
   :straight t
