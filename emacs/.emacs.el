@@ -448,8 +448,6 @@ With argument ARG, do this that many times."
   :config
   (setf (alist-get 'python-mode apheleia-mode-alist)
         '(ruff-isort ruff))
-  (setf (alist-get 'python-ts-mode apheleia-mode-alist)
-        '(ruff-isort ruff))
   (setf (alist-get 'swiftformat apheleia-formatters)
         '("swiftformat"
           ;; Look for .swiftformat in parent directories
