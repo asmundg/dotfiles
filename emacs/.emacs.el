@@ -389,8 +389,10 @@ With argument ARG, do this that many times."
     (flycheck-swiftlint-setup)))
 
 (use-package flycheck-color-mode-line
-             :straight t
-             :hook (flycheck-mode . flycheck-color-mode-line-mode))
+  :straight t
+  :hook (flycheck-mode . flycheck-color-mode-line-mode)
+  :config (custom-set-faces
+           '(flycheck-color-mode-line-success-face ((t (:background "dark green"))))))
 
 (use-package format-all
   :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code")

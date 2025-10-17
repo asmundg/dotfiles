@@ -649,8 +649,10 @@ layout.
       (flycheck-swiftlint-setup)))
 
   (use-package flycheck-color-mode-line
-               :straight t
-               :hook (flycheck-mode . flycheck-color-mode-line-mode))
+    :straight t
+    :hook (flycheck-mode . flycheck-color-mode-line-mode)
+    :config (custom-set-faces
+             '(flycheck-color-mode-line-success-face ((t (:background "dark green"))))))
 #+end_src
 
 * Formatting
