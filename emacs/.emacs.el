@@ -129,6 +129,19 @@ With argument ARG, do this that many times."
   :bind (:map org-mode-map ("M-e" . org-fill-paragraph)
               ("C-c C-." . org-time-stamp-inactive))
   :config
+  (defun my/org-agenda-prefix-with-roam-title ()
+    "Get org-roam title for agenda prefix."
+    (let ((file (buffer-file-name (org-base-buffer (current-buffer)))))
+      (if (and file (org-roam-file-p file))
+          (let* ((title (or (caar (org-roam-db-query
+                                   [:select title :from nodes
+                                            :where (= file $s1)] file))
+                            ""))
+                 (formatted (format "%-20.20s" title)))
+            (message "Title: '%s' Length: %d" formatted (length formatted))
+            formatted)
+        (format "%-20s" ""))))
+
   (setq
    org-directory "~/Sync"
 
@@ -141,8 +154,8 @@ With argument ARG, do this that many times."
 
    org-agenda-breadcrumbs-separator "/"
 
-   org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s %b")
-                              (todo . "%i %-12:c %b")
+   org-agenda-prefix-format '((agenda . "%i %(my/org-agenda-prefix-with-roam-title) %t %s")
+                              (todo . "%i %(my/org-agenda-prefix-with-roam-title) %b")
                               (tags . " %i %-12:c")
                               (search . " %i %-12:c"))
 
@@ -182,7 +195,7 @@ With argument ARG, do this that many times."
   (defun air-org-skip-subtree-if-priority (priority)
     "Skip an agenda subtree if it has a priority of PRIORITY.
 
-        PRIORITY may be one of the characters ?A, ?B, or ?C."
+          PRIORITY may be one of the characters ?A, ?B, or ?C."
     (let ((subtree-end (save-excursion (org-end-of-subtree t)))
           (pri-value (* 1000 (- org-lowest-priority priority)))
           (pri-current (org-get-priority (thing-at-point 'line t))))
@@ -276,6 +289,48 @@ With argument ARG, do this that many times."
   :config
   (add-to-list 'org-modules 'org-habit t)
   (add-to-list 'org-modules 'org-habit-plus t))
+
+;; install required inheritenv dependency:
+(use-package inheritenv
+  :straight (:type git :host github :repo "purcell/inheritenv"))
+
+;; for eat terminal backend:
+(use-package eat
+  :straight (:type git
+                   :host codeberg
+                   :repo "akib/emacs-eat"
+                   :files ("*.el" ("term" "term/*.el") "*.texi"
+                           "*.ti" ("terminfo/e" "terminfo/e/*")
+                           ("terminfo/65" "terminfo/65/*")
+                           ("integration" "integration/*")
+                           (:exclude ".dir-locals.el" "*-tests.el"))))
+
+;; for vterm terminal backend:
+(use-package vterm :straight t)
+
+(defun my-claude-notify (title message)
+  "Display a macOS notification with sound."
+  (call-process "osascript" nil nil nil
+                "-e" (format "display notification \"%s\" with title \"%s\" sound name \"Glass\""
+                             message title)))
+
+;; install claude-code.el, using :depth 1 to reduce download size:
+(use-package claude-code
+  :straight (:type git :host github :repo "stevemolitor/claude-code.el" :branch "main" :depth 1
+                   :files ("*.el" (:exclude "images/*")))
+  :bind-keymap
+  ("C-c c" . claude-code-command-map) ;; or your preferred key
+  ;; Optionally define a repeat map so that "M" will cycle thru Claude auto-accept/plan/confirm modes after invoking claude-code-cycle-mode / C-c M.
+  :bind
+  (:repeat-map my-claude-code-map ("M" . claude-code-cycle-mode))
+  :config
+  ;; optional IDE integration with Monet
+  ;;(add-hook 'claude-code-process-environment-functions #'monet-start-server-function)
+  ;;(monet-mode 1)
+  (setq claude-code-notification-function #'my-claude-notify)
+  (setq use-default-font-for-symbols nil)
+  (set-fontset-font t 'unicode (font-spec :family "JuliaMono"))
+  (claude-code-mode))
 
 (use-package counsel
   :straight t
