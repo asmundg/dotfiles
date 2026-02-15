@@ -268,7 +268,7 @@ With argument ARG, do this that many times."
     (org-roam-capture-templates
      '(("d" "default" plain
         "%?"
-        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org"
+        :if-new (file+head "%<%Y-%m-%d-%H_%M_%S>-${slug}.org"
                            ":PROPERTIES:
 :CATEGORY: roam
 :END:
@@ -780,6 +780,18 @@ With argument ARG, do this that many times."
         ;; This would override `fill-column' if it's an integer.
         (emacs-lisp-docstring-fill-column t))
     (fill-paragraph nil region)))
+
+(defun my/copy-image-to-clipboard ()
+  "Copy the current image to the macOS clipboard."
+  (interactive)
+  (let ((file (buffer-file-name)))
+    (if (and file (derived-mode-p 'image-mode))
+        (progn
+          (shell-command (format "osascript -e 'set the clipboard to (read (POSIX file \"%s\") as TIFF picture)'" file))
+          (message "Image copied to clipboard"))
+      (message "Not visiting an image file"))))
+
+(define-key image-mode-map (kbd "C-c C-v") #'my/copy-image-to-clipboard)
 
 (use-package which-key
   :straight t
