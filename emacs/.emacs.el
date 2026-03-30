@@ -574,6 +574,10 @@ With argument ARG, do this that many times."
   :straight t
   :hook (magit-mode . magit-delta-mode))
 
+(use-package markdown-indent-mode
+:straight (format-all :type git :host github :repo "whhone/markdown-indent-mode")
+:hook (markdown-mode . markdown-indent-mode))
+
 (use-package delight
   :straight t
   ;; Hide auto-revert-mode

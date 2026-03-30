@@ -516,7 +516,6 @@ daily increment, i.e. skipping some days.
     (add-to-list 'org-modules 'org-habit t)
     (add-to-list 'org-modules 'org-habit-plus t))
 #+end_src
-
 * Claude Code
 #+begin_src shell :tangle bootstrap.sh
 brew install --cask font-juliamono
@@ -882,6 +881,19 @@ Git frontend
     :hook (magit-mode . magit-delta-mode))
 #+end_src
 
+* Markdown
+Mostly works well out of the box.
+
+** markdown-indent-mode
+https://github.com/whhone/markdown-indent-mode provides layout similar
+to org-mode, making the semantic structure way easier to visually
+parse.
+
+#+begin_src emacs-lisp
+    (use-package markdown-indent-mode
+    :straight (format-all :type git :host github :repo "whhone/markdown-indent-mode")
+    :hook (markdown-mode . markdown-indent-mode))
+#+end_src
 * Delight
 Delight
 (https://git.savannah.gnu.org/cgit/delight.git/plain/delight.el)
