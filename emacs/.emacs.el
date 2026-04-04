@@ -38,7 +38,7 @@
        			orig-fg))))
 
 (when (eq system-type 'darwin)
-  (set-face-attribute 'default nil :font "Inconsolata" :height 160))
+  (set-face-attribute 'default nil :font "Iosevka" :height 160))
 
 (setq-default indent-tabs-mode nil)
 
