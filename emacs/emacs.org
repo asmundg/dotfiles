@@ -70,21 +70,19 @@ Install emacs
   
 ** Fonts
 
-Now using Iosevka (https://github.com/be5invis/Iosevka)
-
 *** Installing the font
 **** MacOS
 
  #+begin_src shell :tangle bootstrap-mac.sh
    brew tap homebrew/cask-fonts
-   brew install iosevka
+   brew install inconsolata
  #+end_src
 
 *** Config
 
  #+begin_src emacs-lisp
    (when (eq system-type 'darwin)
-     (set-face-attribute 'default nil :font "Iosevka" :height 160))
+     (set-face-attribute 'default nil :font "Inconsolata" :height 160))
  #+end_src
 
 ** General editing
