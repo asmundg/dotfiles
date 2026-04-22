@@ -976,13 +976,11 @@ Mark changed lines in tracked files in the "gutter" on the side of the
 buffer.
 
 #+begin_src emacs-lisp
-  (use-package git-gutter
-    :straight (git-gutter
-               :type git :host github :repo "emacsorphanage/git-gutter" :files ("dist" "*.el"))
-    :delight git-gutter-mode
+  (use-package diff-hl
+    :straight t
+    :hook ('magit-post-refresh 'diff-hl-magit-post-refresh)
     :config
-    (global-git-gutter-mode 1)
-    (setq git-gutter:update-interval 0.02))
+    (global-diff-hl-mode))
 #+end_src
 
 ** Shell switcher

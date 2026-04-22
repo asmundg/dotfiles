@@ -625,13 +625,11 @@ With argument ARG, do this that many times."
   :straight t
   :init (load-theme 'modus-vivendi))
 
-(use-package git-gutter
-  :straight (git-gutter
-             :type git :host github :repo "emacsorphanage/git-gutter" :files ("dist" "*.el"))
-  :delight git-gutter-mode
+(use-package diff-hl
+  :straight t
+  :hook ('magit-post-refresh 'diff-hl-magit-post-refresh)
   :config
-  (global-git-gutter-mode 1)
-  (setq git-gutter:update-interval 0.02))
+  (global-diff-hl-mode))
 
 (use-package shell-switcher
   :straight t
