@@ -514,6 +514,13 @@ daily increment, i.e. skipping some days.
     (add-to-list 'org-modules 'org-habit t)
     (add-to-list 'org-modules 'org-habit-plus t))
 #+end_src
+** org-pandoc-import
+#+begin_src emacs-lisp
+(use-package org-pandoc-import
+  :straight (:host github
+             :repo "tecosaur/org-pandoc-import"
+             :files ("*.el" "filters" "preprocessors")))
+#+end_src
 * Claude Code
 #+begin_src shell :tangle bootstrap.sh
 brew install --cask font-juliamono
@@ -889,8 +896,8 @@ parse.
 
 #+begin_src emacs-lisp
     (use-package markdown-indent-mode
-    :straight (format-all :type git :host github :repo "whhone/markdown-indent-mode")
-    :hook (markdown-mode . markdown-indent-mode))
+      :straight (markdown-indent-mode :type git :host github :repo "whhone/markdown-indent-mode")
+      :hook (markdown-mode . markdown-indent-mode))
 #+end_src
 * Delight
 Delight
@@ -1328,7 +1335,8 @@ Copy image to clipboard (macos)
             (message "Image copied to clipboard"))
         (message "Not visiting an image file"))))
 
-  (define-key image-mode-map (kbd "C-c C-v") #'my/copy-image-to-clipboard)
+  (with-eval-after-load 'image-mode
+    (define-key image-mode-map (kbd "C-c C-v") #'my/copy-image-to-clipboard))
 #+end_src
 
 * Which-key

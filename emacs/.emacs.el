@@ -290,6 +290,11 @@ With argument ARG, do this that many times."
   (add-to-list 'org-modules 'org-habit t)
   (add-to-list 'org-modules 'org-habit-plus t))
 
+(use-package org-pandoc-import
+  :straight (:host github
+             :repo "tecosaur/org-pandoc-import"
+             :files ("*.el" "filters" "preprocessors")))
+
 ;; install required inheritenv dependency:
 (use-package inheritenv
   :straight (:type git :host github :repo "purcell/inheritenv"))
@@ -575,8 +580,8 @@ With argument ARG, do this that many times."
   :hook (magit-mode . magit-delta-mode))
 
 (use-package markdown-indent-mode
-:straight (format-all :type git :host github :repo "whhone/markdown-indent-mode")
-:hook (markdown-mode . markdown-indent-mode))
+  :straight (markdown-indent-mode :type git :host github :repo "whhone/markdown-indent-mode")
+  :hook (markdown-mode . markdown-indent-mode))
 
 (use-package delight
   :straight t
@@ -793,7 +798,8 @@ With argument ARG, do this that many times."
           (message "Image copied to clipboard"))
       (message "Not visiting an image file"))))
 
-(define-key image-mode-map (kbd "C-c C-v") #'my/copy-image-to-clipboard)
+(with-eval-after-load 'image-mode
+  (define-key image-mode-map (kbd "C-c C-v") #'my/copy-image-to-clipboard))
 
 (use-package which-key
   :straight t
