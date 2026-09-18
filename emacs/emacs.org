@@ -45,15 +45,16 @@ Install emacs
  Disable various buttons and things we don't need
 
  #+begin_src emacs-lisp
- (setq inhibit-splash-screen t)
- (setq inhibit-startup-message t)
- (setq visible-bell t)
- (tool-bar-mode -1)
- (scroll-bar-mode -1)
- (menu-bar-mode -1)
+   (setq inhibit-splash-screen t)
+   (setq inhibit-startup-message t)
+   (setq visible-bell t)
+   (tool-bar-mode t)
+   (tool-bar-mode -1)
+   (scroll-bar-mode -1)
+   (menu-bar-mode -1)
 
- (line-number-mode 1)
- (column-number-mode 1)
+   (line-number-mode 1)
+   (column-number-mode 1)
  #+end_src
 
  Blink modeline on visual bell, to make it a bit more obvious.
@@ -854,6 +855,7 @@ Text-based accounting system (https://github.com/ledger/ledger-mode).
     :config
     (setq lsp-ui-sideline-diagnostic-max-lines 10)
     (setq lsp-ui-doc-position 'bottom)
+    (setq lsp-ui-doc-show-with-cursor t)
     :commands lsp-ui-mode)
 #+end_src
 
@@ -916,9 +918,17 @@ by adding the :delight keyword.
 #+begin_src emacs-lisp
   (use-package lsp-pyright
     :straight t
+    ;; basedpyright is a pyright fork bundling stdlib/builtin docstrings, so
+    ;; hover and completion show real docs. Set in :init because the client
+    ;; registers at load time and reads this to pick the executable.
+    :init (setq lsp-pyright-langserver-command "basedpyright")
     :hook (python-mode . (lambda ()
                           (require 'lsp-pyright)
                           (lsp))))
+#+end_src
+
+#+begin_src shell :tangle bootstrap.sh
+  brew install basedpyright
 #+end_src
 * Rainbow
 Visual aid, adding color identifies to variables and parens

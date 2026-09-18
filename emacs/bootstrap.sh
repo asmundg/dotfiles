@@ -10,6 +10,8 @@ brew install atuin
 
 brew install --cask font-juliamono
 
+brew install basedpyright
+
 brew install sdcv
 mkdir -p ~/.stardict/dic/
 curl https://s3.amazonaws.com/jsomers/dictionary.zip | tar -xO --strip-components=1 dictionary/stardict-dictd-web1913-2.4.2.tar.bz2 | tar -xC ~/.stardict/dic/

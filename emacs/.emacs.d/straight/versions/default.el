@@ -52,7 +52,7 @@
  ("llama" . "d430d48e0b5afd2a34b5531f103dcb110c3539c4")
  ("lsp-ivy" . "2927cbc776477e23d4a1062568d55793eed33c51")
  ("lsp-mode" . "5d9e72816a36ec5b0fbf128c25f88e5daaae5b41")
- ("lsp-pyright" . "4cd2adbb32287278d9d9da59a3212a53ecdf8036")
+ ("lsp-pyright" . "147d6d9c799f945ba4a2fb14824ddea9ade6de74")
  ("lsp-sourcekit" . "1cd5e7d2699598a97bdbcd289d9a88b249db474c")
  ("lsp-ui" . "09d40806429fadc01a12d9a1841b49430f58adb5")
  ("magit" . "569b9656d6a2c792b07d3980796c76b121c9737e")

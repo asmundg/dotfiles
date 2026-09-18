@@ -22,6 +22,7 @@
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
 (setq visible-bell t)
+(tool-bar-mode t)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
@@ -34,8 +35,8 @@
         (let ((orig-fg (face-foreground 'mode-line)))
           (set-face-foreground 'mode-line "#F2804F")
           (run-with-idle-timer 0.1 nil
-       			(lambda (fg) (set-face-foreground 'mode-line fg))
-       			orig-fg))))
+       			       (lambda (fg) (set-face-foreground 'mode-line fg))
+       			       orig-fg))))
 
 (when (eq system-type 'darwin)
   (set-face-attribute 'default nil :font "Iosevka" :height 160))
@@ -75,7 +76,7 @@ With argument ARG, do this that many times."
   (interactive "p")
   (delete-region (point) (progn (backward-word arg) (point))))
 
-  (global-set-key (kbd "C-w") 'backward-delete-word)
+(global-set-key (kbd "C-w") 'backward-delete-word)
 
 ;; No quick exit emacs
 (global-unset-key "\C-x\C-c")
@@ -106,9 +107,9 @@ With argument ARG, do this that many times."
 (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
 ;; Redirect customizations outside the main config, to avoid spurious diffs
-  (setq custom-file "~/.emacs.d/custom.el")
-  (when (file-exists-p custom-file)
-    (load custom-file))
+(setq custom-file "~/.emacs.d/custom.el")
+(when (file-exists-p custom-file)
+  (load custom-file))
 
 (use-package marginalia
   :straight t
@@ -255,28 +256,28 @@ With argument ARG, do this that many times."
   :straight t)
 
 (use-package org-roam
-    :straight t
-    :after (org)
-    :hook (after-init . org-roam-mode)
-    :bind (("C-c n l" . org-roam-buffer-toggle)
-           ("C-c n f" . org-roam-node-find)
-           ("C-c n i" . org-roam-node-insert)
-           ("C-c n g" . org-roam-graph)
-           ("C-c n c" . org-roam-capture))
-    :custom
-    (org-roam-directory (file-truename "~/Sync/roam"))
-    (org-roam-capture-templates
-     '(("d" "default" plain
-        "%?"
-        :if-new (file+head "%<%Y-%m-%d-%H_%M_%S>-${slug}.org"
-                           ":PROPERTIES:
+  :straight t
+  :after (org)
+  :hook (after-init . org-roam-mode)
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n c" . org-roam-capture))
+  :custom
+  (org-roam-directory (file-truename "~/Sync/roam"))
+  (org-roam-capture-templates
+   '(("d" "default" plain
+      "%?"
+      :if-new (file+head "%<%Y-%m-%d-%H_%M_%S>-${slug}.org"
+                         ":PROPERTIES:
 :CATEGORY: roam
 :END:
 #+title: ${title}\n#+date: %U\n")
-        :unnarrowed t)))
-    :config
-    (make-directory "~/Sync/roam" t)
-    (org-roam-db-autosync-mode))
+      :unnarrowed t)))
+  :config
+  (make-directory "~/Sync/roam" t)
+  (org-roam-db-autosync-mode))
 
 (use-package org-tidy
   :straight t
@@ -292,8 +293,8 @@ With argument ARG, do this that many times."
 
 (use-package org-pandoc-import
   :straight (:host github
-             :repo "tecosaur/org-pandoc-import"
-             :files ("*.el" "filters" "preprocessors")))
+                   :repo "tecosaur/org-pandoc-import"
+                   :files ("*.el" "filters" "preprocessors")))
 
 ;; install required inheritenv dependency:
 (use-package inheritenv
@@ -388,7 +389,7 @@ With argument ARG, do this that many times."
 (eval-after-load "dired" '(require 'dired-x))
 ;; Use system trash instead of rm
 (setq delete-by-moving-to-trash t
-;; Suggest other buffer as target when two direds are open
+      ;; Suggest other buffer as target when two direds are open
       dired-dwim-target t)
 
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
@@ -556,6 +557,7 @@ With argument ARG, do this that many times."
   :config
   (setq lsp-ui-sideline-diagnostic-max-lines 10)
   (setq lsp-ui-doc-position 'bottom)
+  (setq lsp-ui-doc-show-with-cursor t)
   :commands lsp-ui-mode)
 
 (use-package lsp-ivy
@@ -590,9 +592,13 @@ With argument ARG, do this that many times."
 
 (use-package lsp-pyright
   :straight t
+  ;; basedpyright is a pyright fork bundling stdlib/builtin docstrings, so
+  ;; hover and completion show real docs. Set in :init because the client
+  ;; registers at load time and reads this to pick the executable.
+  :init (setq lsp-pyright-langserver-command "basedpyright")
   :hook (python-mode . (lambda ()
-                        (require 'lsp-pyright)
-                        (lsp))))
+                         (require 'lsp-pyright)
+                         (lsp))))
 
 (use-package rainbow-delimiters
   :straight t
@@ -693,8 +699,8 @@ With argument ARG, do this that many times."
   (c-set-offset 'arglist-intro '+))
 (add-hook 'java-mode-hook 'java-indent-setup)
 
-;(use-package indium
-;  :straight t)
+                                        ;(use-package indium
+                                        ;  :straight t)
 
 (use-package json-mode
   :straight t
