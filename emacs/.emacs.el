@@ -35,8 +35,8 @@
         (let ((orig-fg (face-foreground 'mode-line)))
           (set-face-foreground 'mode-line "#F2804F")
           (run-with-idle-timer 0.1 nil
-       			       (lambda (fg) (set-face-foreground 'mode-line fg))
-       			       orig-fg))))
+       			(lambda (fg) (set-face-foreground 'mode-line fg))
+       			orig-fg))))
 
 (when (eq system-type 'darwin)
   (set-face-attribute 'default nil :font "Iosevka" :height 160))
@@ -76,7 +76,7 @@ With argument ARG, do this that many times."
   (interactive "p")
   (delete-region (point) (progn (backward-word arg) (point))))
 
-(global-set-key (kbd "C-w") 'backward-delete-word)
+  (global-set-key (kbd "C-w") 'backward-delete-word)
 
 ;; No quick exit emacs
 (global-unset-key "\C-x\C-c")
@@ -107,9 +107,9 @@ With argument ARG, do this that many times."
 (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
 ;; Redirect customizations outside the main config, to avoid spurious diffs
-(setq custom-file "~/.emacs.d/custom.el")
-(when (file-exists-p custom-file)
-  (load custom-file))
+  (setq custom-file "~/.emacs.d/custom.el")
+  (when (file-exists-p custom-file)
+    (load custom-file))
 
 (use-package marginalia
   :straight t
@@ -256,28 +256,28 @@ With argument ARG, do this that many times."
   :straight t)
 
 (use-package org-roam
-  :straight t
-  :after (org)
-  :hook (after-init . org-roam-mode)
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n g" . org-roam-graph)
-         ("C-c n c" . org-roam-capture))
-  :custom
-  (org-roam-directory (file-truename "~/Sync/roam"))
-  (org-roam-capture-templates
-   '(("d" "default" plain
-      "%?"
-      :if-new (file+head "%<%Y-%m-%d-%H_%M_%S>-${slug}.org"
-                         ":PROPERTIES:
+    :straight t
+    :after (org)
+    :hook (after-init . org-roam-mode)
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n g" . org-roam-graph)
+           ("C-c n c" . org-roam-capture))
+    :custom
+    (org-roam-directory (file-truename "~/Sync/roam"))
+    (org-roam-capture-templates
+     '(("d" "default" plain
+        "%?"
+        :if-new (file+head "%<%Y-%m-%d-%H_%M_%S>-${slug}.org"
+                           ":PROPERTIES:
 :CATEGORY: roam
 :END:
 #+title: ${title}\n#+date: %U\n")
-      :unnarrowed t)))
-  :config
-  (make-directory "~/Sync/roam" t)
-  (org-roam-db-autosync-mode))
+        :unnarrowed t)))
+    :config
+    (make-directory "~/Sync/roam" t)
+    (org-roam-db-autosync-mode))
 
 (use-package org-tidy
   :straight t
@@ -293,8 +293,8 @@ With argument ARG, do this that many times."
 
 (use-package org-pandoc-import
   :straight (:host github
-                   :repo "tecosaur/org-pandoc-import"
-                   :files ("*.el" "filters" "preprocessors")))
+             :repo "tecosaur/org-pandoc-import"
+             :files ("*.el" "filters" "preprocessors")))
 
 ;; install required inheritenv dependency:
 (use-package inheritenv
@@ -389,7 +389,7 @@ With argument ARG, do this that many times."
 (eval-after-load "dired" '(require 'dired-x))
 ;; Use system trash instead of rm
 (setq delete-by-moving-to-trash t
-      ;; Suggest other buffer as target when two direds are open
+;; Suggest other buffer as target when two direds are open
       dired-dwim-target t)
 
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
@@ -401,10 +401,10 @@ With argument ARG, do this that many times."
 
   (flycheck-define-checker proselint
     "A linter for prose."
-    :command ("proselint" source-inplace)
+    :command ("proselint" "check" source-inplace)
     :error-patterns
     ((warning line-start (file-name) ":" line ":" column ": "
-              (id (one-or-more (not (any " "))))
+              (id (one-or-more (not (any " :")))) ": "
               (message) line-end))
     :modes (text-mode markdown-mode gfm-mode org-mode))
 
@@ -597,8 +597,105 @@ With argument ARG, do this that many times."
   ;; registers at load time and reads this to pick the executable.
   :init (setq lsp-pyright-langserver-command "basedpyright")
   :hook (python-mode . (lambda ()
-                         (require 'lsp-pyright)
-                         (lsp))))
+                        (require 'lsp-pyright)
+                        (lsp))))
+
+(use-package python-pytest
+  :straight t
+  :config
+  ;; A project with a pyproject.toml per subdirectory (adventofcode has one per
+  ;; year) needs pytest to run in that subdirectory, so rootdir and conftest
+  ;; discovery resolve there. Projectile's root stays at the repo, which keeps
+  ;; cross-directory search working.
+  (define-advice python-pytest--project-root
+      (:around (orig) asg/nearest-pyproject)
+    (or (locate-dominating-file default-directory "pyproject.toml")
+        (funcall orig)))
+
+  ;; projectile-find-matching-test guesses a test path by swapping "src" for
+  ;; "test" and never checks that it exists, so dwim runs pytest on a missing
+  ;; file. Fall back to the visited file. The guess also needs re-rooting,
+  ;; since projectile returns it relative to its own root.
+  (define-advice python-pytest--sensible-test-file
+      (:around (orig file) asg/only-existing)
+    (let ((guess (and (not (python-pytest--test-file-p file))
+                      (ignore-errors
+                        (expand-file-name (funcall orig file)
+                                          (projectile-project-root))))))
+      (python-pytest--relative-file-name
+       (if (and guess (file-exists-p guess)) guess file)))))
+
+(defun asg/pytest-target ()
+  "Absolute path of the tests covering the current buffer, or nil.
+Either the buffer itself when it defines tests, or the test file
+projectile associates with it."
+  (let ((file (buffer-file-name)))
+    (cond
+     ((null file) nil)
+     ((save-excursion (goto-char (point-min))
+                      (re-search-forward "^[ \t]*def test" nil t))
+      file)
+     (t (let ((guess (ignore-errors
+                       (expand-file-name (python-pytest--sensible-test-file file)
+                                         (python-pytest--project-root)))))
+          (and guess (file-exists-p guess) (not (equal guess file)) guess))))))
+
+(with-eval-after-load 'flycheck
+  (flycheck-define-checker pytest
+    "Run the tests covering the current file with pytest."
+    :command ("pytest" "--tb=line" "-q" "--no-header" "-p" "no:cacheprovider"
+              (eval (asg/pytest-target)))
+    :error-patterns
+    ((error line-start (file-name) ":" line ": " (message) line-end)
+     (error line-start "E" (one-or-more " ") "File \"" (file-name)
+            "\", line " line line-end)
+     (error line-start "FAILED " (one-or-more (not (any " "))) "::"
+            (id (minimal-match (one-or-more not-newline))) " - " (message)
+            line-end))
+    ;; A traceback line points at where the exception was raised, which is
+    ;; often not the test. pytest lists failures and its summary in the same
+    ;; order, so the node ids from the summary zip onto the locations. Errors
+    ;; belonging to another file are moved to line 1, since flycheck discards
+    ;; them otherwise: a failing assertion in tests/ would leave src/ green.
+    :error-filter
+    (lambda (errors)
+      (let* ((this (buffer-file-name))
+             (named (seq-filter #'flycheck-error-id errors))
+             (sites (seq-remove #'flycheck-error-id errors))
+             (paired (= (length named) (length sites))))
+        (when paired
+          (cl-loop for site in sites for name in named do
+                   (setf (flycheck-error-message site)
+                         (format "%s: %s" (flycheck-error-id name)
+                                 (flycheck-error-message site)))))
+        (dolist (err sites)
+          (unless (flycheck-error-message err)
+            (setf (flycheck-error-message err)
+                  "pytest could not import this file"))
+          (unless (equal (flycheck-error-filename err) this)
+            (setf (flycheck-error-message err)
+                  (format "%s (%s:%s)"
+                          (flycheck-error-message err)
+                          (file-name-nondirectory
+                           (or (flycheck-error-filename err) "?"))
+                          (flycheck-error-line err))
+                  (flycheck-error-filename err) this
+                  (flycheck-error-line err) 1)))
+        (flycheck-sanitize-errors
+         (flycheck-fill-empty-line-numbers (if paired sites errors)))))
+    ;; Only on a saved buffer: pytest reads the file from disk. Requiring a
+    ;; target also keeps pytest from exiting 5 on a file with no tests, which
+    ;; flycheck would report as a broken checker.
+    :predicate (lambda () (and (not (buffer-modified-p)) (asg/pytest-target)))
+    :modes (python-mode python-ts-mode))
+
+  (add-to-list 'flycheck-checkers 'pytest t))
+
+;; lsp-mode claims flycheck-checker in python buffers, so the checker only runs
+;; when chained. The lsp checker is defined lazily, hence the explicit call.
+(with-eval-after-load 'lsp-diagnostics
+  (lsp-diagnostics-lsp-checker-if-needed)
+  (flycheck-add-next-checker 'lsp '(t . pytest)))
 
 (use-package rainbow-delimiters
   :straight t
@@ -699,8 +796,8 @@ With argument ARG, do this that many times."
   (c-set-offset 'arglist-intro '+))
 (add-hook 'java-mode-hook 'java-indent-setup)
 
-                                        ;(use-package indium
-                                        ;  :straight t)
+;(use-package indium
+;  :straight t)
 
 (use-package json-mode
   :straight t
