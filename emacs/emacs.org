@@ -28,10 +28,11 @@ configuration. This file only configures Emacs.
          (eval-print-last-sexp)))
      (load bootstrap-file nil 'nomessage))
 
-   ;; This installs and integrates straight with use-package, making
-   ;; use-package use straight as long as we provide a :straight t
-   ;; keyword.
-   (straight-use-package 'use-package)
+   ;; Emacs ships these. Straight skips them when another package
+   ;; depends on them (org-roam on org, copilot on editorconfig).
+   (setq straight-built-in-pseudo-packages
+         (append '(org use-package bind-key which-key editorconfig csharp-mode)
+                 straight-built-in-pseudo-packages))
  #+end_src
 
 ** UI cleanups
@@ -211,7 +212,7 @@ Grab configured PATH from environment.
   (use-package exec-path-from-shell
     :straight t
     :config
-    (setq exec-path-from-shell-variables '("PATH" "OPENAI_API_BASE" "OPENAI_API_KEY"))
+    (setq exec-path-from-shell-variables '("PATH"))
     (exec-path-from-shell-initialize))
 #+end_src
 
@@ -247,9 +248,6 @@ Inline help in minibuffer
     (marginalia-mode))
 #+end_src
 * Org
-Initialize org early, to get the straight version loaded before
-anything accidentally pulls in the native version.
-
 ** Main org setup
 Org is a vast project management, note orchestration and spreadhsheet
 application. I only use a small fraction of it. See for example
@@ -263,7 +261,6 @@ which supports execution of source blocks with C-c C-c.
 
 #+begin_src emacs-lisp
   (use-package org
-    :straight t
     :after (ob-http ob-mermaid)
     :hook (
            ;; Refresh any images after running org-babel, in case the
@@ -775,7 +772,6 @@ aren't backed by files, the normal format-all save hook doesn't work.
 ** Editorconfig
 #+begin_src emacs-lisp
   (use-package editorconfig
-    :straight t
     :delight
     :config
     (editorconfig-mode 1)
@@ -1199,7 +1195,6 @@ Programming framework
 ** C#
 #+begin_src emacs-lisp
   (use-package csharp-mode
-    :straight t
     :config
     (setq-local company-backends '(company-dabbrev-code company-keywords)))
 #+end_src
@@ -1410,22 +1405,10 @@ Show available chord completions
 
 #+begin_src emacs-lisp
   (use-package which-key
-    :straight t
     :delight
     :init
     (which-key-mode))
 #+end_src
-* LLM
-** Aider
-#+begin_src emacs-lisp
-  (use-package aidermacs
-    :straight t
-    :bind (("C-c a" . aidermacs-transient-menu))
-    :config
-    :custom
-    (aidermacs-default-chat-mode 'architect)
-    (aidermacs-default-model "openai/claude-sonnet-4"))
-  #+end_src
 
 * Custom
 Mark theme as safe

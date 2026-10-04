@@ -14,10 +14,11 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;; This installs and integrates straight with use-package, making
-;; use-package use straight as long as we provide a :straight t
-;; keyword.
-(straight-use-package 'use-package)
+;; Emacs ships these. Straight skips them when another package
+;; depends on them (org-roam on org, copilot on editorconfig).
+(setq straight-built-in-pseudo-packages
+      (append '(org use-package bind-key which-key editorconfig csharp-mode)
+              straight-built-in-pseudo-packages))
 
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
@@ -96,7 +97,7 @@ With argument ARG, do this that many times."
 (use-package exec-path-from-shell
   :straight t
   :config
-  (setq exec-path-from-shell-variables '("PATH" "OPENAI_API_BASE" "OPENAI_API_KEY"))
+  (setq exec-path-from-shell-variables '("PATH"))
   (exec-path-from-shell-initialize))
 
 (setenv "TERM" "screen-256color")
@@ -117,7 +118,6 @@ With argument ARG, do this that many times."
   (marginalia-mode))
 
 (use-package org
-  :straight t
   :after (ob-http ob-mermaid)
   :hook (
          ;; Refresh any images after running org-babel, in case the
@@ -514,7 +514,6 @@ With argument ARG, do this that many times."
     (format-all-buffer)))
 
 (use-package editorconfig
-  :straight t
   :delight
   :config
   (editorconfig-mode 1)
@@ -810,7 +809,6 @@ projectile associates with it."
   (setq treesit-auto-install t))
 
 (use-package csharp-mode
-  :straight t
   :config
   (setq-local company-backends '(company-dabbrev-code company-keywords)))
 
@@ -945,18 +943,9 @@ projectile associates with it."
   (define-key image-mode-map (kbd "C-c C-v") #'my/copy-image-to-clipboard))
 
 (use-package which-key
-  :straight t
   :delight
   :init
   (which-key-mode))
-
-(use-package aidermacs
-  :straight t
-  :bind (("C-c a" . aidermacs-transient-menu))
-  :config
-  :custom
-  (aidermacs-default-chat-mode 'architect)
-  (aidermacs-default-model "openai/claude-sonnet-4"))
 
 (custom-set-variables
  '(custom-safe-themes
