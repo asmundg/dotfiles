@@ -951,9 +951,26 @@ by adding the :delight keyword.
     ;; one repo's config errors and deleted folders leak into all the others.
     :init (setq lsp-pyright-langserver-command "basedpyright"
                 lsp-pyright-multi-root nil)
-    :hook (python-mode . (lambda ()
-                          (require 'lsp-pyright)
-                          (lsp))))
+    :hook (python-mode . my/python-lsp))
+#+end_src
+
+lsp-mode roots a file at the deepest session folder containing it, so
+a subproject with its own =pyproject.toml= inside an already-known repo
+(=adventofcode/2018= under =adventofcode=) would share the repo-wide
+server. Registering the nearest =pyproject.toml= directory first gives
+each subproject its own server. direnv-mode applies =.envrc= after the
+mode hook has run, so load it explicitly or pyright starts without the
+project's venv.
+
+#+begin_src emacs-lisp
+  (defun my/python-lsp ()
+    (require 'lsp-pyright)
+    (direnv-update-environment)
+    (when-let* ((dir (locate-dominating-file default-directory "pyproject.toml"))
+                (root (lsp-f-canonical dir))
+                ((not (member root (lsp-session-folders (lsp-session))))))
+      (lsp-workspace-folders-add root))
+    (lsp))
 #+end_src
 
 #+begin_src shell :tangle bootstrap.sh

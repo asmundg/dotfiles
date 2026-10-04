@@ -614,9 +614,16 @@ With argument ARG, do this that many times."
   ;; one repo's config errors and deleted folders leak into all the others.
   :init (setq lsp-pyright-langserver-command "basedpyright"
               lsp-pyright-multi-root nil)
-  :hook (python-mode . (lambda ()
-                        (require 'lsp-pyright)
-                        (lsp))))
+  :hook (python-mode . my/python-lsp))
+
+(defun my/python-lsp ()
+  (require 'lsp-pyright)
+  (direnv-update-environment)
+  (when-let* ((dir (locate-dominating-file default-directory "pyproject.toml"))
+              (root (lsp-f-canonical dir))
+              ((not (member root (lsp-session-folders (lsp-session))))))
+    (lsp-workspace-folders-add root))
+  (lsp))
 
 (use-package python-pytest
   :straight t
