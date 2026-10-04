@@ -613,8 +613,13 @@ With argument ARG, do this that many times."
   ;; registers at load time and reads this to pick the executable.
   ;; Multi-root shares one server across every project in the lsp session, so
   ;; one repo's config errors and deleted folders leak into all the others.
+  ;; lsp-pyright sends typeCheckingMode "standard", which reports unused
+  ;; names only as hints (flycheck info). Raise those to warnings.
   :init (setq lsp-pyright-langserver-command "basedpyright"
-              lsp-pyright-multi-root nil)
+              lsp-pyright-multi-root nil
+              lsp-pyright-diagnostic-severity-overrides
+              '(("reportUnusedVariable" . "warning")
+                ("reportUnusedImport" . "warning")))
   :hook (python-mode . my/python-lsp))
 
 (defun my/python-lsp ()
