@@ -452,8 +452,23 @@ With argument ARG, do this that many times."
 (use-package flycheck-color-mode-line
   :straight t
   :hook (flycheck-mode . flycheck-color-mode-line-mode)
+  :custom
+  (flycheck-color-mode-line-face-to-color 'mode-line-active)
+  (flycheck-mode-line-color nil)
   :config (custom-set-faces
-           '(flycheck-color-mode-line-success-face ((t (:background "dark green"))))))
+           '(flycheck-color-mode-line-success-face ((t (:background "dark green" :foreground "white"))))
+           '(flycheck-color-mode-line-error-face ((t (:background "dark red" :foreground "white"))))))
+
+(defun my/moody-flycheck-face (args)
+  (if-let* ((face (cdr-safe (bound-and-true-p flycheck-color-mode-line-cookie)))
+            ((face-background face nil t)))
+      (let ((args (append args (make-list (- 6 (length args)) nil))))
+        (setf (nth 4 args) (or (nth 4 args) face))
+        args)
+    args))
+
+(with-eval-after-load 'moody
+  (advice-add 'moody-wrap :filter-args #'my/moody-flycheck-face))
 
 (use-package format-all
   :straight (format-all :type git :host github :repo "lassik/emacs-format-all-the-code")
@@ -726,11 +741,15 @@ projectile associates with it."
   :config
   (require 'smartparens-config))
 
-(use-package powerline
+(use-package moody
   :straight t
   :after (modus-themes)
   :config
-  (powerline-default-theme))
+  (set-face-attribute 'mode-line-active nil :box 'unspecified)
+  (set-face-attribute 'mode-line-inactive nil :box 'unspecified)
+  (moody-replace-mode-line-front-space)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
 
 (use-package modus-themes
   :straight t
