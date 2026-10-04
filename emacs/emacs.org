@@ -722,13 +722,16 @@ layout.
     (flycheck-mode-line-color nil)
     :config (custom-set-faces
              '(flycheck-color-mode-line-success-face ((t (:background "dark green" :foreground "white"))))
+             '(flycheck-color-mode-line-info-face ((t (:inherit flycheck-color-mode-line-success-face))))
              '(flycheck-color-mode-line-error-face ((t (:background "dark red" :foreground "white"))))))
 #+end_src
 
 modus-themes gives =mode-line-active= its own background, so the
 remap has to target that face; remapping =mode-line= never reaches the
 active window. The whole bar carries the status color, so the "FlyC"
-lighter stays uncolored to keep it readable on red.
+lighter stays uncolored to keep it readable on red. Info-only results
+(basedpyright hints) count as clean, and warnings keep the modus
+warning colors.
 
 moody draws tab edges as images from colors it reads with
 =face-attribute=, which ignores buffer-local face remaps. Passing the

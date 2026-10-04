@@ -457,6 +457,7 @@ With argument ARG, do this that many times."
   (flycheck-mode-line-color nil)
   :config (custom-set-faces
            '(flycheck-color-mode-line-success-face ((t (:background "dark green" :foreground "white"))))
+           '(flycheck-color-mode-line-info-face ((t (:inherit flycheck-color-mode-line-success-face))))
            '(flycheck-color-mode-line-error-face ((t (:background "dark red" :foreground "white"))))))
 
 (defun my/moody-flycheck-face (args)
