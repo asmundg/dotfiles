@@ -752,8 +752,13 @@ projectile associates with it."
   :straight t
   :after (modus-themes)
   :config
-  (set-face-attribute 'mode-line-active nil :box 'unspecified)
-  (set-face-attribute 'mode-line-inactive nil :box 'unspecified)
+  (defun my/moody-unbox (&rest _)
+    (set-face-attribute 'mode-line-active nil :box 'unspecified)
+    (set-face-attribute 'mode-line-inactive nil :box 'unspecified))
+  ;; This block runs when modus-themes is required, before load-theme
+  ;; applies the theme's faces, so the boxes have to go after that.
+  (add-hook 'enable-theme-functions #'my/moody-unbox)
+  (my/moody-unbox)
   (moody-replace-mode-line-front-space)
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
