@@ -35,8 +35,8 @@
         (let ((orig-fg (face-foreground 'mode-line)))
           (set-face-foreground 'mode-line "#F2804F")
           (run-with-idle-timer 0.1 nil
-       			(lambda (fg) (set-face-foreground 'mode-line fg))
-       			orig-fg))))
+				(lambda (fg) (set-face-foreground 'mode-line fg))
+				orig-fg))))
 
 (when (eq system-type 'darwin)
   (set-face-attribute 'default nil :font "Iosevka" :height 160))
@@ -595,7 +595,10 @@ With argument ARG, do this that many times."
   ;; basedpyright is a pyright fork bundling stdlib/builtin docstrings, so
   ;; hover and completion show real docs. Set in :init because the client
   ;; registers at load time and reads this to pick the executable.
-  :init (setq lsp-pyright-langserver-command "basedpyright")
+  ;; Multi-root shares one server across every project in the lsp session, so
+  ;; one repo's config errors and deleted folders leak into all the others.
+  :init (setq lsp-pyright-langserver-command "basedpyright"
+              lsp-pyright-multi-root nil)
   :hook (python-mode . (lambda ()
                         (require 'lsp-pyright)
                         (lsp))))

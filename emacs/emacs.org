@@ -921,7 +921,10 @@ by adding the :delight keyword.
     ;; basedpyright is a pyright fork bundling stdlib/builtin docstrings, so
     ;; hover and completion show real docs. Set in :init because the client
     ;; registers at load time and reads this to pick the executable.
-    :init (setq lsp-pyright-langserver-command "basedpyright")
+    ;; Multi-root shares one server across every project in the lsp session, so
+    ;; one repo's config errors and deleted folders leak into all the others.
+    :init (setq lsp-pyright-langserver-command "basedpyright"
+                lsp-pyright-multi-root nil)
     :hook (python-mode . (lambda ()
                           (require 'lsp-pyright)
                           (lsp))))
