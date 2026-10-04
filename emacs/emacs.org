@@ -4,14 +4,8 @@
 #+startup: fold
 :END:
 * Bootstrap
-** MacOS dependencies
-Install emacs
-
-#+begin_src shell :tangle bootstrap.sh
-  brew reinstall gcc libgccjit
-  brew tap d12frosted/emacs-plus
-  brew install emacs-plus@29 --with-poll --with-native-comp
-#+end_src
+Emacs, fonts, and external commands are supplied by the machine
+configuration. This file only configures Emacs.
 
 ** Straight
  Straight is a package manager producing consistent configurations via
@@ -70,15 +64,6 @@ Install emacs
  #+end_src
   
 ** Fonts
-
-*** Installing the font
-**** MacOS
-
- #+begin_src shell :tangle bootstrap-mac.sh
-   brew tap homebrew/cask-fonts
-   brew install iosevka
- #+end_src
-
 *** Config
 
  #+begin_src emacs-lisp
@@ -237,14 +222,6 @@ Grab configured PATH from environment.
 Ensure we have a default auth token for .npmrc
 #+begin_src emacs-lisp
 (setenv "NPM_AUTH_TOKEN" "")
-#+end_src
-
-#+begin_src shell :tangle bootstrap.sh
-  # Zsh basics
-  curl -L git.io/antigen >antigen.zsh
-  cp antigen.zsh ~/
-
-  brew install atuin
 #+end_src
 
 Increase GC threshold and process IO batch size (recommended for LSP:
@@ -414,10 +391,6 @@ Org-tempo provides completion templates
 Org-download supports grabbing images from the OS clipboard and
 inserting them into org files.
 
-#+begin_src shell :tangle bootstrap-mac.sh
-   brew install pngpaste
-#+end_src
-
 #+begin_src emacs-lisp
   (use-package org-download
     :straight t
@@ -523,10 +496,6 @@ daily increment, i.e. skipping some days.
              :files ("*.el" "filters" "preprocessors")))
 #+end_src
 * Claude Code
-#+begin_src shell :tangle bootstrap.sh
-brew install --cask font-juliamono
-#+end_src
-
 #+begin_src emacs-lisp
   ;; install required inheritenv dependency:
   (use-package inheritenv
@@ -981,9 +950,6 @@ project's venv.
     (lsp))
 #+end_src
 
-#+begin_src shell :tangle bootstrap.sh
-  brew install basedpyright
-#+end_src
 ** Pytest
 Run the tests for the current file, and report failures inline.
 
@@ -1107,10 +1073,13 @@ Visual aid, adding color identifies to variables and parens
 Dictionary handler. Pair this with Webster's Unabridged for maximum
 effect.
 
-#+begin_src shell :tangle bootstrap.sh
-  brew install sdcv
+Install the dictionary data once:
+
+#+begin_src shell
   mkdir -p ~/.stardict/dic/
-  curl https://s3.amazonaws.com/jsomers/dictionary.zip | tar -xO --strip-components=1 dictionary/stardict-dictd-web1913-2.4.2.tar.bz2 | tar -xC ~/.stardict/dic/
+  curl -L https://s3.amazonaws.com/jsomers/dictionary.zip |
+    tar -xO --strip-components=1 dictionary/stardict-dictd-web1913-2.4.2.tar.bz2 |
+    tar -xC ~/.stardict/dic/
 #+end_src
 
 #+begin_src emacs-lisp
@@ -1191,73 +1160,6 @@ processes, etc.
     (direnv-mode))
 #+end_src
 
-#+begin_src shell :tangle bootstrap.sh
-nix-env -i direnv
-#+end_src
-
-Direnv config for auto-loading nvm. Note that "14" in .nvmrc will
-currently match v15.14 and so on.
-
-#+begin_src shell :tangle .direnvrc
-  # -*- mode: sh; -*-
-
-  find_up_() {
-      (
-          while true; do
-              for v in "${@}"; do
-                  if [[ -f "${v}" ]]; then
-                      echo "${PWD}/${v}"
-                      return 0
-                  fi
-              done
-
-              if [[ "${PWD}" == / ]] || [[ "${PWD}" == // ]]; then
-                  return 1
-              fi
-
-              cd ..
-          done
-      )
-  }
-
-  read_version_file() {
-      local file
-      file="$(find_up_ "${@}")"
-
-      [[ -z "${file}" ]] && return
-
-      watch_file "${file}"
-      cat "${file}"
-  }
-
-  use_nvm() {
-      local version
-      version="${1}"
-
-      [[ "${version}" == --auto ]] && version="$(read_version_file .node-version .nvmrc)"
-      [[ -z "${version}" ]] && return
-
-      NVM_PATH=~/.local/share/nvm
-
-      if [[ -e ~/.nvm/nvm.sh ]]; then
-          source ~/.nvm/nvm.sh
-          nvm use "${version}"
-      elif [[ -f ${NVM_PATH}/.index ]]; then
-          # This works with jorgebucaran/fish-nvm, a fish-specific alternative to
-          # nvm. The version of Node requested must be installed before use.
-          NVM_BIN=$(
-              grep $version ${NVM_PATH}/.index | awk '{print $1}' | while read candidate; do
-                  if [[ -d ${NVM_PATH}/"${candidate}"/bin ]]; then
-                      echo "${NVM_PATH}/${candidate}/bin"
-                      return
-                  fi
-              done)
-          PATH_add $NVM_BIN
-          export NVM_BIN
-      fi
-  }
-#+end_src
-
 ** Prescient
 prescient.el: simple but effective sorting and filtering for
 Emacs. https://github.com/raxod502/prescient.el
@@ -1320,19 +1222,12 @@ This is needed for org-babel-gnuplot to work.
     :straight t)
 #+end_src
 
-#+begin_src shell :tangle bootstrap.sh
-nix-env -i gnuplot
-#+end_src
-
 ** GraphQL
 #+begin_src emacs-lisp
   (use-package graphql-mode
     :straight t)
 #+end_src
 
-#+begin_src shell :tangle bootstrap.sh
-nix-env -f '<nixpkgs>' -iA nodePackages.node2nix
-#+end_src
 ** Groovy
 #+begin_src emacs-lisp
   (use-package groovy-mode
@@ -1359,9 +1254,6 @@ process. E.g. you might want to start node manually with --inspect.
   ;  :straight t)
 #+end_src
 
-#+begin_src shell :tangle bootstrap.sh
-yarn global add indium
-#+end_src
 ** JSON
 #+begin_src emacs-lisp
   (use-package json-mode
@@ -1373,9 +1265,6 @@ yarn global add indium
 #+begin_src emacs-lisp
   (use-package mermaid-mode
     :straight t)
-#+end_src
-#+begin_src shell :tangle bootstrap.sh
-brew install mermaid-cli
 #+end_src
 ** Mustache
 #+begin_src emacs-lisp
@@ -1390,9 +1279,6 @@ Reproducible package manager.
     :straight t)
 #+end_src
 
-#+begin_src shell :tangle bootstrap.sh
-nix-env -i nixfmt
-#+end_src
 ** Swift
 LSP support
 #+begin_src emacs-lisp
