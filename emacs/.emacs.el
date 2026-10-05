@@ -840,7 +840,14 @@ projectile associates with it."
     (lsp-with-current-buffer (car (lsp--workspace-buffers workspace))
       (with-lsp-workspace workspace
         (lsp-roslyn-open-solution-file))))
-  (advice-add 'lsp-roslyn--on-initialized :override #'my/lsp-roslyn-on-initialized))
+  (advice-add 'lsp-roslyn--on-initialized :override #'my/lsp-roslyn-on-initialized)
+  ;; On a pty with TERM set, .NET writes terminfo escapes to stdout ahead of
+  ;; the pipe-name JSON, and lsp-roslyn fails to parse them. A pipe keeps
+  ;; stdout clean.
+  (defun my/lsp-roslyn-connect-over-pipe (orig &rest args)
+    (let ((process-connection-type nil))
+      (apply orig args)))
+  (advice-add 'lsp-roslyn--connect :around #'my/lsp-roslyn-connect-over-pipe))
 
 (use-package csv-mode
   :straight t)
