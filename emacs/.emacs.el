@@ -809,8 +809,38 @@ projectile associates with it."
   (setq treesit-auto-install t))
 
 (use-package csharp-mode
+  :hook (csharp-mode . lsp-deferred)
   :config
   (setq-local company-backends '(company-dabbrev-code company-keywords)))
+
+(setq lsp-roslyn-package-version "5.4.0-2.26179.14"
+      lsp-roslyn-dotnet-executable (expand-file-name "~/.dotnet/dotnet")
+      ;; Information level logs a line to stdout ahead of the pipe-name JSON,
+      ;; and lsp-roslyn fails to parse it.
+      lsp-roslyn-server-log-level "Warning")
+(setenv "DOTNET_ROOT" (expand-file-name "~/.dotnet"))
+;; Sydney's native macOS Bond compiler, so design-time builds generate Bond types.
+(when (file-executable-p (expand-file-name "~/.local/bin/gbc"))
+  (setenv "BOND_COMPILER_PATH" (expand-file-name "~/.local/bin")))
+
+(with-eval-after-load 'lsp-roslyn
+  ;; lsp-roslyn only looks for .sln files, so it never offers .slnx solutions.
+  (defun my/lsp-roslyn-find-solution-file ()
+    (let ((solutions (lsp-roslyn--find-files-in-parent-directories
+                      (file-name-directory (buffer-file-name))
+                      (rx ".sln" (? "x") eos))))
+      (if (cdr solutions)
+          (lsp-roslyn--pick-solution-file-interactively solutions)
+        (car solutions))))
+  (advice-add 'lsp-roslyn--find-solution-file :override #'my/lsp-roslyn-find-solution-file)
+  ;; lsp-mode runs this hook from a response callback in whatever buffer is
+  ;; current, so the solution lookup and the solution/open notify need the
+  ;; workspace's own buffer.
+  (defun my/lsp-roslyn-on-initialized (workspace)
+    (lsp-with-current-buffer (car (lsp--workspace-buffers workspace))
+      (with-lsp-workspace workspace
+        (lsp-roslyn-open-solution-file))))
+  (advice-add 'lsp-roslyn--on-initialized :override #'my/lsp-roslyn-on-initialized))
 
 (use-package csv-mode
   :straight t)
